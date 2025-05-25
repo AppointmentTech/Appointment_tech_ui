@@ -49,7 +49,7 @@ const API_Get_All_UserType = "api/v1/usertypes/all-usertypes";
 const API_Register = "api/v1/authrouter/register";
 const API_Add_Bussinessman =
   "api/v1/businessmanuser/addmultiplebusinessmanusers";
-const API_Get_All_Bussiness_Type = "api/v1/businesstype/allbusinesstypes";
+const API_Get_All_Bussiness_Type = "api/v1/businesstype/all-businesstypes";
 
 export default function SignUp() {
   const initialState = {
@@ -100,7 +100,7 @@ export default function SignUp() {
       .then((response) => {
         if (response.status === "success") {
           var typeData = response.data.filter((item) => {
-            return item.User_Type_Id !== 1 && item.Is_Active==='Y';
+            return item.User_Type_Id !== 1 && item.Is_Active === "Y";
           });
           setUserTypes(typeData);
         }
@@ -118,7 +118,7 @@ export default function SignUp() {
     let componentMounted = true;
     getRecord(API_Get_All_Bussiness_Type, {})
       .then((response) => {
-        if (response.status === "success") {
+        if (response.status === "success" && componentMounted) {
           setAllBussinessType(response.data);
         }
       })
@@ -426,6 +426,13 @@ export default function SignUp() {
                 inputMode: "numeric",
               }}
               onInput={(e) => onlyNumbers(e)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">+91</InputAdornment>
+                  ),
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -435,6 +442,17 @@ export default function SignUp() {
               value={thisRegistration.Alt_Phone}
               onChange={handleInputChange}
               name="Alt_Phone"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">+91</InputAdornment>
+                  ),
+                },
+              }}
+              inputProps={{
+                maxLength: 10,
+                inputMode: "numeric",
+              }}
               onInput={(e) => onlyNumbers(e)}
             />
             <TextField

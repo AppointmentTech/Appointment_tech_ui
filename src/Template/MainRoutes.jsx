@@ -35,7 +35,7 @@ import AdminDashboard from "./Dashboards/Views/AdminDashboards/AdminDashboard.js
 // import PreviewBed from "./Dashboards/Views/CoAdminDashboard/HostelAdmin/BedManagement/PreviewBed.jsx";
 // import PreviewRequest from "./Dashboards/Views/CoAdminDashboard/HostelAdmin/CustomerRequests/PreviewRequest.jsx";
 // import ApproveRequest from "./Dashboards/Views/CoAdminDashboard/HostelAdmin/CustomerRequests/ApproveRequest.jsx";
-import HostelAdminDashboard from "./Dashboards/Views/CoAdminDashboard/HostelAdmin/HostelAdminDashboard.jsx";
+import HostelAdminDashboard from "./Dashboards/Views/BusinessDashboard/HostelAdmin/HostelAdminDashboard.jsx";
 import UserTypes from "CommonModules/UserModule/UserTypes/UserTypes.jsx";
 import Users from "../CommonModules/UserModule/Users/Users.jsx";
 import Pages from "../CommonModules/UserModule/Pages/Pages.jsx";

@@ -54,7 +54,7 @@ export default function HostelAdminDashboard() {
             mb={3}
           >
             <Typography variant="h4" fontWeight="bold">
-              Admin Dashboard
+              Business Dashboard
             </Typography>
             <Box display="flex" alignItems="center" gap={2}>
               {/* <Select

@@ -243,6 +243,7 @@ export default function UserStayRequest() {
   const paginationModel = { page: 0, pageSize: 10 };
   return (
     <React.Fragment>
+      <Box sx={{ display: "flex" }}>
         <Paper sx={{ height: 700, width: "100%", padding: 2 }}>
           {/* ✅ Toolbar Above the Table */}
           <Box
@@ -343,6 +344,7 @@ export default function UserStayRequest() {
             sx={{ border: 0 }}
           />
         </Paper>
+        </Box>
     </React.Fragment>
   );
 }

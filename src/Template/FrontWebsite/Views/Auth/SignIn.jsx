@@ -30,11 +30,7 @@ import {
 } from "services/services";
 import { AuthContext } from "ContextOrRedux/AuthContext";
 import { onlyPassword, onlyEmail } from "CommonMethods/Validatations";
-import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import GoogleAuth from "../../../../CommonComponents/GoogleAuth.jsx";
 import MenuItem from "@mui/material/MenuItem";
 import IndianStatesAndDistricts from "../../../../CommonComponents/IndianStatesAndDistricts.json";
 const API_Login = "api/v1/authrouter/login";
@@ -555,22 +551,22 @@ export default function SignIn() {
           {/* Social Sign-In Buttons */}
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <GoogleOAuthProvider clientId="9138237898-jrcvs13hjvjqc0rfnsska86kq1mjsao7.apps.googleusercontent.com">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() =>
-                    setSnackOptions({
-                      color: "error",
-                      message: "Google Sign-In failed",
-                    })
-                  }
-                  theme="outline"
-                  size="large"
-                  text="signin_with"
-                  shape="rectangular"
-                  logo_alignment="left"
-                />
-              </GoogleOAuthProvider>
+              <GoogleAuth
+                clientId="9138237898-jrcvs13hjvjqc0rfnsska86kq1mjsao7.apps.googleusercontent.com"
+                userTypes={userTypes}
+                allBussinessType={allBussinessType}
+                states={states}
+                IndianStatesAndDistricts={IndianStatesAndDistricts}
+                setSnackOptions={setSnackOptions}
+                setSnackOpen={setSnackOpen}
+                postGoogleSignIn={async (payload) => authPostRecord('api/v1/GoogleSignIn/auth/google', payload)}
+                postMultipleRecords={postMultipleRecords}
+                API_Add_Bussinessman={API_Add_Bussinessman}
+                onSuccess={(contextData, businessData, default_page) => {
+                  dispatch({ type: "LOGIN", payload: businessData ? { ...contextData, business: businessData } : contextData });
+                  navigate(default_page || "/dashboard");
+                }}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
@@ -614,242 +610,7 @@ export default function SignIn() {
         open={snackOpen}
         setOpen={setSnackOpen}
         options={snackOptions}
-        // message={snackOptions.message}
       />
-      {/* User Type Dialog for Google Sign-In */}
-      <Dialog
-        open={userTypeDialogOpen}
-        onClose={() => setUserTypeDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            boxShadow: 10,
-            minWidth: { xs: 320, sm: 400 },
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-            p: 2,
-          },
-        }}
-        BackdropProps={{
-          sx: {
-            backgroundColor: 'rgba(0,0,0,0.2)',
-            backdropFilter: 'blur(2px)',
-          },
-        }}
-      >
-        <DialogTitle sx={{
-          fontWeight: 'bold',
-          color: 'primary.main',
-          textAlign: 'center',
-          fontSize: 24,
-          letterSpacing: 1,
-          pb: 1,
-        }}>
-          Select Account Type
-        </DialogTitle>
-        <DialogContent sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          alignItems: 'center',
-        }}>
-          <FormControl component="fieldset" sx={{ width: '100%' }}>
-            <FormLabel component="legend" sx={{ fontWeight: 600, color: 'primary.dark', mb: 1 }}>Select Type</FormLabel>
-            <RadioGroup
-              row
-              required
-              value={userTypeId}
-              name="User_Type_Id"
-              onChange={e => {
-                setUserTypeId(e.target.value);
-                setThisRegistration({ ...thisRegistration, User_Type_Id: e.target.value });
-                if (parseInt(e.target.value) !== 2) {
-                  setSelectedBusinessTypes([]);
-                  setThisRegistration({ ...thisRegistration, Brand_Name: '', State: '', City: '', Postal_Code: '', Address: '' });
-                }
-              }}
-              sx={{ justifyContent: 'center', gap: 3 }}
-            >
-              {userTypes.map((type) => (
-                <FormControlLabel
-                  value={type.User_Type_Id}
-                  control={<Radio sx={{ color: 'primary.main' }} />}
-                  key={type.User_Type_Id}
-                  label={<span style={{ fontWeight: 500 }}>{type.User_Type_Desc}</span>}
-                  sx={{ mx: 1, borderRadius: 2, px: 2, py: 1, background: '#fff', boxShadow: 1, minWidth: 120 }}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
-          {/* Show business type selection and brand name if user_type_id === 2 */}
-          {Number(userTypeId) === 2 && (
-            <Box sx={{ width: '100%', mt: 1 }}>
-              <TextField
-                fullWidth
-                label="Brand Name"
-                variant="outlined"
-                margin="normal"
-                required
-                name="Brand_Name"
-                value={thisRegistration.Brand_Name}
-                onChange={e => setThisRegistration({ ...thisRegistration, Brand_Name: e.target.value })}
-                sx={{ borderRadius: 2, background: '#f9fafb' }}
-              />
-              <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
-                <FormLabel component="legend" sx={{ fontWeight: 600, color: 'primary.dark', mb: 1 }}>Business Type</FormLabel>
-                <FormGroup row sx={{ gap: 1, flexWrap: 'wrap' }}>
-                  {allBussinessType &&
-                    allBussinessType.length > 0 &&
-                    allBussinessType.map((type, i) => (
-                      <FormControlLabel
-                        key={i}
-                        control={
-                          <Checkbox
-                            checked={selectedBusinessTypes.includes(type.Business_Type_Id)}
-                            onChange={e => {
-                              const id = type.Business_Type_Id;
-                              setSelectedBusinessTypes(prev =>
-                                e.target.checked ? [...prev, id] : prev.filter(item => item !== id)
-                              );
-                            }}
-                            value={type.Business_Type_Id}
-                            sx={{ color: 'primary.main' }}
-                          />
-                        }
-                        label={<span style={{ fontWeight: 500 }}>{type.Business_Type_Name}</span>}
-                        sx={{ mx: 0.5, borderRadius: 2, px: 2, py: 0.5, background: '#fff', boxShadow: 1, minWidth: 120 }}
-                      />
-                    ))}
-                </FormGroup>
-              </FormControl>
-              <TextField
-                select
-                fullWidth
-                label="State"
-                variant="outlined"
-                margin="normal"
-                required
-                name="State"
-                value={thisRegistration.State}
-                onChange={e => {
-                  setThisRegistration({ ...thisRegistration, State: e.target.value, City: '' });
-                  const stateData = IndianStatesAndDistricts.states.find(item => item.state === e.target.value);
-                  setDistricts(stateData ? stateData.districts : []);
-                }}
-                sx={{ borderRadius: 2, background: '#f9fafb' }}
-              >
-                {states &&
-                  states.length > 0 &&
-                  states.map((state, i) => (
-                    <MenuItem value={state} key={i}>
-                      {state}
-                    </MenuItem>
-                  ))}
-              </TextField>
-              <TextField
-                select
-                fullWidth
-                label="District"
-                variant="outlined"
-                margin="normal"
-                required
-                name="City"
-                value={thisRegistration.City}
-                onChange={e => setThisRegistration({ ...thisRegistration, City: e.target.value })}
-                sx={{ borderRadius: 2, background: '#f9fafb' }}
-              >
-                {districts &&
-                  districts.length > 0 &&
-                  districts.map((district, i) => (
-                    <MenuItem value={district} key={i}>
-                      {district}
-                    </MenuItem>
-                  ))}
-              </TextField>
-              <TextField
-                fullWidth
-                label="Pin Code"
-                variant="outlined"
-                margin="normal"
-                required
-                name="Postal_Code"
-                value={thisRegistration.Postal_Code}
-                onChange={e => {
-                  if (!/^\d{0,6}$/.test(e.target.value)) return;
-                  setThisRegistration({ ...thisRegistration, Postal_Code: e.target.value });
-                }}
-                inputProps={{
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                  maxLength: 6,
-                }}
-                sx={{ borderRadius: 2, background: '#f9fafb' }}
-              />
-              <TextField
-                fullWidth
-                label="Address"
-                variant="outlined"
-                margin="normal"
-                multiline
-                rows={2}
-                required
-                name="Address"
-                value={thisRegistration.Address}
-                onChange={e => setThisRegistration({ ...thisRegistration, Address: e.target.value })}
-                sx={{ borderRadius: 2, background: '#f9fafb' }}
-              />
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setUserTypeDialogOpen(false)}
-            color="secondary"
-            sx={{ borderRadius: 2, px: 3, fontWeight: 600 }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={async () => {
-              // Validate all required fields for business user
-              if (
-                Number(userTypeId) === 2 &&
-                (
-                  !thisRegistration.Brand_Name ||
-                  selectedBusinessTypes.length === 0 ||
-                  !thisRegistration.State ||
-                  !thisRegistration.City ||
-                  !thisRegistration.Postal_Code ||
-                  !thisRegistration.Address
-                )
-              ) {
-                setSnackOptions({ color: 'error', message: 'Please fill all required business fields.' });
-                setSnackOpen(true);
-                return;
-              }
-              await handleGoogleDialogSubmit();
-            }}
-            color="primary"
-            variant="contained"
-            disabled={
-              !userTypeId ||
-              (Number(userTypeId) === 2 &&
-                (
-                  selectedBusinessTypes.length === 0 ||
-                  !thisRegistration.Brand_Name ||
-                  !thisRegistration.State ||
-                  !thisRegistration.City ||
-                  !thisRegistration.Postal_Code ||
-                  !thisRegistration.Address
-                )
-              ) ||
-              loading
-            }
-            sx={{ borderRadius: 2, px: 4, fontWeight: 600, boxShadow: 2 }}
-          >
-            Continue
-          </Button>
-        </DialogActions>
-      </Dialog>
     </React.Fragment>
   );
 }

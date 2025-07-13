@@ -37,6 +37,7 @@ import {
   setAuthToken,
 } from "services/services";
 import { AuthContext } from "ContextOrRedux/AuthContext";
+import GoogleAuth from "CommonComponents/GoogleAuth.jsx";
 import IndianStatesAndDistricts from "../../../../CommonComponents/IndianStatesAndDistricts.json";
 import {
   onlyPassword,
@@ -48,7 +49,7 @@ import {
 const API_Get_All_UserType = "api/v1/usertypes/all-usertypes";
 const API_Register = "api/v1/authrouter/register";
 const API_Add_Bussinessman =
-  "api/v1/businessmanuser/addmultiplebusinessmanusers";
+  "api/v1/businessmanuser/add-multiplebusinessmanusers";
 const API_Get_All_Bussiness_Type = "api/v1/businesstype/all-businesstypes";
 
 export default function SignUp() {
@@ -698,6 +699,63 @@ export default function SignUp() {
               </Link>
             </Typography>
           </Box>
+          {/* Google Sign Up Divider */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              my: 3,
+            }}
+          >
+            <Box
+              sx={{ flexGrow: 1, height: "1px", backgroundColor: "#e0e0e0" }}
+            />
+            <Typography variant="body2" sx={{ px: 2, color: "grey.600" }}>
+              OR
+            </Typography>
+            <Box
+              sx={{ flexGrow: 1, height: "1px", backgroundColor: "#e0e0e0" }}
+            />
+          </Box>
+          {/* GoogleAuth Sign Up Button */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <GoogleAuth
+                clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+                userTypes={userTypes}
+                allBussinessType={allBussinessType}
+                states={states}
+                postGoogleSignIn={async (payload) =>
+                  authPostRecord("api/v1/GoogleSignIn/auth/google", payload)
+                }
+                IndianStatesAndDistricts={IndianStatesAndDistricts}
+                onSuccess={(contextData, businessData, defaultPage) => {
+                  dispatch({ type: "LOGIN", payload: contextData });
+                  navigate(defaultPage || "/");
+                }}
+                setSnackOptions={setSnackOptions}
+                setSnackOpen={setSnackOpen}
+                // postGoogleSignIn={authPostRecord}
+                postMultipleRecords={postMultipleRecords}
+                API_Add_Bussinessman={API_Add_Bussinessman}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="secondary"
+                size="large"
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                }}
+                disabled
+              >
+                Sign in with Facebook
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
       <Snackbar

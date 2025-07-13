@@ -721,7 +721,7 @@ export default function SignUp() {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <GoogleAuth
-                clientId="9138237898-jrcvs13hjvjqc0rfnsska86kq1mjsao7.apps.googleusercontent.com"
+                clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
                 userTypes={userTypes}
                 allBussinessType={allBussinessType}
                 states={states}

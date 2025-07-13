@@ -40,7 +40,7 @@ import IndianStatesAndDistricts from "../../../../CommonComponents/IndianStatesA
 const API_Login = "api/v1/authrouter/login";
 const API_Get_All_UserType = "api/v1/usertypes/all-usertypes";
 const API_Add_Bussinessman =
-  "api/v1/businessmanuser/addmultiplebusinessmanusers";
+  "api/v1/businessmanuser/add-multiplebusinessmanusers";
 const API_Get_All_Bussiness_Type = "api/v1/businesstype/all-businesstypes";
 
 export default function SignIn() {
@@ -240,110 +240,115 @@ export default function SignIn() {
         payload.address = thisRegistration.Address;
       }
       // Debug: log payload before sending
-      console.log('Google Sign-In payload:', payload);
-      const response = await authPostRecord(
-        'api/v1/GoogleSignIn/auth/google',
-        payload,
-      );
-      if (response.status === "success") {
-        console.log("Google Sign-In response:", response);
-        setSnackOptions({ color: response.color, message: response.message });
-        setSnackOpen(true);
-        const contextData = {
-          user: response.data.user_info,
-          permissions: response.data.user_permission,
-          token: response.data.access_token,
-          usertype: response.data.user_type,
-        };
-        console.log("Google Sign-In contextData:", contextData);
-        dispatch({ type: "LOGIN", payload: contextData });
-        // If business user, store business records as in signup
-        if (
-          parseInt(userTypeId) === 2 &&
-          response.data.user_id &&
-          response.data.user_type
-        ) {
-          console.log("Business User Detected");
-          const userId = response.data.user_id;
-          const userTypeIdVal = response.data.user_type;
-          const addedBy = userId;
-          // Debug: log selectedBusinessTypes and allBussinessType
-          console.log("selectedBusinessTypes:", selectedBusinessTypes);
-          console.log("allBussinessType:", allBussinessType);
-          const businessPayload = selectedBusinessTypes.map((typeId) => {
-            const businessTypeObj = allBussinessType.find(
-              (x) => x.Business_Type_Id === typeId,
-            );
-            // Debug: log each businessTypeObj
-            console.log("businessTypeObj for typeId", typeId, businessTypeObj);
-            return {
-              User_Id: userId,
-              User_Type_Id: userTypeIdVal,
-              Business_Type_Id: typeId,
-              Business_Type_Name: (allBussinessType.find(x => Number(x.Business_Type_Id) === Number(typeId))?.Business_Type_Name) || "",
-              Brand_Name: thisRegistration.Brand_Name || "",
-              State: thisRegistration.State || "",
-              City: thisRegistration.City || "",
-              Postal_Code: thisRegistration.Postal_Code || "",
-              Address: thisRegistration.Address || "",
-              Business_Code: "",
-              Business_Status: "Pending",
-              Bussiness_Logo: "",
-              Bussiness_Banner: "",
-              Bussiness_Description: "",
-              Is_Active: "Y",
-              Added_By: addedBy,
-              Added_On: new Date().toISOString(),
-            };
-          });
-          // Debug: log businessPayload
-          console.log("businessPayload:", businessPayload);
-          const businessResponse = await postMultipleRecords(
-            API_Add_Bussinessman,
-            businessPayload,
-            response.data.access_token,
-          );
-          // Debug: log businessResponse
-          console.log("businessResponse:", businessResponse);
-          if (businessResponse.status === "success") {
-            // Store context info after business creation
-            const contextData = {
-              user: response.data.user_info,
-              permissions: response.data.user_permission,
-              token: response.data.access_token,
-              usertype: response.data.user_type,
-              business: businessResponse.data, // Optionally store business info
-            };
-            dispatch({ type: "LOGIN", payload: contextData });
-            navigate(response.data.default_page);
-          } else {
-            setSnackOptions({
-              color: "error",
-              message: businessResponse.error || "Failed to add businesses",
-            });
+      // console.log('Google Sign-In payload:', payload);
+      let response;
+      try {
+        response = await authPostRecord(
+          'api/v1/GoogleSignIn/auth/google',
+          payload,
+        );
+        // console.log('Google Sign-In API response:', response);
+        if (response.status === "success" && response) {
+          // console.log('Google Sign-In successful:', response);
+          // Support new backend structure
+          const user = response.user_info || response.user;
+          const access_token = response.access_token;
+          const user_permission = response.user_permission || [];
+          const user_type = response.user_type || response.user_type_id;
+          const default_page = response.default_page || (response.user_type && response.user_type.Default_Page);
+          if (!user || !access_token) {
+            setSnackOptions({ color: 'error', message: 'Login failed: Missing user data in response.' });
             setSnackOpen(true);
+            setLoading(false);
             return;
           }
-        } else {
-          // Store context info for non-business users
+          // Use user_type object if available, else fallback to id
+          let userTypeDetails = response.user_type || null;
+          // Get selected business type details (array of objects) (no longer storing in context)
           const contextData = {
-            user: response.data.user_info,
-            permissions: response.data.user_permission,
-            token: response.data.access_token,
-            usertype: response.data.user_type,
+            user: user,
+            permissions: user_permission,
+            token: access_token,
+            usertype: userTypeDetails || user_type,
           };
+          // console.log('Context data for login:', contextData);
           dispatch({ type: "LOGIN", payload: contextData });
-          navigate(response.data.default_page);
+          setUserTypeDialogOpen(false);
+          setUserTypeId("");
+          setGoogleCredential(null);
+          setSelectedBusinessTypes([]);
+          setThisRegistration(initialState);
+          // If business user, store business records as in signup
+          if (
+            (user.User_Type_Id === 2 || user_type === 2 || (userTypeDetails && userTypeDetails.User_Type_Id === 2)) &&
+            (user.User_Id || response.user_id)
+          ) {
+            const userId = user.User_Id || response.user_id;
+            const userTypeIdVal = user.User_Type_Id || user_type;
+            const addedBy = userId;
+            const businessPayload = selectedBusinessTypes.map((typeId) => {
+              const businessTypeObj = allBussinessType.find(
+                (x) => x.Business_Type_Id === typeId,
+              );
+              return {
+                User_Id: userId,
+                User_Type_Id: userTypeIdVal,
+                Business_Type_Id: typeId,
+                Business_Type_Name: (allBussinessType.find(x => Number(x.Business_Type_Id) === Number(typeId))?.Business_Type_Name) || "",
+                Brand_Name: thisRegistration.Brand_Name || "",
+                State: thisRegistration.State || "",
+                City: thisRegistration.City || "",
+                Postal_Code: thisRegistration.Postal_Code || "",
+                Address: thisRegistration.Address || "",
+                Business_Code: "",
+                Business_Status: "Pending",
+                Bussiness_Logo: "",
+                Bussiness_Banner: "",
+                Bussiness_Description: "",
+                Is_Active: "Y",
+                Added_By: addedBy,
+                Added_On: new Date().toISOString(),
+              };
+            });
+            try {
+              const businessResponse = await postMultipleRecords(
+                API_Add_Bussinessman,
+                businessPayload,
+                access_token,
+              );
+              if (businessResponse.status === "success") {
+                // Update context with business info only
+                dispatch({ type: "LOGIN", payload: { ...contextData, business: businessResponse.data } });
+                navigate(default_page || "/dashboard");
+                return;
+              } else {
+                setSnackOptions({
+                  color: "error",
+                  message: businessResponse.error || "Failed to add businesses",
+                });
+                setSnackOpen(true);
+                setLoading(false);
+                return;
+              }
+            } catch (err) {
+              setSnackOptions({ color: "error", message: "Failed to add businesses (exception)" });
+              setSnackOpen(true);
+              setLoading(false);
+              return;
+            }
+          }
+          // Always navigate after context is set and dialog is closed
+          navigate(default_page || "/dashboard");
+          return;
+        } else {
+          setSnackOptions({ color: response.color, message: response.message });
+          setSnackOpen(true);
         }
-        setUserTypeDialogOpen(false);
-        setUserTypeId("");
-        setGoogleCredential(null);
-        setSelectedBusinessTypes([]);
-        setBrandName("");
-        setThisRegistration(initialState); // Reset registration state
-      } else {
-        setSnackOptions({ color: response.color, message: response.message });
+      } catch (apiErr) {
+        setSnackOptions({ color: 'error', message: 'Google Sign-In API failed: ' + (apiErr?.response?.data?.detail || apiErr.message || 'Unknown error') });
         setSnackOpen(true);
+        setLoading(false);
+        return;
       }
     } catch (err) {
       let errorMsg = err?.response?.data?.detail || "Google Sign-In failed";
@@ -615,11 +620,40 @@ export default function SignIn() {
       <Dialog
         open={userTypeDialogOpen}
         onClose={() => setUserTypeDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            boxShadow: 10,
+            minWidth: { xs: 320, sm: 400 },
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            p: 2,
+          },
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0,0,0,0.2)',
+            backdropFilter: 'blur(2px)',
+          },
+        }}
       >
-        <DialogTitle>Select Account Type</DialogTitle>
-        <DialogContent>
-          <FormControl component="fieldset" sx={{ mb: 2 }}>
-            <FormLabel component="legend">Select Type</FormLabel>
+        <DialogTitle sx={{
+          fontWeight: 'bold',
+          color: 'primary.main',
+          textAlign: 'center',
+          fontSize: 24,
+          letterSpacing: 1,
+          pb: 1,
+        }}>
+          Select Account Type
+        </DialogTitle>
+        <DialogContent sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          alignItems: 'center',
+        }}>
+          <FormControl component="fieldset" sx={{ width: '100%' }}>
+            <FormLabel component="legend" sx={{ fontWeight: 600, color: 'primary.dark', mb: 1 }}>Select Type</FormLabel>
             <RadioGroup
               row
               required
@@ -633,20 +667,22 @@ export default function SignIn() {
                   setThisRegistration({ ...thisRegistration, Brand_Name: '', State: '', City: '', Postal_Code: '', Address: '' });
                 }
               }}
+              sx={{ justifyContent: 'center', gap: 3 }}
             >
               {userTypes.map((type) => (
                 <FormControlLabel
                   value={type.User_Type_Id}
-                  control={<Radio />}
+                  control={<Radio sx={{ color: 'primary.main' }} />}
                   key={type.User_Type_Id}
-                  label={type.User_Type_Desc}
+                  label={<span style={{ fontWeight: 500 }}>{type.User_Type_Desc}</span>}
+                  sx={{ mx: 1, borderRadius: 2, px: 2, py: 1, background: '#fff', boxShadow: 1, minWidth: 120 }}
                 />
               ))}
             </RadioGroup>
           </FormControl>
           {/* Show business type selection and brand name if user_type_id === 2 */}
           {Number(userTypeId) === 2 && (
-            <>
+            <Box sx={{ width: '100%', mt: 1 }}>
               <TextField
                 fullWidth
                 label="Brand Name"
@@ -656,10 +692,11 @@ export default function SignIn() {
                 name="Brand_Name"
                 value={thisRegistration.Brand_Name}
                 onChange={e => setThisRegistration({ ...thisRegistration, Brand_Name: e.target.value })}
+                sx={{ borderRadius: 2, background: '#f9fafb' }}
               />
-              <FormControl component="fieldset" sx={{ mt: 2 }}>
-                <FormLabel component="legend">Business Type</FormLabel>
-                <FormGroup row>
+              <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
+                <FormLabel component="legend" sx={{ fontWeight: 600, color: 'primary.dark', mb: 1 }}>Business Type</FormLabel>
+                <FormGroup row sx={{ gap: 1, flexWrap: 'wrap' }}>
                   {allBussinessType &&
                     allBussinessType.length > 0 &&
                     allBussinessType.map((type, i) => (
@@ -675,9 +712,11 @@ export default function SignIn() {
                               );
                             }}
                             value={type.Business_Type_Id}
+                            sx={{ color: 'primary.main' }}
                           />
                         }
-                        label={type.Business_Type_Name}
+                        label={<span style={{ fontWeight: 500 }}>{type.Business_Type_Name}</span>}
+                        sx={{ mx: 0.5, borderRadius: 2, px: 2, py: 0.5, background: '#fff', boxShadow: 1, minWidth: 120 }}
                       />
                     ))}
                 </FormGroup>
@@ -696,6 +735,7 @@ export default function SignIn() {
                   const stateData = IndianStatesAndDistricts.states.find(item => item.state === e.target.value);
                   setDistricts(stateData ? stateData.districts : []);
                 }}
+                sx={{ borderRadius: 2, background: '#f9fafb' }}
               >
                 {states &&
                   states.length > 0 &&
@@ -715,6 +755,7 @@ export default function SignIn() {
                 name="City"
                 value={thisRegistration.City}
                 onChange={e => setThisRegistration({ ...thisRegistration, City: e.target.value })}
+                sx={{ borderRadius: 2, background: '#f9fafb' }}
               >
                 {districts &&
                   districts.length > 0 &&
@@ -741,6 +782,7 @@ export default function SignIn() {
                   pattern: "[0-9]*",
                   maxLength: 6,
                 }}
+                sx={{ borderRadius: 2, background: '#f9fafb' }}
               />
               <TextField
                 fullWidth
@@ -753,14 +795,16 @@ export default function SignIn() {
                 name="Address"
                 value={thisRegistration.Address}
                 onChange={e => setThisRegistration({ ...thisRegistration, Address: e.target.value })}
+                sx={{ borderRadius: 2, background: '#f9fafb' }}
               />
-            </>
+            </Box>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
           <Button
             onClick={() => setUserTypeDialogOpen(false)}
             color="secondary"
+            sx={{ borderRadius: 2, px: 3, fontWeight: 600 }}
           >
             Cancel
           </Button>
@@ -800,6 +844,7 @@ export default function SignIn() {
               ) ||
               loading
             }
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600, boxShadow: 2 }}
           >
             Continue
           </Button>

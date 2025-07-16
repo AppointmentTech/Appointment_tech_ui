@@ -18,6 +18,7 @@ import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CustomTableToolbar from "../../../../CommonComponents/CustomTableToolbar";
 
 import { deleteRecord } from "services/services";
+const APIURL = process.env.APIURL;
 
 const Transition = forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -47,7 +48,28 @@ export default function BussinessTypePreview(props) {
     { field: "Business_Code", headerName: "Business Code", minWidth: 150 },
     { field: "Business_Status", headerName: "Business Status", minWidth: 100 },
     { field: "Is_Active", headerName: "Active", minWidth: 100 },
-    { field: "Business_Media", headerName: "Media", minWidth: 100 },
+    { field: "Business_Media", headerName: "Media", minWidth: 100, renderCell: (params) => {
+      const value = params.value;
+      if (!value) return null;
+      // Always use APIURL + '/uploads/business_media/' + filename
+      const filename = value.split("/").pop();
+      const url = `${APIURL}uploads/business_media/${filename}`;
+      if (url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+        // Image preview
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            <img src={url} alt="media" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 4, border: "1px solid #ccc" }} />
+          </a>
+        );
+      } else {
+        // Other file types: show link
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            View File
+          </a>
+        );
+      }
+    }},
     { field: "Added_By", headerName: "Added By", minWidth: 150 },
     { field: "Added_On", headerName: "Added On", minWidth: 150 },
     { field: "Modified_By", headerName: "Modified By", minWidth: 150 },

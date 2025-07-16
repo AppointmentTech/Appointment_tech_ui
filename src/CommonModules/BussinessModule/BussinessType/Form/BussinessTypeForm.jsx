@@ -32,6 +32,7 @@ import {
 /** ------------------ Icons ----------------------------- */
 import SaveIcon from "@mui/icons-material/Save";
 /** ------------------ Media Imports --------------------- */
+import FileUpload from "CommonComponents/FileUpload.jsx";
 /** ------------------ Style Components ------------------ */
 /** ------------------ API Declarations ------------------ */
 /** ------------------ Third Party Components ------------ */
@@ -59,6 +60,14 @@ export default function BussinessTypeForm(props) {
     const { name, checked } = event.target;
     var ischecked = checked ? "Y" : "N";
     setThisBussinessType({ ...thisBussinessType, [name]: ischecked });
+  };
+  const handleFileSelect = (files) => {
+    // If uploading a single file, take the last one
+    const file = files[files.length - 1];
+    setThisBussinessType({ ...thisBussinessType, Business_Media: file });
+  };
+  const handleFileRemove = () => {
+    setThisBussinessType({ ...thisBussinessType, Business_Media: "" });
   };
   const handleSubmit = () => {
     setProcessing(true);
@@ -127,6 +136,18 @@ export default function BussinessTypeForm(props) {
                       "length must be numeric, minimum 1 and maximum digits",
                   }}
                   helperText="Length- Minimum 1, Maximum 250"
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                <FileUpload
+                  onFileSelect={handleFileSelect}
+                  selectedFiles={
+                    thisBussinessType.Business_Media
+                      ? [thisBussinessType.Business_Media]
+                      : []
+                  }
+                  onFileRemove={handleFileRemove}
+                  name="Business_Media"
                 />
               </Grid>
               <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>

@@ -38,6 +38,8 @@ import {
   handleResponse,
   getRecord,
   putRecord,
+  uploadFormDataRecord,
+  uploadFormDataPutRecord,
 } from "services/services";
 import { AuthContext } from "../../../ContextOrRedux/AuthContext";
 import { CheckRouteAccess } from "commonmethods/Authorization";
@@ -65,7 +67,7 @@ export default function BussinessType(props) {
     Business_Code: "",
     Business_Status: "",
     Is_Active: "N",
-    Business_Media: "",
+    Business_Media: [],
     Added_By: context.state.user.User_Id,
     Added_On: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
   };
@@ -103,7 +105,22 @@ export default function BussinessType(props) {
   }, [preview]);
   /** ------------------ Functions & Events ---------------- */
   const addBussinessType = () => {
-    postRecord(API_AddBussinessType, thisBussinessType)
+    if (!thisBussinessType.Business_Type_Name) {
+      setSnackOptions({ color: "error", message: "Business Type Name is required." });
+      setSnackOpen(true);
+      setProcessing(false);
+      return;
+    }
+    const formData = new FormData();
+    formData.append("business_type_name", thisBussinessType.Business_Type_Name);
+    formData.append("business_type_desc", thisBussinessType.Business_Type_Desc || "");
+    formData.append("business_code", thisBussinessType.Business_Code || "");
+    formData.append("business_status", thisBussinessType.Business_Status || "");
+    formData.append("is_active", thisBussinessType.Is_Active || "N");
+    if (thisBussinessType.Business_Media && thisBussinessType.Business_Media instanceof File) {
+      formData.append("business_media", thisBussinessType.Business_Media);
+    }
+    uploadFormDataRecord(API_AddBussinessType, formData)
       .then((response) => {
         if (response.status === "success") {
           setSnackOptions({ color: response.color, message: response.message });
@@ -115,9 +132,19 @@ export default function BussinessType(props) {
         setSnackOpen(true);
       })
       .catch((err) => {
+        let errorMsg = "Unknown error";
+        if (err.response?.data?.detail) {
+          if (Array.isArray(err.response.data.detail)) {
+            errorMsg = err.response.data.detail.map(e => e.msg).join(", ");
+          } else {
+            errorMsg = err.response.data.detail;
+          }
+        } else if (err.message) {
+          errorMsg = err.message;
+        }
         setSnackOptions({
           color: "error",
-          message: err.response.data.detail,
+          message: errorMsg,
         });
         setSnackOpen(true);
         setProcessing(false);
@@ -125,47 +152,56 @@ export default function BussinessType(props) {
   };
   const updateBussinessType = () => {
     const bussinessTypeId = thisBussinessType.Business_Type_Id;
-
     if (!bussinessTypeId) {
       setSnackOptions({
         color: "error",
         message: 'Please Check internet connection. Refresh and Try again!',
       });
       setSnackOpen(true);
+      setProcessing(false);
       return;
     }
-
-    // Add metadata
-    thisBussinessType.Modified_By = context.state.user.User_Id;
-    thisBussinessType.Modified_On = moment(new Date()).format(
-      "YYYY-MM-DD HH:mm:ss",
-    );
-
-    // Replace placeholder with actual ID
+    const formData = new FormData();
+    formData.append("business_type_name", thisBussinessType.Business_Type_Name);
+    formData.append("business_type_desc", thisBussinessType.Business_Type_Desc || "");
+    formData.append("business_code", thisBussinessType.Business_Code || "");
+    formData.append("business_status", thisBussinessType.Business_Status || "");
+    formData.append("is_active", thisBussinessType.Is_Active || "N");
+    formData.append("business_type_id", thisBussinessType.Business_Type_Id);
+    if (thisBussinessType.Business_Media && thisBussinessType.Business_Media instanceof File) {
+      formData.append("business_media", thisBussinessType.Business_Media);
+    }
+    // Add metadata if needed
+    if (context.state.user && context.state.user.User_Id) {
+      formData.append("modified_by", context.state.user.User_Id);
+      formData.append("modified_on", moment(new Date()).format("YYYY-MM-DD HH:mm:ss"));
+    }
     const endpoint = `api/v1/businesstype/update-businesstypes/${bussinessTypeId}`;
-
-    // Make PUT call
-    putRecord(endpoint, thisBussinessType)
+    uploadFormDataPutRecord(endpoint, formData)
       .then((response) => {
         if (response.status === "success") {
-          setSnackOptions({
-            color: response.data.color,
-            message: response.data.message,
-          });
+          setSnackOptions({ color: response.color, message: response.message });
+          resetAndPreview();
         } else {
-          setSnackOptions({
-            color: response.data.color,
-            message: response.data.message,
-          });
+          setSnackOptions({ color: response.color, message: response.message });
         }
         setProcessing(false);
         setSnackOpen(true);
-        resetAndPreview();
       })
       .catch((err) => {
+        let errorMsg = "Unknown error";
+        if (err.response?.data?.detail) {
+          if (Array.isArray(err.response.data.detail)) {
+            errorMsg = err.response.data.detail.map(e => e.msg).join(", ");
+          } else {
+            errorMsg = err.response.data.detail;
+          }
+        } else if (err.message) {
+          errorMsg = err.message;
+        }
         setSnackOptions({
           color: "error",
-          message: err.response.data.detail,
+          message: errorMsg,
         });
         setSnackOpen(true);
         setProcessing(false);

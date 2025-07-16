@@ -354,3 +354,41 @@ export const postMultipleRecords = async (url, dataArray, token = "") => {
     };
   }
 };
+
+// Upload FormData (for file upload endpoints)
+export const uploadFormDataRecord = (url, formData) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`${APIURL}${url}`, formData, {
+        headers: {
+          accept: "application/json",
+          "security-key": APPSECRET,
+          // Do NOT set Content-Type here!
+        },
+      })
+      .then((res) => resolve(res.data))
+      .catch((err) => {
+        console.error("API POST error:", err.response?.data || err.message);
+        reject(err);
+      });
+  });
+};
+
+// Upload FormData with PUT (for file upload update endpoints)
+export const uploadFormDataPutRecord = (url, formData) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .put(`${APIURL}${url}`, formData, {
+        headers: {
+          accept: "application/json",
+          "security-key": APPSECRET,
+          // Do NOT set Content-Type here!
+        },
+      })
+      .then((res) => resolve(res.data))
+      .catch((err) => {
+        console.error("API PUT error:", err.response?.data || err.message);
+        reject(err);
+      });
+  });
+};

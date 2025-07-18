@@ -25,8 +25,8 @@ const Footer = () => {
     <Box
       sx={{
         background: darkMode
-          ? "linear-gradient(135deg, #0f2027, #203a43, #2c5364)"
-          : "#2c3e50",
+          ? "linear-gradient(135deg,rgb(97, 110, 219),rgb(63, 77, 156),rgb(53, 77, 212))"
+          : "#090040",
         color: "white",
         py: 6,
       }}

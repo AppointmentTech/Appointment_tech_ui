@@ -7,9 +7,15 @@ const lightTheme = createTheme({
         mode: 'light',
         primary: {
             main: '#ff5200', // Bright orange
+            light: '#ff7a33',
+            dark: '#cc4200',
+            contrastText: '#ffffff',
         },
         secondary: {
             main: '#2ecc71', // Green
+            light: '#58d68d',
+            dark: '#27ae60',
+            contrastText: '#ffffff',
         },
         background: {
             // default: '#ecf0f1', // Light gray
@@ -52,6 +58,12 @@ const lightTheme = createTheme({
                 root: {
                     backgroundColor: '#ffffff',
                     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                    borderRadius: 12,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)',
+                        transform: 'translateY(-2px)',
+                    },
                 },
             },
         },
@@ -59,6 +71,7 @@ const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: '#ffffff',
+                    borderRadius: 12,
                 },
             },
         },
@@ -66,6 +79,36 @@ const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: '#bdc3c7',
+                },
+            },
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 8,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    boxShadow: 'none',
+                    '&:hover': {
+                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                    },
+                },
+            },
+        },
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: 8,
+                    },
+                },
+            },
+        },
+        MuiChip: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 16,
+                    fontWeight: 500,
                 },
             },
         },

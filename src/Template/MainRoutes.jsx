@@ -36,6 +36,15 @@ import AdminDashboard from "./Dashboards/Views/AdminDashboards/AdminDashboard.js
 // import PreviewRequest from "./Dashboards/Views/CoAdminDashboard/HostelAdmin/CustomerRequests/PreviewRequest.jsx";
 // import ApproveRequest from "./Dashboards/Views/CoAdminDashboard/HostelAdmin/CustomerRequests/ApproveRequest.jsx";
 import HostelAdminDashboard from "./Dashboards/Views/BusinessDashboard/HostelAdmin/HostelAdminDashboard.jsx";
+import RoomManagement from "./Dashboards/Views/BusinessDashboard/HostelAdmin/RoomManagement/RoomManagement.jsx";
+import CustomerManagement from "./Dashboards/Views/BusinessDashboard/HostelAdmin/CustomerManagement/CustomerManagement.jsx";
+import BookingManagement from "./Dashboards/Views/BusinessDashboard/HostelAdmin/BookingManagement/BookingManagement.jsx";
+import BillingManagement from "./Dashboards/Views/BusinessDashboard/HostelAdmin/BillingManagement/BillingManagement.jsx";
+import StaffManagement from "./Dashboards/Views/BusinessDashboard/HostelAdmin/StaffManagement/StaffManagement.jsx";
+import FoodCatering from "./Dashboards/Views/BusinessDashboard/HostelAdmin/FoodCatering/FoodCatering.jsx";
+import Reports from "./Dashboards/Views/BusinessDashboard/HostelAdmin/Reports/Reports.jsx";
+import Maintenance from "./Dashboards/Views/BusinessDashboard/HostelAdmin/Maintenance/Maintenance.jsx";
+import SystemSettings from "./Dashboards/Views/BusinessDashboard/HostelAdmin/Settings/Settings.jsx";
 import UserTypes from "CommonModules/UserModule/UserTypes/UserTypes.jsx";
 import Users from "../CommonModules/UserModule/Users/Users.jsx";
 import Pages from "../CommonModules/UserModule/Pages/Pages.jsx";
@@ -95,6 +104,52 @@ export default function MainRoutes() {
             path="/HostelAdminDashboard"
             element={<HostelAdminDashboard />}
           />
+          <Route
+            exact
+            path="/RoomManagement"
+            element={<RoomManagement />}
+          />
+          <Route
+            exact
+            path="/CustomerManagement"
+            element={<CustomerManagement />}
+          />
+           <Route
+            exact
+            path="/BookingManagement"
+            element={<BookingManagement />}
+          />
+         <Route
+            exact
+            path="/BillingManagement"
+            element={<BillingManagement />}
+          />
+          <Route
+            exact
+            path="/StaffManagement"
+            element={<StaffManagement />}
+          />
+          <Route
+            exact
+            path="/FoodCatering"
+            element={<FoodCatering />}
+          />
+          <Route
+            exact
+            path="/Reports"
+            element={<Reports />}
+          />
+          <Route
+            exact
+            path="/Maintenance"
+            element={<Maintenance />}
+          />
+          <Route
+            exact
+            path="/Settings"
+            element={<SystemSettings />}
+          />
+          
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

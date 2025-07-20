@@ -24,8 +24,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -38,40 +36,89 @@ import Collapse from "@mui/material/Collapse";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShareIcon from "@mui/icons-material/Share";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useMediaQuery } from "@mui/material";
 import { authPostRecord } from "services/services";
 import Snackbar from "SnackBar/Snackbar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
-import { sidebarData, additionalMenuItems } from "CommonComponents/SidebarData.js";
+import { sidebarData as adminSidebarData, moduleData, additionalMenuItems as adminAdditionalMenuItems } from "CommonComponents/SidebarData.js";
+// If you have a separate coadminSidebarData, import it here
+// import { sidebarData as coadminSidebarData, additionalMenuItems as coadminAdditionalMenuItems } from "...";
+import MailIcon from "@mui/icons-material/Mail";
+import Popover from "@mui/material/Popover";
+import Chip from "@mui/material/Chip";
+import CloseIcon from "@mui/icons-material/Close";
 
 const API_Logout = "api/v1/authrouter/logout";
 const drawerWidth = 300;
 const collapsedDrawerWidth = 80;
 
-export default function CoAdminHeader() {
-  const theme = useTheme();
+export default function CommonHeader({ role: propRole }) {
   const navigate = useNavigate();
-  const themeMode = useContext(ThemeContext);
   const context = useContext(AuthContext);
   const { dispatch } = useContext(AuthContext);
+  const theme = useTheme();
+  const themeMode = useContext(ThemeContext);
   const darkMode = themeMode.state.darkMode;
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const [open, setOpen] = React.useState(!isMobile);
   const [collapsed, setCollapsed] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedService, setSelectedService] = useState({});
+  const [selectedModules, setSelectedModules] = useState({});
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackOptions, setSnackOptions] = useState({
     color: "success",
     message: "Hi",
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
+
+  // Popover state for messages and notifications
+  const [msgAnchorEl, setMsgAnchorEl] = useState(null);
+  const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+  const openMsg = Boolean(msgAnchorEl);
+  const openNotif = Boolean(notifAnchorEl);
+  const handleMsgClick = (event) => setMsgAnchorEl(event.currentTarget);
+  const handleNotifClick = (event) => setNotifAnchorEl(event.currentTarget);
+  const handleMsgClose = () => setMsgAnchorEl(null);
+  const handleNotifClose = () => setNotifAnchorEl(null);
+  // Sample data (use state for removal)
+  const [messages, setMessages] = useState([
+    { id: 1, sender: "Support", text: "Welcome to AppointmentTech!", time: "2 min ago" },
+    { id: 2, sender: "Admin", text: "Your profile was updated.", time: "10 min ago" },
+    { id: 3, sender: "System", text: "Monthly report is ready.", time: "1 hr ago" },
+  ]);
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: "success", text: "New business registered: Food Catering Plus", time: "1 min ago" },
+    { id: 2, type: "warning", text: "High occupancy alert: Downtown Hostel (95%)", time: "3 min ago" },
+    { id: 3, type: "info", text: "System maintenance scheduled for tonight", time: "10 min ago" },
+    { id: 4, type: "success", text: "Monthly report generated successfully", time: "15 min ago" },
+  ]);
+  const handleRemoveMessage = (id) => setMessages((msgs) => msgs.filter((m) => m.id !== id));
+  const handleRemoveNotification = (id) => setNotifications((notifs) => notifs.filter((n) => n.id !== id));
+
+  // Determine role: from prop, context, or default to 'admin'
+  let userRole = propRole;
+  if (!userRole && context?.state?.usertype?.name) {
+    userRole = context.state.usertype.name.toLowerCase();
+  }
+  if (!userRole) userRole = "admin";
+
+  // Sidebar/menu data based on role
+  let sidebarData = adminSidebarData;
+  let additionalMenuItems = adminAdditionalMenuItems;
+  let dashboardRoute = "/AdminDashboard";
+  let panelTitle = "Admin Panel";
+  if (userRole === "coadmin") {
+    // If you have coadminSidebarData, use it here
+    sidebarData = adminSidebarData; // Replace with coadminSidebarData if available
+    additionalMenuItems = adminAdditionalMenuItems; // Replace with coadminAdditionalMenuItems if available
+    dashboardRoute = "/CoAdminDashboard";
+    panelTitle = "Co-Admin Panel";
+  }
+
   const openProfile = Boolean(anchorEl);
   const currentDrawerWidth = collapsed ? collapsedDrawerWidth : drawerWidth;
-  
-  // Handle responsive behavior
+
   useEffect(() => {
     if (isMobile) {
       setOpen(false);
@@ -81,24 +128,30 @@ export default function CoAdminHeader() {
     }
   }, [isMobile]);
 
-  // Prevent content flickering during transitions
   const handleDrawerToggle = () => {
     setIsTransitioning(true);
     setCollapsed(!collapsed);
     setTimeout(() => setIsTransitioning(false), 300);
   };
-  
+
   const handleToggle = (sectionName) => {
     setSelectedService((prevState) => ({
       ...prevState,
       [sectionName]: !prevState[sectionName],
     }));
   };
-  
+
+  const handleModules = (moduleName) => {
+    setSelectedModules((prevState) => ({
+      ...prevState,
+      [moduleName]: !prevState[moduleName],
+    }));
+  };
+
   const handleProfileOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  
+
   const handleProfileClose = () => {
     setAnchorEl(null);
   };
@@ -110,11 +163,7 @@ export default function CoAdminHeader() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  
-  const handleItemClick = (url) => {
-    navigate(url);
-  };
-  
+
   const handleLogout = () => {
     var tokenData = {
       token: context.state.token,
@@ -143,7 +192,7 @@ export default function CoAdminHeader() {
         setSnackOpen(true);
       });
   };
-  
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -194,7 +243,6 @@ export default function CoAdminHeader() {
           >
             <MenuIcon />
           </IconButton>
-          
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
             <Typography 
               variant="h4" 
@@ -214,7 +262,6 @@ export default function CoAdminHeader() {
               AppointmentTech
             </Typography>
           </Box>
-          
           <Box sx={{ 
             display: "flex", 
             alignItems: "center", 
@@ -225,7 +272,9 @@ export default function CoAdminHeader() {
               "&:hover": {
                 backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.04)",
                 transform: "translateY(-2px)",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                boxShadow: darkMode 
+                  ? "0 4px 12px rgba(0,0,0,0.3)" 
+                  : "0 4px 12px rgba(0,0,0,0.15)",
               },
             },
           }}>
@@ -246,37 +295,105 @@ export default function CoAdminHeader() {
                 {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
               </IconButton>
             </Tooltip>
-
             <Tooltip title="Messages" arrow placement="bottom">
-              <IconButton size="large" color="inherit">
-                <Badge badgeContent={4} color="error" sx={{
+              <IconButton size="large" color="inherit" onClick={handleMsgClick}>
+                <Badge badgeContent={messages.length} color="error" sx={{
                   "& .MuiBadge-badge": {
                     fontSize: "0.7rem",
                     height: "18px",
                     minWidth: "18px",
                     borderRadius: "9px",
+                    background: darkMode ? "#ef4444" : "#dc2626",
                   }
                 }}>
                   <MailIcon />
                 </Badge>
               </IconButton>
+              <Popover
+                open={openMsg}
+                anchorEl={msgAnchorEl}
+                onClose={handleMsgClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 320,
+                    borderRadius: 2,
+                    boxShadow: 6,
+                    background: darkMode ? '#1e293b' : '#fff',
+                    color: darkMode ? '#e2e8f0' : '#1e293b',
+                    p: 1,
+                  }
+                }}
+              >
+                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: 700 }}>Messages</Typography>
+                <Divider />
+                {messages.map((msg) => (
+                  <Box key={msg.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, '&:hover .remove-btn': { opacity: 1 }, borderRadius: 1, cursor: 'pointer', position: 'relative' }}>
+                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 16 }}>{msg.sender.charAt(0)}</Avatar>
+                    <Box flex={1}>
+                      <Typography variant="body2" fontWeight={600}>{msg.sender}</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: 13 }}>{msg.text}</Typography>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">{msg.time}</Typography>
+                    <IconButton size="small" onClick={() => handleRemoveMessage(msg.id)} sx={{ ml: 1, opacity: 0, transition: 'opacity 0.2s', position: 'absolute', right: 4, top: 4 }} className="remove-btn">
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ))}
+                {messages.length === 0 && <Typography sx={{ px: 2, py: 2, color: 'text.secondary' }}>No messages</Typography>}
+              </Popover>
             </Tooltip>
-            
             <Tooltip title="Notifications" arrow placement="bottom">
-              <IconButton size="large" color="inherit">
-                <Badge badgeContent={17} color="error" sx={{
+              <IconButton size="large" color="inherit" onClick={handleNotifClick}>
+                <Badge badgeContent={notifications.length} color="error" sx={{
                   "& .MuiBadge-badge": {
                     fontSize: "0.7rem",
                     height: "18px",
                     minWidth: "18px",
                     borderRadius: "9px",
+                    background: darkMode ? "#ef4444" : "#dc2626",
                   }
                 }}>
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
+              <Popover
+                open={openNotif}
+                anchorEl={notifAnchorEl}
+                onClose={handleNotifClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 340,
+                    borderRadius: 2,
+                    boxShadow: 6,
+                    background: darkMode ? '#1e293b' : '#fff',
+                    color: darkMode ? '#e2e8f0' : '#1e293b',
+                    p: 1,
+                  }
+                }}
+              >
+                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: 700 }}>Notifications</Typography>
+                <Divider />
+                {notifications.map((notif) => (
+                  <Box key={notif.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, '&:hover .remove-btn': { opacity: 1 }, borderRadius: 1, cursor: 'pointer', position: 'relative' }}>
+                    <Chip label={notif.type} size="small" color={notif.type} sx={{ mr: 1, textTransform: 'capitalize' }} />
+                    <Box flex={1}>
+                      <Typography variant="body2" fontWeight={600}>{notif.text}</Typography>
+                      <Typography variant="caption" color="text.secondary">{notif.time}</Typography>
+                    </Box>
+                    <IconButton size="small" onClick={() => handleRemoveNotification(notif.id)} sx={{ ml: 1, opacity: 0, transition: 'opacity 0.2s', position: 'absolute', right: 4, top: 4 }} className="remove-btn">
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ))}
+                {notifications.length === 0 && <Typography sx={{ px: 2, py: 2, color: 'text.secondary' }}>No notifications</Typography>}
+              </Popover>
             </Tooltip>
-            
             <Box sx={{ ml: 1 }}>
               <Tooltip title="Account settings" arrow placement="bottom">
                 <IconButton
@@ -287,10 +404,10 @@ export default function CoAdminHeader() {
                   color="inherit"
                   onClick={handleProfileOpen}
                   sx={{
-                    border: `2px solid ${darkMode ? "#4a5568" : "#e2e8f0"}`,
+                    border: `2px solid ${darkMode ? "#475569" : "#cbd5e1"}`,
                     borderRadius: "14px",
                     "&:hover": {
-                      borderColor: theme.palette.primary.main,
+                      borderColor: darkMode ? "#60a5fa" : "#3b82f6",
                       transform: "scale(1.05)",
                     },
                     transition: "all 0.2s ease-in-out",
@@ -299,7 +416,6 @@ export default function CoAdminHeader() {
                   <AccountCircle />
                 </IconButton>
               </Tooltip>
-              
               <Menu
                 anchorEl={anchorEl}
                 id="account-menu"
@@ -311,10 +427,14 @@ export default function CoAdminHeader() {
                     elevation: 12,
                     sx: {
                       overflow: "visible",
-                      filter: "drop-shadow(0px 12px 32px rgba(0,0,0,0.15))",
+                      filter: darkMode 
+                        ? "drop-shadow(0px 12px 32px rgba(0,0,0,0.4))" 
+                        : "drop-shadow(0px 12px 32px rgba(0,0,0,0.15))",
                       mt: 2,
                       borderRadius: "16px",
                       minWidth: 220,
+                      background: darkMode ? "#1e293b" : "#ffffff",
+                      border: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
                       "& .MuiAvatar-root": {
                         width: 32,
                         height: 32,
@@ -329,7 +449,9 @@ export default function CoAdminHeader() {
                         right: 16,
                         width: 12,
                         height: 12,
-                        bgcolor: "background.paper",
+                        bgcolor: darkMode ? "#1e293b" : "#ffffff",
+                        borderLeft: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
+                        borderTop: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
                         transform: "translateY(-50%) rotate(45deg)",
                         zIndex: 0,
                       },
@@ -341,23 +463,46 @@ export default function CoAdminHeader() {
               >
                 <MenuItem
                   onClick={() => navigate(context.state.usertype.Default_Page)}
-                  sx={{ borderRadius: "12px", mx: 1, my: 0.5, py: 1.5 }}
+                  sx={{ 
+                    borderRadius: "12px", 
+                    mx: 1, 
+                    my: 0.5, 
+                    py: 1.5,
+                    "&:hover": {
+                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                    }
+                  }}
                 >
                   <Avatar sx={{ width: 28, height: 28, mr: 2 }} />
                   Dashboard
                 </MenuItem>
                 <MenuItem 
                   onClick={handleProfileClose}
-                  sx={{ borderRadius: "12px", mx: 1, my: 0.5, py: 1.5 }}
+                  sx={{ 
+                    borderRadius: "12px", 
+                    mx: 1, 
+                    my: 0.5, 
+                    py: 1.5,
+                    "&:hover": {
+                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                    }
+                  }}
                 >
                   <Avatar sx={{ width: 28, height: 28, mr: 2 }} />
                   Profile
                 </MenuItem>
-
-                <Divider sx={{ my: 1.5 }} />
+                <Divider sx={{ my: 1.5, borderColor: darkMode ? "#334155" : "#e2e8f0" }} />
                 <MenuItem 
                   onClick={handleProfileClose}
-                  sx={{ borderRadius: "12px", mx: 1, my: 0.5, py: 1.5 }}
+                  sx={{ 
+                    borderRadius: "12px", 
+                    mx: 1, 
+                    my: 0.5, 
+                    py: 1.5,
+                    "&:hover": {
+                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                    }
+                  }}
                 >
                   <ListItemIcon>
                     <PersonAdd fontSize="small" />
@@ -366,7 +511,15 @@ export default function CoAdminHeader() {
                 </MenuItem>
                 <MenuItem 
                   onClick={handleProfileClose}
-                  sx={{ borderRadius: "12px", mx: 1, my: 0.5, py: 1.5 }}
+                  sx={{ 
+                    borderRadius: "12px", 
+                    mx: 1, 
+                    my: 0.5, 
+                    py: 1.5,
+                    "&:hover": {
+                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                    }
+                  }}
                 >
                   <ListItemIcon>
                     <Settings fontSize="small" />
@@ -380,10 +533,9 @@ export default function CoAdminHeader() {
                     mx: 1, 
                     my: 0.5,
                     py: 1.5,
-                    color: "error.main",
+                    color: darkMode ? "#f87171" : "#dc2626",
                     "&:hover": {
-                      backgroundColor: "error.light",
-                      color: "error.contrastText",
+                      backgroundColor: darkMode ? "rgba(248,113,113,0.1)" : "rgba(220,38,38,0.1)",
                     }
                   }}
                 >
@@ -397,7 +549,7 @@ export default function CoAdminHeader() {
           </Box>
         </Toolbar>
       </MuiAppBar>
-      
+      {/* ...Drawer and sidebar rendering, same as AdminHeader, but use role-based data... */}
       <MuiDrawer
         variant={isMobile ? "temporary" : "permanent"}
         open={open}
@@ -420,6 +572,12 @@ export default function CoAdminHeader() {
               duration: theme.transitions.duration.enteringScreen,
             }),
             overflowX: "hidden",
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "transparent",
+            },
             "&::-webkit-scrollbar-thumb": {
               background: darkMode ? "#64748b" : "#cbd5e1",
               borderRadius: "3px",
@@ -460,10 +618,9 @@ export default function CoAdminHeader() {
                 flexGrow: 1,
               }}
             >
-              Co-Admin Panel
+              {panelTitle}
             </Typography>
           </Collapse>
-          
           <Box sx={{ 
             display: "flex", 
             gap: 1, 
@@ -489,7 +646,6 @@ export default function CoAdminHeader() {
                 </IconButton>
               </Tooltip>
             )}
-            
             {isMobile && (
               <IconButton 
                 onClick={handleDrawerClose}
@@ -508,7 +664,6 @@ export default function CoAdminHeader() {
             )}
           </Box>
         </Box>
-        
         <Box sx={{ 
           overflow: "auto", 
           height: "calc(100vh - 70px)",
@@ -519,16 +674,16 @@ export default function CoAdminHeader() {
             background: "transparent",
           },
           "&::-webkit-scrollbar-thumb": {
-            background: darkMode ? "#4a5568" : "#cbd5e0",
+            background: darkMode ? "#64748b" : "#cbd5e1",
             borderRadius: "3px",
           },
           "&::-webkit-scrollbar-thumb:hover": {
-            background: darkMode ? "#718096" : "#a0aec0",
+            background: darkMode ? "#94a3b8" : "#94a3b8",
           },
         }}>
           <List sx={{ pt: 2, pb: 1 }}>
             <ListItemButton 
-              onClick={() => navigate("/CoAdminDashboard")}
+              onClick={() => navigate(dashboardRoute)}
               sx={{
                 mx: 1.5,
                 mb: 1,
@@ -573,25 +728,8 @@ export default function CoAdminHeader() {
                 />
               </Collapse>
             </ListItemButton>
-
-            <Divider sx={{ my: 3, mx: 2 }} />
-            
-            <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
-              <Box sx={{ px: 2.5, mb: 1.5 }}>
-                <Typography 
-                  variant="overline" 
-                  sx={{ 
-                    fontWeight: 700,
-                    color: darkMode ? "#a0aec0" : "#718096",
-                    letterSpacing: "1.2px",
-                    fontSize: "0.75rem",
-                  }}
-                >
-                  SERVICES
-                </Typography>
-              </Box>
-            </Collapse>
-
+            <Divider sx={{ my: 3, mx: 2, borderColor: darkMode ? "#475569" : "#e2e8f0" }} />
+            {/* Render sidebarData.sections */}
             {sidebarData.sections.map((section) => (
               <Box key={section.name}>
                 <ListItemButton 
@@ -630,22 +768,22 @@ export default function CoAdminHeader() {
                         }}
                       />
                     </Collapse>
-                    <Collapse in={!collapsed} orientation="horizontal" timeout={300} sx={{ ml: 1 }}>
-                      {selectedService[section.name] ? (
-                        <ArrowDropDownIcon />
-                      ) : (
-                        <ArrowRightIcon />
-                      )}
-                    </Collapse>
-                    {/* If collapsed, show icon only */}
-                    {collapsed && (
+                    {/* Only show one icon, depending on collapsed state */}
+                    {!collapsed ? (
+                      <Collapse in={!collapsed} orientation="horizontal" timeout={300} sx={{ ml: 1 }}>
+                        {selectedService[section.name] ? (
+                          <ArrowDropDownIcon />
+                        ) : (
+                          <ArrowRightIcon />
+                        )}
+                      </Collapse>
+                    ) : (
                       <Box sx={{ ml: 1 }}>
                         {selectedService[section.name] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
                       </Box>
                     )}
                   </Box>
                 </ListItemButton>
-
                 <Collapse
                   in={selectedService[section.name] && !collapsed}
                   timeout="auto"
@@ -653,8 +791,8 @@ export default function CoAdminHeader() {
                 >
                   <List component="div" disablePadding>
                     {section.items.map((item, index) => (
-                      <ListItemButton
-                        key={index}
+                      <ListItemButton 
+                        key={index} 
                         sx={{ 
                           pl: 7,
                           py: 0.75,
@@ -666,13 +804,13 @@ export default function CoAdminHeader() {
                           },
                           transition: "all 0.2s ease-in-out",
                         }}
-                        onClick={() => handleItemClick(item.url)}
+                        onClick={() => item.url && navigate(item.url)}
                       >
                         <ListItemText 
-                          primary={item.name}
+                          primary={typeof item === 'string' ? item : item.name}
                           primaryTypographyProps={{ 
                             fontSize: "0.85rem",
-                            color: darkMode ? "#cbd5e0" : "#4a5568",
+                            color: darkMode ? "#cbd5e1" : "#6b7280",
                             fontWeight: 400,
                           }}
                         />
@@ -682,44 +820,148 @@ export default function CoAdminHeader() {
                 </Collapse>
               </Box>
             ))}
+            {/* Render modules only for admin */}
+            {userRole === "admin" && <>
+              <Divider sx={{ my: 3, mx: 2, borderColor: darkMode ? "#475569" : "#e2e8f0" }} />
+              <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
+                <Box sx={{ px: 2.5, mb: 1.5 }}>
+                  <Typography 
+                    variant="overline" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: darkMode ? "#94a3b8" : "#64748b",
+                      letterSpacing: "1.2px",
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    MODULES
+                  </Typography>
+                </Box>
+              </Collapse>
+              {moduleData.sections.map((section) => (
+                <Box key={section.name}>
+                  <ListItemButton 
+                    onClick={() => handleModules(section.name)}
+                    sx={{
+                      mx: 1.5,
+                      mb: 0.5,
+                      borderRadius: "12px",
+                      "&:hover": {
+                        backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+                        transform: "translateX(2px)",
+                      },
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 44 }}>
+                      {section.icon}
+                    </ListItemIcon>
+                    <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
+                      <ListItemText 
+                        primary={section.name}
+                        primaryTypographyProps={{ 
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          color: darkMode ? "#e2e8f0" : "#374151",
+                        }}
+                      />
+                    </Collapse>
+                    <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
+                      {selectedModules[section.name] ? (
+                        <ArrowDropDownIcon />
+                      ) : (
+                        <ArrowRightIcon />
+                      )}
+                    </Collapse>
+                  </ListItemButton>
+                  <Collapse
+                    in={selectedModules[section.name] && !collapsed}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <List component="div" disablePadding>
+                      {section.items.map((item, index) => (
+                        <ListItemButton
+                          key={index}
+                          sx={{ 
+                            pl: 7,
+                            py: 0.75,
+                            mx: 1.5,
+                            borderRadius: "10px",
+                            "&:hover": {
+                              backgroundColor: darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.01)",
+                              transform: "translateX(2px)",
+                            },
+                            transition: "all 0.2s ease-in-out",
+                          }}
+                          onClick={() => navigate(item.url)}
+                        >
+                          <ListItemText 
+                            primary={item.name}
+                            primaryTypographyProps={{ 
+                              fontSize: "0.85rem",
+                              color: darkMode ? "#cbd5e1" : "#6b7280",
+                              fontWeight: 400,
+                            }}
+                          />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  </Collapse>
+                </Box>
+              ))}
+            </>}
           </List>
-          
-          <Divider sx={{ my: 3, mx: 2 }} />
-          
-          <List sx={{ pb: 2 }}>
-            {additionalMenuItems.map((item, index) => (
+          {/* ...rest of sidebar rendering... */}
+        </Box>
+        <Divider sx={{ my: 2, mx: 2, borderColor: darkMode ? '#334155' : '#e2e8f0' }} />
+        <List sx={{ pb: 1, pt: 0 }}>
+          {additionalMenuItems.map((item) => {
+            let icon = null;
+            let iconColor = '';
+            if (item.name.toLowerCase().includes('share')) {
+              icon = <ShareIcon fontSize="inherit" />;
+              iconColor = '#3b82f6'; // blue
+            } else if (item.name.toLowerCase().includes('news')) {
+              icon = <NewspaperIcon fontSize="inherit" />;
+              iconColor = '#f59e42'; // orange
+            } else {
+              icon = <NewspaperIcon fontSize="inherit" />;
+              iconColor = darkMode ? '#60a5fa' : '#3b82f6';
+            }
+            return (
               <ListItem key={item.name} disablePadding>
                 <ListItemButton
                   sx={{
-                    mx: 1.5,
+                    borderRadius: '10px',
+                    minHeight: 44,
                     mb: 0.5,
-                    borderRadius: "12px",
-                    minHeight: 52,
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
-                      transform: "translateX(2px)",
+                    px: 2,
+                    '&:hover': {
+                      backgroundColor: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      transform: 'translateY(-1px)',
                     },
-                    transition: "all 0.2s ease-in-out",
+                    transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 44 }}>
-                    {index % 2 === 0 ? <ShareIcon /> : <NewspaperIcon />}
+                  <ListItemIcon sx={{ minWidth: 36, color: iconColor, fontSize: 20 }}>
+                    {icon}
                   </ListItemIcon>
-                  <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
+                  <Collapse in={!collapsed} orientation="horizontal" timeout={300} sx={{ flexGrow: 1 }}>
                     <ListItemText 
                       primary={item.name}
                       primaryTypographyProps={{ 
-                        fontSize: "0.9rem",
+                        fontSize: '0.95rem',
                         fontWeight: 500,
+                        color: darkMode ? '#e2e8f0' : '#374151',
                       }}
                     />
                   </Collapse>
                 </ListItemButton>
               </ListItem>
-            ))}
-          </List>
-        </Box>
-        
+            );
+          })}
+        </List>
         <Snackbar
           open={snackOpen}
           setOpen={setSnackOpen}
@@ -728,4 +970,4 @@ export default function CoAdminHeader() {
       </MuiDrawer>
     </Box>
   );
-}
+} 

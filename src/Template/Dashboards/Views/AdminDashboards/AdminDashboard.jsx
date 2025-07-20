@@ -15,8 +15,10 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import BusinessIcon from "@mui/icons-material/Business";
 import AdminHeader from "../../Components/AdminHeader/AdminHeader.jsx";
 import { sidebarData } from "CommonComponents/SidebarData.js";
+import { useTheme } from "@mui/material/styles";
 
 const AdminDashboard = () => {
+  const theme = useTheme();
   const [selectedBusiness, setSelectedBusiness] = useState("All Businesses");
   const [dateRange, setDateRange] = useState([null, null]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -192,7 +194,8 @@ const AdminDashboard = () => {
           pt: 10,
           overflow: "auto",
           height: "100vh",
-          backgroundColor: "#f5f5f5"
+          backgroundColor: theme.palette.background.default
+          // backgroundColor: "#f5f5f5"
         }}>
       {/* Header */}
           <Box 
@@ -238,28 +241,47 @@ const AdminDashboard = () => {
                 displayEmpty
                 size="small"
                 sx={{ 
-                  bgcolor: "#fff", 
+                  bgcolor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
                   borderRadius: 1, 
                   minWidth: { xs: "100%", sm: 200 },
                   "& .MuiSelect-select": { py: 1.5 }
                 }}
               >
                 {businessTypes.map((business) => (
-                  <MenuItem key={business} value={business}>
+                  <MenuItem 
+                    key={business} 
+                    value={business}
+                    sx={{
+                      bgcolor: theme.palette.background.paper,
+                      color: theme.palette.text.primary,
+                      '&.Mui-selected': {
+                        bgcolor: theme.palette.action.selected,
+                        color: theme.palette.text.primary,
+                      },
+                    }}
+                  >
                     {business}
                   </MenuItem>
                 ))}
               </Select>
-          <TextField
+              <TextField
                 placeholder="Search metrics, reports..."
-            size="small"
+                size="small"
                 InputProps={{ 
-                  endAdornment: <SearchIcon />,
-                  sx: { bgcolor: "#fff", borderRadius: 1 }
+                  endAdornment: <SearchIcon />, 
+                  sx: { bgcolor: theme.palette.background.paper, color: theme.palette.text.primary, borderRadius: 1 }
                 }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ minWidth: { xs: "100%", sm: 250 } }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{ 
+                  minWidth: { xs: "100%", sm: 250 },
+                  bgcolor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
+                  '& .MuiInputBase-input': {
+                    color: theme.palette.text.primary,
+                  },
+                }}
               />
               <Button
                 variant="contained"

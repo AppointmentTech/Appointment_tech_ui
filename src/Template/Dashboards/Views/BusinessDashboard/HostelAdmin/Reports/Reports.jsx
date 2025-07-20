@@ -160,6 +160,7 @@ import {
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
+import { BarChart as RechartsBarChart, Bar, LineChart, Line, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
@@ -196,6 +197,67 @@ export default function Reports() {
         { month: "Jun", occupancy: 90 },
       ]
     },
+    // Additional chart data
+    occupancyTrends: [
+      { month: "Jan", occupancy: 75, revenue: 450000, bookings: 180 },
+      { month: "Feb", occupancy: 80, revenue: 520000, bookings: 200 },
+      { month: "Mar", occupancy: 82, revenue: 580000, bookings: 220 },
+      { month: "Apr", occupancy: 85, revenue: 650000, bookings: 235 },
+      { month: "May", occupancy: 88, revenue: 720000, bookings: 245 },
+      { month: "Jun", occupancy: 90, revenue: 780000, bookings: 260 },
+    ],
+    bookingPatterns: [
+      { day: "Mon", bookings: 45, checkins: 38, checkouts: 32 },
+      { day: "Tue", bookings: 52, checkins: 45, checkouts: 40 },
+      { day: "Wed", bookings: 48, checkins: 42, checkouts: 35 },
+      { day: "Thu", bookings: 55, checkins: 48, checkouts: 42 },
+      { day: "Fri", bookings: 62, checkins: 55, checkouts: 48 },
+      { day: "Sat", bookings: 58, checkins: 52, checkouts: 45 },
+      { day: "Sun", bookings: 50, checkins: 45, checkouts: 38 },
+    ],
+    revenueBreakdown: [
+      { category: "Room Rent", value: 65, color: "#0088FE" },
+      { category: "Food Services", value: 20, color: "#00C49F" },
+      { category: "Laundry", value: 8, color: "#FFBB28" },
+      { category: "Other Services", value: 7, color: "#FF8042" },
+    ],
+    expenseBreakdown: [
+      { category: "Staff Salaries", value: 45, color: "#FF6B6B" },
+      { category: "Utilities", value: 25, color: "#4ECDC4" },
+      { category: "Maintenance", value: 15, color: "#45B7D1" },
+      { category: "Food Supplies", value: 10, color: "#96CEB4" },
+      { category: "Other", value: 5, color: "#FFEAA7" },
+    ],
+    customerSatisfaction: [
+      { aspect: "Cleanliness", rating: 4.8 },
+      { aspect: "Staff Service", rating: 4.6 },
+      { aspect: "Room Comfort", rating: 4.7 },
+      { aspect: "Food Quality", rating: 4.5 },
+      { aspect: "Value for Money", rating: 4.4 },
+      { aspect: "Location", rating: 4.9 },
+    ],
+    staffPerformance: [
+      { name: "John Doe", attendance: 95, rating: 4.5, tasks: 45 },
+      { name: "Jane Smith", attendance: 92, rating: 4.7, tasks: 52 },
+      { name: "Mike Johnson", attendance: 88, rating: 4.3, tasks: 38 },
+      { name: "Sarah Wilson", attendance: 96, rating: 4.8, tasks: 48 },
+      { name: "David Brown", attendance: 90, rating: 4.4, tasks: 42 },
+    ],
+    serviceUsage: [
+      { service: "Breakfast", usage: 85, revenue: 125000, rating: 4.5 },
+      { service: "Lunch", usage: 65, revenue: 147000, rating: 4.2 },
+      { service: "Dinner", usage: 75, revenue: 168000, rating: 4.3 },
+      { service: "Laundry", usage: 45, revenue: 45000, rating: 4.0 },
+      { service: "WiFi", usage: 95, revenue: 25000, rating: 4.6 },
+    ],
+    securityIncidents: [
+      { month: "Jan", incidents: 2, resolved: 2, pending: 0 },
+      { month: "Feb", incidents: 1, resolved: 1, pending: 0 },
+      { month: "Mar", incidents: 3, resolved: 2, pending: 1 },
+      { month: "Apr", incidents: 0, resolved: 0, pending: 0 },
+      { month: "May", incidents: 1, resolved: 1, pending: 0 },
+      { month: "Jun", incidents: 2, resolved: 2, pending: 0 },
+    ],
     revenue: {
       current: 1250000,
       previous: 1100000,
@@ -343,15 +405,20 @@ export default function Reports() {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ 
+        display: "flex", 
+        height: "100vh",
+        overflow: "hidden"
+      }}>
         <CoAdminHeader />
         <Box 
           sx={{ 
             flexGrow: 1, 
             p: { xs: 2, sm: 3 }, 
-            py: { xs: 8, sm: 10 },
-            backgroundColor: theme.palette.background.default,
-            minHeight: "100vh"
+            pt: { xs: 8, sm: 10 },
+            overflow: "auto",
+            height: "100vh",
+            backgroundColor: theme.palette.background.default
           }}
         >
           {/* Header */}
@@ -585,42 +652,122 @@ export default function Reports() {
             variant="scrollable"
             scrollButtons="auto"
           >
-            <Tab label="Operations" />
-            <Tab label="Finance" />
-            <Tab label="Customer Service" />
-            <Tab label="HR" />
-            <Tab label="Services" />
-            <Tab label="Security" />
+            <Tab label="Operations" icon={<Engineering />} />
+            <Tab label="Finance" icon={<AttachMoney />} />
+            <Tab label="Customer Service" icon={<Star />} />
+            <Tab label="HR" icon={<People />} />
+            <Tab label="Services" icon={<Restaurant />} />
+            <Tab label="Security" icon={<Security />} />
           </Tabs>
 
           {/* Operations Reports */}
           {activeTab === 0 && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
                   <CardContent>
-                    <Typography variant="h6" gutterBottom>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
                       Occupancy Trends
                     </Typography>
-                    <Box height={300} display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Chart placeholder - Occupancy data visualization
-                      </Typography>
-                    </Box>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={mockData.occupancyTrends}>
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip formatter={(value, name) => [
+                          name === 'occupancy' ? `${value}%` : `₹${value.toLocaleString()}`,
+                          name === 'occupancy' ? 'Occupancy' : name === 'revenue' ? 'Revenue' : 'Bookings'
+                        ]} />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="occupancy" 
+                          stroke="#4CAF50" 
+                          strokeWidth={3}
+                          dot={{ fill: '#4CAF50', strokeWidth: 2, r: 5 }}
+                          name="Occupancy %"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="revenue" 
+                          stroke="#2196F3" 
+                          strokeWidth={2}
+                          dot={{ fill: '#2196F3', strokeWidth: 2, r: 4 }}
+                          name="Revenue"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Weekly Booking Patterns
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={mockData.bookingPatterns}>
+                        <XAxis dataKey="day" />
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="bookings" fill="#8884d8" radius={[4, 4, 0, 0]} name="Bookings" />
+                        <Line yAxisId="right" type="monotone" dataKey="checkins" stroke="#82ca9d" strokeWidth={2} name="Check-ins" />
+                        <Line yAxisId="right" type="monotone" dataKey="checkouts" stroke="#ffc658" strokeWidth={2} name="Check-outs" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      Booking Patterns
+                      Operations Summary
                     </Typography>
-                    <Box height={300} display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Chart placeholder - Booking patterns visualization
-                      </Typography>
-                    </Box>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="primary.main" fontWeight="bold">
+                            {mockData.occupancy.current}%
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Current Occupancy
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="success.main" fontWeight="bold">
+                            {mockData.bookings.current}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Active Bookings
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="info.main" fontWeight="bold">
+                            45
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Available Rooms
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="warning.main" fontWeight="bold">
+                            8
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Pending Requests
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
                   </CardContent>
                 </Card>
               </Grid>
@@ -640,6 +787,7 @@ export default function Reports() {
                             <TableCell>Priority</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Created Date</TableCell>
+                            <TableCell>Actions</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -654,6 +802,14 @@ export default function Reports() {
                               <Chip label="In Progress" color="warning" size="small" />
                             </TableCell>
                             <TableCell>2024-01-15</TableCell>
+                            <TableCell>
+                              <IconButton size="small" color="primary">
+                                <Visibility />
+                              </IconButton>
+                              <IconButton size="small" color="secondary">
+                                <Edit />
+                              </IconButton>
+                            </TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell>MR002</TableCell>
@@ -666,6 +822,34 @@ export default function Reports() {
                               <Chip label="Completed" color="success" size="small" />
                             </TableCell>
                             <TableCell>2024-01-14</TableCell>
+                            <TableCell>
+                              <IconButton size="small" color="primary">
+                                <Visibility />
+                              </IconButton>
+                              <IconButton size="small" color="secondary">
+                                <Edit />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>MR003</TableCell>
+                            <TableCell>Room B-205</TableCell>
+                            <TableCell>Light bulb replacement</TableCell>
+                            <TableCell>
+                              <Chip label="Low" color="success" size="small" />
+                            </TableCell>
+                            <TableCell>
+                              <Chip label="Pending" color="default" size="small" />
+                            </TableCell>
+                            <TableCell>2024-01-16</TableCell>
+                            <TableCell>
+                              <IconButton size="small" color="primary">
+                                <Visibility />
+                              </IconButton>
+                              <IconButton size="small" color="secondary">
+                                <Edit />
+                              </IconButton>
+                            </TableCell>
                           </TableRow>
                         </TableBody>
                       </Table>
@@ -680,30 +864,58 @@ export default function Reports() {
           {activeTab === 1 && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
                   <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Revenue Trends
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Revenue Breakdown
                     </Typography>
-                    <Box height={300} display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Chart placeholder - Revenue trends visualization
-                      </Typography>
-                    </Box>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsPieChart>
+                        <Pie
+                          data={mockData.revenueBreakdown}
+                          dataKey="value"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          innerRadius={60}
+                          label={({ category, percent }) => `${category} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
+                        >
+                          {mockData.revenueBreakdown.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value, name) => [`${value}%`, name]} />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
                   <CardContent>
-                    <Typography variant="h6" gutterBottom>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
                       Expense Breakdown
                     </Typography>
-                    <Box height={300} display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Chart placeholder - Expense breakdown pie chart
-                      </Typography>
-                    </Box>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsPieChart>
+                        <Pie
+                          data={mockData.expenseBreakdown}
+                          dataKey="value"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          innerRadius={60}
+                          label={({ category, percent }) => `${category} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
+                        >
+                          {mockData.expenseBreakdown.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value, name) => [`${value}%`, name]} />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </Grid>
@@ -758,6 +970,67 @@ export default function Reports() {
                   </CardContent>
                 </Card>
               </Grid>
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Recent Transactions
+                    </Typography>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Transaction ID</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Amount</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Status</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>TXN001</TableCell>
+                            <TableCell>
+                              <Chip label="Income" color="success" size="small" />
+                            </TableCell>
+                            <TableCell>₹15,000</TableCell>
+                            <TableCell>Room booking payment</TableCell>
+                            <TableCell>2024-01-15</TableCell>
+                            <TableCell>
+                              <Chip label="Completed" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>TXN002</TableCell>
+                            <TableCell>
+                              <Chip label="Expense" color="error" size="small" />
+                            </TableCell>
+                            <TableCell>₹8,500</TableCell>
+                            <TableCell>Maintenance supplies</TableCell>
+                            <TableCell>2024-01-14</TableCell>
+                            <TableCell>
+                              <Chip label="Completed" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>TXN003</TableCell>
+                            <TableCell>
+                              <Chip label="Income" color="success" size="small" />
+                            </TableCell>
+                            <TableCell>₹12,000</TableCell>
+                            <TableCell>Food service payment</TableCell>
+                            <TableCell>2024-01-13</TableCell>
+                            <TableCell>
+                              <Chip label="Pending" color="warning" size="small" />
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
           )}
 
@@ -765,30 +1038,51 @@ export default function Reports() {
           {activeTab === 2 && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
                   <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Customer Satisfaction Trends
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Customer Satisfaction Radar
                     </Typography>
-                    <Box height={300} display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Chart placeholder - Customer satisfaction trends
-                      </Typography>
-                    </Box>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RadarChart data={mockData.customerSatisfaction}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="aspect" />
+                        <PolarRadiusAxis angle={90} domain={[0, 5]} />
+                        <Radar
+                          name="Rating"
+                          dataKey="rating"
+                          stroke="#8884d8"
+                          fill="#8884d8"
+                          fillOpacity={0.6}
+                        />
+                        <Tooltip />
+                      </RadarChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Card>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
                   <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Feedback Categories
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Satisfaction Trends
                     </Typography>
-                    <Box height={300} display="flex" alignItems="center" justifyContent="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Chart placeholder - Feedback categories distribution
-                      </Typography>
-                    </Box>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={mockData.customerSatisfaction.data}>
+                        <XAxis dataKey="month" />
+                        <YAxis domain={[0, 5]} />
+                        <Tooltip formatter={(value) => [`${value}/5`, 'Rating']} />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="rating" 
+                          stroke="#4CAF50" 
+                          strokeWidth={3}
+                          dot={{ fill: '#4CAF50', strokeWidth: 2, r: 5 }}
+                          name="Customer Rating"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </Grid>
@@ -842,6 +1136,380 @@ export default function Reports() {
                         </ListItemSecondaryAction>
                       </ListItem>
                     </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
+
+          {/* HR Reports */}
+          {activeTab === 3 && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Staff Performance Overview
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsBarChart data={mockData.staffPerformance}>
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="attendance" fill="#8884d8" name="Attendance %" />
+                        <Bar dataKey="rating" fill="#82ca9d" name="Rating" />
+                      </RechartsBarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Task Completion vs Rating
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={mockData.staffPerformance}>
+                        <XAxis dataKey="name" />
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="tasks" fill="#8884d8" radius={[4, 4, 0, 0]} name="Tasks Completed" />
+                        <Line yAxisId="right" type="monotone" dataKey="rating" stroke="#82ca9d" strokeWidth={2} name="Rating" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Staff Performance Summary
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="success.main" fontWeight="bold">
+                            95%
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Average Attendance
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="primary.main" fontWeight="bold">
+                            4.2/5
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Average Rating
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="info.main" fontWeight="bold">
+                            12
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Active Staff
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="warning.main" fontWeight="bold">
+                            2
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Training Required
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
+
+          {/* Services Reports */}
+          {activeTab === 4 && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Service Usage vs Revenue
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={mockData.serviceUsage}>
+                        <XAxis dataKey="service" />
+                        <YAxis yAxisId="left" />
+                        <YAxis yAxisId="right" orientation="right" />
+                        <Tooltip formatter={(value, name) => [
+                          name === 'usage' ? `${value}%` : `₹${value.toLocaleString()}`,
+                          name === 'usage' ? 'Usage %' : 'Revenue'
+                        ]} />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="usage" fill="#8884d8" radius={[4, 4, 0, 0]} name="Usage %" />
+                        <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#82ca9d" strokeWidth={2} name="Revenue" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Service Ratings
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsBarChart data={mockData.serviceUsage}>
+                        <XAxis dataKey="service" />
+                        <YAxis domain={[0, 5]} />
+                        <Tooltip formatter={(value) => [`${value}/5`, 'Rating']} />
+                        <Legend />
+                        <Bar dataKey="rating" fill="#ffc658" radius={[4, 4, 0, 0]} name="Rating" />
+                      </RechartsBarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Service Performance Metrics
+                    </Typography>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Service Type</TableCell>
+                            <TableCell>Usage Count</TableCell>
+                            <TableCell>Revenue</TableCell>
+                            <TableCell>Rating</TableCell>
+                            <TableCell>Status</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>Breakfast</TableCell>
+                            <TableCell>1,250</TableCell>
+                            <TableCell>₹125,000</TableCell>
+                            <TableCell>
+                              <Rating value={4.5} size="small" readOnly />
+                            </TableCell>
+                            <TableCell>
+                              <Chip label="Active" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Lunch</TableCell>
+                            <TableCell>980</TableCell>
+                            <TableCell>₹147,000</TableCell>
+                            <TableCell>
+                              <Rating value={4.2} size="small" readOnly />
+                            </TableCell>
+                            <TableCell>
+                              <Chip label="Active" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Dinner</TableCell>
+                            <TableCell>1,120</TableCell>
+                            <TableCell>₹168,000</TableCell>
+                            <TableCell>
+                              <Rating value={4.3} size="small" readOnly />
+                            </TableCell>
+                            <TableCell>
+                              <Chip label="Active" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Laundry</TableCell>
+                            <TableCell>450</TableCell>
+                            <TableCell>₹45,000</TableCell>
+                            <TableCell>
+                              <Rating value={4.0} size="small" readOnly />
+                            </TableCell>
+                            <TableCell>
+                              <Chip label="Active" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
+
+          {/* Security Reports */}
+          {activeTab === 5 && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Security Incidents Overview
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={mockData.securityIncidents}>
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="incidents" fill="#ff6b6b" radius={[4, 4, 0, 0]} name="Total Incidents" />
+                        <Line type="monotone" dataKey="resolved" stroke="#4CAF50" strokeWidth={2} name="Resolved" />
+                        <Line type="monotone" dataKey="pending" stroke="#ff9800" strokeWidth={2} name="Pending" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ transition: 'all 0.3s ease', '&:hover': { boxShadow: '0 8px 25px rgba(0,0,0,0.15)' } }}>
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                      Monthly Incident Trends
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <AreaChart data={mockData.securityIncidents}>
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Area 
+                          type="monotone" 
+                          dataKey="incidents" 
+                          stackId="1"
+                          stroke="#ff6b6b" 
+                          fill="#ff6b6b" 
+                          fillOpacity={0.6}
+                          name="Total Incidents"
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="resolved" 
+                          stackId="2"
+                          stroke="#4CAF50" 
+                          fill="#4CAF50" 
+                          fillOpacity={0.6}
+                          name="Resolved"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Security Summary
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="success.main" fontWeight="bold">
+                            0
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Major Incidents
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="warning.main" fontWeight="bold">
+                            3
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Minor Incidents
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="info.main" fontWeight="bold">
+                            24/7
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Security Coverage
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Box textAlign="center" p={2}>
+                          <Typography variant="h4" color="primary.main" fontWeight="bold">
+                            100%
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            CCTV Coverage
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Recent Security Logs
+                    </Typography>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Timestamp</TableCell>
+                            <TableCell>Event Type</TableCell>
+                            <TableCell>Location</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Severity</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>2024-01-15 14:30</TableCell>
+                            <TableCell>Access Entry</TableCell>
+                            <TableCell>Main Gate</TableCell>
+                            <TableCell>Authorized entry - Staff ID: ST001</TableCell>
+                            <TableCell>
+                              <Chip label="Low" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>2024-01-15 13:45</TableCell>
+                            <TableCell>Access Exit</TableCell>
+                            <TableCell>Back Gate</TableCell>
+                            <TableCell>Authorized exit - Staff ID: ST002</TableCell>
+                            <TableCell>
+                              <Chip label="Low" color="success" size="small" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>2024-01-15 12:20</TableCell>
+                            <TableCell>Unauthorized Access</TableCell>
+                            <TableCell>Kitchen Area</TableCell>
+                            <TableCell>Unauthorized access attempt - Resolved</TableCell>
+                            <TableCell>
+                              <Chip label="Medium" color="warning" size="small" />
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   </CardContent>
                 </Card>
               </Grid>

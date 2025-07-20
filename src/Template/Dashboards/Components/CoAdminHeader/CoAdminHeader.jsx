@@ -35,13 +35,6 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Collapse from "@mui/material/Collapse";
-import HotelIcon from "@mui/icons-material/Hotel";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import FaceRetouchingNaturalIcon from "@mui/icons-material/FaceRetouchingNatural";
-import FlatwareIcon from "@mui/icons-material/Flatware";
-import GarageIcon from "@mui/icons-material/Garage";
-import HomeRepairServiceIcon from "@mui/icons-material/HomeRepairService";
-import ContentCutIcon from "@mui/icons-material/ContentCut";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShareIcon from "@mui/icons-material/Share";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
@@ -50,88 +43,9 @@ import { useMediaQuery } from "@mui/material";
 import { authPostRecord } from "services/services";
 import Snackbar from "SnackBar/Snackbar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
+import { sidebarData, additionalMenuItems } from "CommonComponents/SidebarData.js";
 const API_Logout = "api/v1/authrouter/logout";
 const drawerWidth = 300;
-const sidebarData = {
-  sections: [
-    {
-      name: "Hostels",
-      items: [
-        { name: "Dashboard", url: "/HostelAdminDashboard" },
-        { name: "Room Management", url: "/RoomManagement" },
-        { name: "Customer Management", url: "/CustomerManagement" },
-        { name: "Booking Management", url: "/BookingManagement" },
-        { name: "Staff Management", url: "/StaffManagement" },
-        { name: "Billing & Payments", url: "/BillingManagement" },
-        { name: "Food Catering", url: "/FoodCatering" },
-        { name: "Reports & Analytics", url: "/Reports" },
-        { name: "Maintenance", url: "/Maintenance" },
-        { name: "Settings", url: "/Settings" },
-      ],
-      icon: <HotelIcon color="primary" />,
-    },
-    {
-      name: "Hospitals",
-      items: [
-        { name: "Overview", url: "/HospitalOverview" },
-        { name: "Manage Doctors", url: "/ManageDoctors" },
-        { name: "Appointments", url: "/HospitalAppointments" },
-        { name: "Patient Management", url: "/PatientManagement" },
-        { name: "Billing", url: "/HospitalBilling" },
-        { name: "Reports", url: "/HospitalReports" },
-      ],
-      icon: <LocalHospitalIcon color="primary" />,
-    },
-    {
-      name: "Garages",
-      items: [
-        { name: "Services Offered", url: "/GarageServices" },
-        { name: "Technician Management", url: "/TechnicianManagement" },
-        { name: "Customer Management", url: "/GarageCustomerManagement" },
-        { name: "Bookings", url: "/GarageBookings" },
-        { name: "Reports", url: "/GarageReports" },
-      ],
-      icon: <GarageIcon color="primary" />,
-    },
-    {
-      name: "Beauty & Tattoo",
-      items: [
-        { name: "Artists", url: "/Artists" },
-        { name: "Appointments", url: "/TattooAppointments" },
-        { name: "Customer Profiles", url: "/TattooCustomerProfiles" },
-        { name: "Reports", url: "/TattooReports" },
-      ],
-      icon: <FaceRetouchingNaturalIcon color="primary" />,
-    },
-    {
-      name: "Food Catering",
-      items: [
-        { name: "Menu Management", url: "/MenuManagement" },
-        { name: "Bookings", url: "/FoodCateringBookings" },
-        { name: "Reports", url: "/FoodCateringReports" },
-      ],
-      icon: <FlatwareIcon color="primary" />,
-    },
-    {
-      name: "Fashion Design",
-      items: [
-        { name: "Designers", url: "/FashionDesigners" },
-        { name: "Orders", url: "/FashionOrders" },
-        { name: "Reports", url: "/FashionReports" },
-      ],
-      icon: <ContentCutIcon color="primary" />,
-    },
-    {
-      name: "Professional Services",
-      items: [
-        { name: "Experts", url: "/Experts" },
-        { name: "Bookings", url: "/ProfessionalServiceBookings" },
-        { name: "Reports", url: "/ProfessionalServiceReports" },
-      ],
-      icon: <HomeRepairServiceIcon color="primary" />,
-    },
-  ],
-};
 
 export default function CoAdminHeader() {
   const theme = useTheme();
@@ -206,7 +120,7 @@ export default function CoAdminHeader() {
       <CssBaseline />
       <MuiAppBar
         position="fixed"
-        style={{
+        sx={{
           backgroundColor: darkMode ? "#1E1E2C" : "#ffffff",
           color: darkMode ? "#ffffff" : "#333",
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
@@ -477,8 +391,8 @@ export default function CoAdminHeader() {
         </List>
         <Divider />
         <List>
-          {["Share", "News Post"].map((text, index) => (
-            <ListItem key={text} disablePadding style={{ display: "block" }}>
+          {additionalMenuItems.map((item, index) => (
+            <ListItem key={item.name} disablePadding style={{ display: "block" }}>
               <ListItemButton
                 style={{
                   minHeight: 48,
@@ -500,7 +414,7 @@ export default function CoAdminHeader() {
                   )}
                 </ListItemIcon>
                 <ListItemText
-                  primary={text}
+                  primary={item.name}
                   style={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>

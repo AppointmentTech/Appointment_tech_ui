@@ -681,15 +681,20 @@ export default function FoodCatering() {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ 
+        display: "flex", 
+        height: "100vh",
+        overflow: "hidden"
+      }}>
         <CoAdminHeader />
         <Box 
           sx={{ 
             flexGrow: 1, 
             p: { xs: 2, sm: 3 }, 
-            py: { xs: 8, sm: 10 },
-            backgroundColor: theme.palette.background.default,
-            minHeight: "100vh"
+            pt: { xs: 8, sm: 10 },
+            overflow: "auto",
+            height: "100vh",
+            backgroundColor: theme.palette.background.default
           }}
         >
           {/* Header */}

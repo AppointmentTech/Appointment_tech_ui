@@ -47,7 +47,7 @@ import Schedule from "@mui/icons-material/Schedule";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import Warning from "@mui/icons-material/Warning";
 import Error from "@mui/icons-material/Error";
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
 import UserStayRequest from "./UserStayRequest/UserStayRequest.jsx";
 
@@ -127,6 +127,41 @@ export default function HostelAdminDashboard() {
     { name: "Available", value: 6, color: "#2196F3" },
   ];
 
+  // Additional detailed data
+  const roomTypes = [
+    { type: "Standard Single", count: 45, occupied: 42, revenue: 189000 },
+    { type: "Standard Double", count: 30, occupied: 28, revenue: 168000 },
+    { type: "Deluxe Room", count: 20, occupied: 18, revenue: 144000 },
+    { type: "Suite", count: 10, occupied: 8, revenue: 96000 },
+    { type: "Dormitory", count: 15, occupied: 12, revenue: 72000 },
+  ];
+
+  const weeklyOccupancy = [
+    { day: "Mon", occupancy: 85, revenue: 45000, checkins: 12 },
+    { day: "Tue", occupancy: 88, revenue: 48000, checkins: 15 },
+    { day: "Wed", occupancy: 92, revenue: 52000, checkins: 18 },
+    { day: "Thu", occupancy: 95, revenue: 55000, checkins: 20 },
+    { day: "Fri", occupancy: 98, revenue: 58000, checkins: 22 },
+    { day: "Sat", occupancy: 96, revenue: 56000, checkins: 19 },
+    { day: "Sun", occupancy: 89, revenue: 49000, checkins: 14 },
+  ];
+
+  const customerSatisfaction = [
+    { aspect: "Cleanliness", rating: 4.8 },
+    { aspect: "Staff Service", rating: 4.6 },
+    { aspect: "Room Comfort", rating: 4.7 },
+    { aspect: "Food Quality", rating: 4.5 },
+    { aspect: "Value for Money", rating: 4.4 },
+    { aspect: "Location", rating: 4.9 },
+  ];
+
+  const maintenanceRequests = [
+    { id: "MR001", room: "A-101", issue: "AC not working", priority: "High", status: "In Progress", assigned: "Tech Team" },
+    { id: "MR002", room: "B-205", issue: "Water leakage", priority: "Medium", status: "Completed", assigned: "Plumber" },
+    { id: "MR003", room: "C-103", issue: "Light bulb replacement", priority: "Low", status: "Pending", assigned: "Electrician" },
+    { id: "MR004", room: "D-401", issue: "WiFi connectivity", priority: "High", status: "In Progress", assigned: "IT Team" },
+  ];
+
   const recentBookings = [
     {
       id: 1,
@@ -189,15 +224,20 @@ export default function HostelAdminDashboard() {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ 
+        display: "flex", 
+        height: "100vh",
+        overflow: "hidden"
+      }}>
         <CoAdminHeader />
         <Box 
           sx={{ 
             flexGrow: 1, 
             p: { xs: 2, sm: 3 }, 
-            py: { xs: 8, sm: 10 },
-            backgroundColor: theme.palette.background.default,
-            minHeight: "100vh"
+            pt: { xs: 8, sm: 10 },
+            overflow: "auto",
+            height: "100vh",
+            backgroundColor: theme.palette.background.default
           }}
         >
           {/* Header Section */}
@@ -211,15 +251,22 @@ export default function HostelAdminDashboard() {
           >
             <Box>
               <Typography 
-                variant={isMobile ? "h5" : "h4"} 
+                variant={{ xs: "h5", md: "h4" }} 
                 fontWeight="bold"
                 color="primary"
               >
                 Hostel Management Dashboard
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Monitor and manage your hostel operations efficiently
-            </Typography>
+                Comprehensive monitoring and management of hostel operations, bookings, and performance metrics
+              </Typography>
+              <Box display="flex" alignItems="center" gap={1} mt={1}>
+                <Typography variant="caption" color="text.secondary">
+                  Last updated: {new Date().toLocaleDateString()}
+                </Typography>
+                <Chip label="Live Data" size="small" color="success" variant="outlined" />
+                <Chip label="24/7 Monitoring" size="small" color="info" variant="outlined" />
+              </Box>
             </Box>
             
             <Box 
@@ -234,7 +281,7 @@ export default function HostelAdminDashboard() {
                 onChange={(e) => setDateRange(e.target.value)}
                 size="small"
                 sx={{ 
-                  minWidth: 120,
+                  minWidth: { xs: "100%", sm: 120 },
                   bgcolor: "background.paper",
                   borderRadius: 1
                 }}
@@ -246,7 +293,7 @@ export default function HostelAdminDashboard() {
               </Select>
               
               <TextField
-                placeholder="Search..."
+                placeholder="Search bookings, rooms, guests..."
                 size="small"
                 InputProps={{ 
                   startAdornment: <Search sx={{ mr: 1, color: "text.secondary" }} />
@@ -254,19 +301,28 @@ export default function HostelAdminDashboard() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 sx={{ 
-                  minWidth: 200,
+                  minWidth: { xs: "100%", sm: 250 },
                   bgcolor: "background.paper",
                   borderRadius: 1
                 }}
               />
               
-              <Button
-                variant="contained"
-                startIcon={<Refresh />}
-                size="small"
-              >
-                Refresh
-              </Button>
+              <Box display="flex" gap={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<Refresh />}
+                  size="small"
+                >
+                  Refresh
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<Download />}
+                  size="small"
+                >
+                  Export
+                </Button>
+              </Box>
             </Box>
           </Box>
 
@@ -393,6 +449,251 @@ export default function HostelAdminDashboard() {
                   </Box>
                 </CardContent>
               </Card>
+                      </Grid>
+        </Grid>
+
+          {/* Additional Analytics Section */}
+          <Grid container spacing={3} mb={4}>
+            {/* Room Type Performance */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                    Room Type Performance
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={roomTypes}>
+                      <XAxis dataKey="type" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']} />
+                      <Bar dataKey="revenue" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Weekly Occupancy Trends */}
+            <Grid item xs={12} md={6}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                    Weekly Occupancy Trends
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={weeklyOccupancy}>
+                      <XAxis dataKey="day" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip />
+                      <Legend />
+                      <Area 
+                        yAxisId="left"
+                        type="monotone" 
+                        dataKey="occupancy" 
+                        fill="#4CAF50" 
+                        stroke="#4CAF50"
+                        fillOpacity={0.3}
+                        name="Occupancy %"
+                      />
+                      <Bar yAxisId="right" dataKey="checkins" fill="#2196F3" radius={[4, 4, 0, 0]} name="Check-ins" />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Customer Satisfaction and Maintenance */}
+          <Grid container spacing={3} mb={4}>
+            {/* Customer Satisfaction Radar */}
+            <Grid item xs={12} lg={6}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                    Customer Satisfaction Metrics
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RadarChart data={customerSatisfaction}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="aspect" />
+                      <PolarRadiusAxis angle={30} domain={[0, 5]} />
+                      <Radar name="Rating" dataKey="rating" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Maintenance Requests */}
+            <Grid item xs={12} lg={6}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
+                    Active Maintenance Requests
+                  </Typography>
+                  <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                    {maintenanceRequests.map((request) => (
+                      <Box key={request.id} sx={{ 
+                        p: 2, 
+                        mb: 1, 
+                        border: '1px solid #e0e0e0', 
+                        borderRadius: 1,
+                        '&:hover': { backgroundColor: '#f5f5f5' }
+                      }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                          <Typography variant="subtitle2" fontWeight="bold">
+                            {request.id} - {request.room}
+                          </Typography>
+                          <Chip 
+                            label={request.priority} 
+                            size="small" 
+                            color={request.priority === "High" ? "error" : request.priority === "Medium" ? "warning" : "success"}
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" mb={1}>
+                          {request.issue}
+                        </Typography>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="caption" color="text.secondary">
+                            Assigned: {request.assigned}
+                          </Typography>
+                          <Chip 
+                            label={request.status} 
+                            size="small" 
+                            color={request.status === "Completed" ? "success" : request.status === "In Progress" ? "warning" : "default"}
+                            variant="outlined"
+                          />
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Quick Stats Summary */}
+          <Grid container spacing={3} mb={4}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h4" fontWeight="bold" color="success.main">
+                    ₹6,69,000
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Revenue (This Month)
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1} mt={1}>
+                    <TrendingUp sx={{ color: "success.main" }} />
+                    <Typography variant="caption" color="success.main">
+                      +15.2% from last month
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h4" fontWeight="bold" color="primary.main">
+                    142
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Rooms Available
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1} mt={1}>
+                    <Hotel sx={{ color: "primary.main" }} />
+                    <Typography variant="caption" color="primary.main">
+                      94% occupancy rate
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h4" fontWeight="bold" color="warning.main">
+                    4.6/5
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Average Customer Rating
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1} mt={1}>
+                    <Star sx={{ color: "warning.main" }} />
+                    <Typography variant="caption" color="warning.main">
+                      Based on 1,247 reviews
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: theme.shadows[8],
+                }
+              }}>
+                <CardContent>
+                  <Typography variant="h4" fontWeight="bold" color="info.main">
+                    23
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Pending Requests
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1} mt={1}>
+                    <Schedule sx={{ color: "info.main" }} />
+                    <Typography variant="caption" color="info.main">
+                      4 high priority
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
 
@@ -497,9 +798,9 @@ export default function HostelAdminDashboard() {
           </Card>
 
           {/* User Stay Requests Section */}
-          <Box mt={4}>
+          {/* <Box mt={4}>
           <UserStayRequest />
-          </Box>
+          </Box> */}
         </Box>
       </Box>
     </React.Fragment>

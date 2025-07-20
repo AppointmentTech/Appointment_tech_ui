@@ -35,119 +35,17 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import Collapse from "@mui/material/Collapse";
-import HotelIcon from "@mui/icons-material/Hotel";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import FaceRetouchingNaturalIcon from "@mui/icons-material/FaceRetouchingNatural";
-import FlatwareIcon from "@mui/icons-material/Flatware";
-import GarageIcon from "@mui/icons-material/Garage";
-import HomeRepairServiceIcon from "@mui/icons-material/HomeRepairService";
-import ContentCutIcon from "@mui/icons-material/ContentCut";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShareIcon from "@mui/icons-material/Share";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import MyLocationIcon from "@mui/icons-material/MyLocation";
-import WorkIcon from "@mui/icons-material/Work";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useMediaQuery } from "@mui/material";
 import { authPostRecord } from "services/services";
 import Snackbar from "SnackBar/Snackbar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
+import { sidebarData, moduleData, additionalMenuItems } from "CommonComponents/SidebarData.js";
 const API_Logout = "api/v1/authrouter/logout";
 const drawerWidth = 300;
-const sidebarData = {
-  sections: [
-    {
-      name: "Hostels",
-      items: [
-        "Overview",
-        "Manage Rooms",
-        "Customer Management",
-        "Bookings",
-        "Staff Management",
-        "Billing",
-        "Reports",
-      ],
-      icon: <HotelIcon color="primary" />,
-    },
-    {
-      name: "Hospitals",
-      items: [
-        "Overview",
-        "Manage Doctors",
-        "Appointments",
-        "Patient Management",
-        "Billing",
-        "Reports",
-      ],
-      icon: <LocalHospitalIcon color="primary" />,
-    },
-    {
-      name: "Garages",
-      items: [
-        "Services Offered",
-        "Technician Management",
-        "Customer Management",
-        "Bookings",
-        "Reports",
-      ],
-      icon: <GarageIcon color="primary" />,
-    },
-    {
-      name: "Beauty & Tattoo",
-      items: ["Artists", "Appointments", "Customer Profiles", "Reports"],
-      icon: <FaceRetouchingNaturalIcon color="primary" />,
-    },
-    {
-      name: "Food Catering",
-      items: ["Menu Management", "Bookings", "Reports"],
-      icon: <FlatwareIcon color="primary" />,
-    },
-    {
-      name: "Fashion Design",
-      items: ["Designers", "Orders", "Reports"],
-      icon: <ContentCutIcon color="primary" />,
-    },
-    {
-      name: "Professional Services",
-      items: ["Experts", "Bookings", "Reports"],
-      icon: <HomeRepairServiceIcon color="primary" />,
-    },
-  ],
-};
-const moduleData = {
-  sections: [
-    {
-      name: "User Modules",
-      items: [
-        { name: "User Types", url: "/UserTypes" },
-        { name: "Users", url: "/Users" },
-        { name: "Pages", url: "/Pages" },
-        { name: "User Permission", url: "/UserPermission" },
-        // { name: "Logs", url: "/Logs" },
-      ],
-      icon: <AccountCircleIcon color="primary" />,
-    },
-    {
-      name: "Location Modules",
-      items: [
-        { name: "Location Master", url: "/LocationMaster" },
-        { name: "Location Active Pin code", url: "/LocationActivePinCode" },
-        { name: "Location User Address", url: "/LocationUserAddress" },
-      ],
-      icon: <MyLocationIcon color="primary" />,
-    },
-    {
-      name: "Bussiness Module",
-      items: [
-        { name: "Business Man User", url: "/BusinessManUsers" },
-        { name: "Business Type", url: "/BussinessType" },
-        { name: "Business Categories", url: "/BusinessCategories" },
-      ],
-      icon: <WorkIcon color="primary" />,
-    },
-  ],
-};
 export default function AdminHeader() {
   const navigate = useNavigate();
   const context = useContext(AuthContext);
@@ -226,7 +124,7 @@ export default function AdminHeader() {
       <CssBaseline />
       <MuiAppBar
         position="fixed"
-        style={{
+        sx={{
           backgroundColor: darkMode ? "#1E1E2C" : "#ffffff",
           color: darkMode ? "#ffffff" : "#333",
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
@@ -482,8 +380,12 @@ export default function AdminHeader() {
               >
                 <List component="div" disablePadding>
                   {section.items.map((item, index) => (
-                    <ListItemButton key={index} sx={{ paddingLeft: 4 }}>
-                      <ListItemText primary={item} />
+                    <ListItemButton 
+                      key={index} 
+                      sx={{ paddingLeft: 4 }}
+                      onClick={() => item.url && navigate(item.url)}
+                    >
+                      <ListItemText primary={typeof item === 'string' ? item : item.name} />
                     </ListItemButton>
                   ))}
                 </List>
@@ -534,8 +436,8 @@ export default function AdminHeader() {
 
         <Divider />
         <List>
-          {["Share", "News Post"].map((text, index) => (
-            <ListItem key={text} disablePadding style={{ display: "block" }}>
+          {additionalMenuItems.map((item, index) => (
+            <ListItem key={item.name} disablePadding style={{ display: "block" }}>
               <ListItemButton
                 style={{
                   minHeight: 48,
@@ -557,7 +459,7 @@ export default function AdminHeader() {
                   )}
                 </ListItemIcon>
                 <ListItemText
-                  primary={text}
+                  primary={item.name}
                   style={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>

@@ -13,7 +13,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import BusinessIcon from "@mui/icons-material/Business";
-import AdminHeader from "../../Components/AdminHeader/AdminHeader.jsx";
+import CommonHeader from "../../Components/CommonHeader.jsx";
 import { sidebarData } from "CommonComponents/SidebarData.js";
 import { useTheme } from "@mui/material/styles";
 
@@ -187,7 +187,7 @@ const AdminDashboard = () => {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <AdminHeader />
+        <CommonHeader role="admin" />
         <Box sx={{ 
           flexGrow: 1, 
           p: 3, 
@@ -623,7 +623,7 @@ const AdminDashboard = () => {
                         <Box key={booking.id} display="flex" alignItems="center" gap={2} p={1} sx={{ 
                           border: '1px solid #e0e0e0', 
                           borderRadius: 1,
-                          '&:hover': { backgroundColor: '#f5f5f5' }
+                          '&:hover': { backgroundColor: theme.palette.action.hover }
                         }}>
                           <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
                             {booking.customer.charAt(0)}
@@ -659,7 +659,7 @@ const AdminDashboard = () => {
                         <Box key={notification.id} display="flex" alignItems="center" gap={2} p={1} sx={{ 
                           border: '1px solid #e0e0e0', 
                           borderRadius: 1,
-                          '&:hover': { backgroundColor: '#f5f5f5' }
+                          '&:hover': { backgroundColor: theme.palette.action.hover }
                         }}>
                           <Chip 
                             label={notification.type} 
@@ -734,33 +734,33 @@ const AdminDashboard = () => {
                 <Table stickyHeader>
           <TableHead>
             <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>ID</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>ID</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>
                         {selectedBusiness === "All Businesses" ? "Business" : 
                          selectedBusiness === "Hostels" ? "Location" :
                          selectedBusiness === "Hospitals" ? "Department" :
                          selectedBusiness === "Garages" ? "Service" : "Category"}
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Revenue</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>Revenue</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>
                         {selectedBusiness === "All Businesses" ? "Bookings" :
                          selectedBusiness === "Hospitals" ? "Appointments" :
                          selectedBusiness === "Garages" ? "Services" : "Bookings"}
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>
                         {selectedBusiness === "All Businesses" ? "Customers" :
                          selectedBusiness === "Hostels" ? "Occupancy" :
                          selectedBusiness === "Hospitals" ? "Patients" :
                          selectedBusiness === "Garages" ? "Customers" : "Customers"}
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Rating</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Growth</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>Rating</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>Growth</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
                     {currentData.tableData.map((row) => (
-                      <TableRow key={row.id} hover sx={{ '&:hover': { backgroundColor: '#f8f9fa' } }}>
+                      <TableRow key={row.id} hover sx={{ '&:hover': { backgroundColor: theme.palette.action.hover } }}>
                         <TableCell>
                           <Chip label={`#${row.id}`} size="small" variant="outlined" />
                         </TableCell>

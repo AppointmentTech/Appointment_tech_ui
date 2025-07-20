@@ -48,7 +48,7 @@ import CheckCircle from "@mui/icons-material/CheckCircle";
 import Warning from "@mui/icons-material/Warning";
 import Error from "@mui/icons-material/Error";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
-import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
+import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import UserStayRequest from "./UserStayRequest/UserStayRequest.jsx";
 
 export default function HostelAdminDashboard() {
@@ -229,7 +229,7 @@ export default function HostelAdminDashboard() {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <CoAdminHeader />
+        <CommonHeader role="coadmin" />
         <Box 
           sx={{ 
             flexGrow: 1, 
@@ -563,7 +563,7 @@ export default function HostelAdminDashboard() {
                         mb: 1, 
                         border: '1px solid #e0e0e0', 
                         borderRadius: 1,
-                        '&:hover': { backgroundColor: '#f5f5f5' }
+                        '&:hover': { backgroundColor: theme.palette.action.hover }
                       }}>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                           <Typography variant="subtitle2" fontWeight="bold">

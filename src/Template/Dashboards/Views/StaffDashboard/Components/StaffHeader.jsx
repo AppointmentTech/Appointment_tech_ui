@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import {
-  AppBar, Toolbar, Typography, IconButton, Avatar, Badge, Tooltip, Box, Popover, Divider, Button, useMediaQuery, Drawer, List, ListItemButton, ListItemIcon, ListItemText
+  AppBar, Toolbar, Typography, IconButton, Avatar, Badge, Tooltip, Box, Popover, Divider, Button, useMediaQuery, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem
 } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MailIcon from '@mui/icons-material/Mail';
@@ -11,9 +11,13 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import BuildIcon from '@mui/icons-material/Build';
 import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
 import { ThemeContext } from 'ContextOrRedux/ThemeProvider.js';
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from 'ContextOrRedux/AuthContext.js';
 
 const navIcons = {
   assigned: <AssignmentIcon />,
@@ -55,6 +59,19 @@ const StaffHeader = ({ navItems = navItemsDefault, section, setSection }) => {
   const handleRemoveNotification = (id) => setNotifications(notifs => notifs.filter(n => n.id !== id));
   // Drawer state for mobile nav
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // Avatar menu state
+  const [avatarAnchorEl, setAvatarAnchorEl] = useState(null);
+  const openAvatarMenu = Boolean(avatarAnchorEl);
+  const navigate = useNavigate();
+  const { dispatch } = useContext(AuthContext);
+
+  const handleAvatarClick = (event) => setAvatarAnchorEl(event.currentTarget);
+  const handleAvatarClose = () => setAvatarAnchorEl(null);
+  const handleLogout = () => {
+    dispatch({ type: 'LOGOUT' });
+    handleAvatarClose();
+    navigate('/SignIn');
+  };
 
   return (
     <AppBar
@@ -237,8 +254,46 @@ const StaffHeader = ({ navItems = navItemsDefault, section, setSection }) => {
             ))}
             {mockNotifications.length === 0 && <Typography sx={{ px: 2, py: 2, color: 'text.secondary' }}>No notifications</Typography>}
           </Popover>
-          {/* User Avatar */}
-          <Avatar sx={{ bgcolor: theme.palette.primary.main, ml: 2, width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, fontSize: isMobile ? 16 : 20, boxShadow: 1 }}>S</Avatar>
+          {/* User Avatar with Menu */}
+          <Box>
+            <Tooltip title="Account" arrow placement="bottom">
+              <IconButton onClick={e => setAvatarAnchorEl(e.currentTarget)} sx={{ ml: 1 }}>
+                <Avatar sx={{ bgcolor: theme.palette.primary.main, width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, fontSize: isMobile ? 16 : 20, boxShadow: 1 }}>S</Avatar>
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={avatarAnchorEl}
+              open={openAvatarMenu}
+              onClose={handleAvatarClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  minWidth: 180,
+                  borderRadius: 2,
+                  boxShadow: 6,
+                  background: darkMode ? '#1e293b' : '#fff',
+                  color: darkMode ? '#e2e8f0' : '#1e293b',
+                  p: 0,
+                },
+              }}
+            >
+              <MenuItem onClick={() => { setSection && setSection('profile'); handleAvatarClose(); }}>
+                <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
+                Profile
+              </MenuItem>
+              <MenuItem onClick={handleAvatarClose}>
+                <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
+                Settings
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout} sx={{ color: theme.palette.error.main }}>
+                <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
+                Logout
+              </MenuItem>
+            </Menu>
+          </Box>
         </Box>
       </Toolbar>
       {/* Mobile Drawer Navigation */}

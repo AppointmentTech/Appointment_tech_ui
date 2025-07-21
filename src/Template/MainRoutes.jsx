@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import ProtectedRoute from "Template/ProtectedRoute.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext.js";
@@ -54,6 +54,7 @@ import LocationActivePincode from "../CommonModules/LocationModule/LocationActiv
 import BussinessType from "../CommonModules/BussinessModule/BussinessType/BussinessType.jsx";
 import BusinessCategories from "../CommonModules/BussinessModule/BusinessCategories/BusinessCategories.jsx";
 import BusinessManUsers from '../CommonModules/BussinessModule/BusinessManUsers/BusinessManUsers.jsx'
+import StaffDashboard from "./Dashboards/Views/StaffDashboard/StaffDashboard.jsx";
 
 var hist = createBrowserHistory();
 export default function MainRoutes() {
@@ -149,7 +150,15 @@ export default function MainRoutes() {
             path="/Settings"
             element={<SystemSettings />}
           />
-          
+          <Route
+            exact
+            path="/StaffDashboard"
+            element={
+              
+                <StaffDashboard />
+             
+            }
+          />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

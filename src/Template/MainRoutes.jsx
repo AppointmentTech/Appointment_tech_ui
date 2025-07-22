@@ -68,6 +68,8 @@ import VisitorManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdm
 import DischargeManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/DischargeManagement.jsx";
 import HospitalRoomManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalRoomManagement.jsx";
 import HospitalStaffManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalStaffManagement.jsx";
+import HospitalBillingManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalBillingManagement.jsx";
+
 var hist = createBrowserHistory();
 export default function MainRoutes() {
   const context = useContext(AuthContext);
@@ -201,6 +203,7 @@ export default function MainRoutes() {
           <Route exact path="/DischargeManagement" element={<DischargeManagement />} />
           <Route exact path="/HospitalRoomManagement" element={<HospitalRoomManagement />} />
           <Route exact path="/HospitalStaffManagement" element={<HospitalStaffManagement />} />
+          <Route exact path="/HospitalBillingManagement" element={<HospitalBillingManagement />} />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

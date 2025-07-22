@@ -43,7 +43,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { ThemeContext } from "ContextOrRedux/ThemeProvider.js";
 import { AuthContext } from "ContextOrRedux/AuthContext";
 import { authPostRecord } from "services/services";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 const API_Logout = "api/v1/authrouter/logout";
 const pages = ["Home", "About", "Our Businesses", "News Room", "ContactUs"];
 const settings = ["Profile", "Orders", "Logout"];

@@ -55,6 +55,20 @@ import BussinessType from "../CommonModules/BussinessModule/BussinessType/Bussin
 import BusinessCategories from "../CommonModules/BussinessModule/BusinessCategories/BusinessCategories.jsx";
 import BusinessManUsers from '../CommonModules/BussinessModule/BusinessManUsers/BusinessManUsers.jsx'
 import StaffDashboard from "./Dashboards/Views/StaffDashboard/StaffDashboard.jsx";
+import HospitalsAdminDashboard from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalsAdminDashboard.jsx";
+import PatientManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/PatientManagement.jsx";
+import AppointmentManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/AppointmentManagement.jsx";
+import AdmissionRequests from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/AdmissionRequests.jsx";
+import InventoryManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/InventoryManagement.jsx";
+import OperationTheaterManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/OperationTheaterManagement.jsx";
+import LaboratoryManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/LaboratoryManagement.jsx";
+import AmbulanceManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/AmbulanceManagement.jsx";
+import AssetManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/AssetManagement.jsx";
+import VisitorManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/VisitorManagement.jsx";
+import DischargeManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/DischargeManagement.jsx";
+import HospitalRoomManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalRoomManagement.jsx";
+import HospitalStaffManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalStaffManagement.jsx";
+import HospitalBillingManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalBillingManagement.jsx";
 
 var hist = createBrowserHistory();
 export default function MainRoutes() {
@@ -159,6 +173,37 @@ export default function MainRoutes() {
              
             }
           />
+          <Route
+            exact
+            path="/HospitalsAdminDashboard"
+            element={<HospitalsAdminDashboard />}
+          />
+          <Route
+            exact
+            path="/PatientManagement"
+            element={<PatientManagement />}
+          />
+          <Route
+            exact
+            path="/AppointmentManagement"
+            element={<AppointmentManagement />}
+          />
+          <Route
+            exact
+            path="/AdmissionRequests"
+            element={<AdmissionRequests />}
+          />
+         
+          <Route exact path="/InventoryManagement" element={<InventoryManagement />} />
+          <Route exact path="/OperationTheaterManagement" element={<OperationTheaterManagement />} />
+          <Route exact path="/LaboratoryManagement" element={<LaboratoryManagement />} />
+          <Route exact path="/AmbulanceManagement" element={<AmbulanceManagement />} />
+          <Route exact path="/AssetManagement" element={<AssetManagement />} />
+          <Route exact path="/VisitorManagement" element={<VisitorManagement />} />
+          <Route exact path="/DischargeManagement" element={<DischargeManagement />} />
+          <Route exact path="/HospitalRoomManagement" element={<HospitalRoomManagement />} />
+          <Route exact path="/HospitalStaffManagement" element={<HospitalStaffManagement />} />
+          <Route exact path="/HospitalBillingManagement" element={<HospitalBillingManagement />} />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

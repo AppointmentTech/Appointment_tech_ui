@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import LocationActivePincodeForm from "./Form/LocationActivePincodeForm.jsx";
 import LocationActivePincodePreview from "./Preview/LocationActivePincodePreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -296,7 +296,7 @@ export default function LocationActivePincode(props) {
               setProcessing={setProcessing}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

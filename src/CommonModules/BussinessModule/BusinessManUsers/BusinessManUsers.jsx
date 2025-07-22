@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import BusinessManUsersForm from "./Form/BusinessManUsersForm.jsx";
 import BusinessManUsersPreview from "./Preview/BusinessManUsersPreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -353,7 +353,7 @@ export default function BusinessManUsers(props) {
               setProcessing={setProcessing}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

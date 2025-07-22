@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import LocationMasterForm from "./Form/LocationMasterForm.jsx";
 import LocationMasterPreview from "./Preview/LocationMasterPreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -331,7 +331,7 @@ export default function LocationMaster(props) {
               setProcessing={setProcessing}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

@@ -41,7 +41,7 @@ import NewspaperIcon from "@mui/icons-material/Newspaper";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useMediaQuery } from "@mui/material";
 import { authPostRecord } from "services/services";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
 import { sidebarData, additionalMenuItems } from "CommonComponents/SidebarData.js";
 
@@ -720,7 +720,7 @@ export default function CoAdminHeader() {
           </List>
         </Box>
         
-        <Snackbar
+        <SnackBar
           open={snackOpen}
           setOpen={setSnackOpen}
           options={snackOptions}

@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import PagesForm from "./Form/PagesForm.jsx";
 import PagesPreview from "./Preview/PagesPreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -300,7 +300,7 @@ export default function Pages(props) {
               setProcessing={setProcessing}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

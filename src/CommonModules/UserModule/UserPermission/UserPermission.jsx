@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import UserPermissionForm from "./Form/UserPermissionForm.jsx";
 import UserPermissionPreview from "./Preview/UserPermissionPreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -326,7 +326,7 @@ const [allUserTypes, setAllUserTypes] = useState([]);
               allUserTypes={allUserTypes}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

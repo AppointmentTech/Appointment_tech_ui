@@ -38,7 +38,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import { useMediaQuery } from "@mui/material";
 import { authPostRecord } from "services/services";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
 import { sidebarData as adminSidebarData, moduleData, additionalMenuItems as adminAdditionalMenuItems } from "CommonComponents/SidebarData.js";
 // If you have a separate coadminSidebarData, import it here
@@ -962,7 +962,7 @@ export default function CommonHeader({ role: propRole }) {
             );
           })}
         </List>
-        <Snackbar
+        <SnackBar
           open={snackOpen}
           setOpen={setSnackOpen}
           options={snackOptions}

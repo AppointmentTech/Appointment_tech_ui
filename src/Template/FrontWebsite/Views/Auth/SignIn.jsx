@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   authPostRecord,
   getRecord,
@@ -606,7 +606,7 @@ export default function SignIn() {
           </Box>
         </Box>
       </Box>
-      <Snackbar
+      <SnackBar
         open={snackOpen}
         setOpen={setSnackOpen}
         options={snackOptions}

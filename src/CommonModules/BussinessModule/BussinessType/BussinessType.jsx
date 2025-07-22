@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import BussinessTypeForm from "./Form/BussinessTypeForm.jsx";
 import BussinessTypePreview from "./Preview/BussinessTypePreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -327,7 +327,7 @@ export default function BussinessType(props) {
               setProcessing={setProcessing}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

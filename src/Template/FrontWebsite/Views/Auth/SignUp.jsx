@@ -29,7 +29,7 @@ import {
 } from "@mui/material";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   authPostRecord,
   getRecord,
@@ -758,7 +758,7 @@ export default function SignUp() {
           </Grid>
         </Box>
       </Box>
-      <Snackbar
+      <SnackBar
         open={snackOpen}
         setOpen={setSnackOpen}
         options={snackOptions}

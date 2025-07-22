@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import UsersForm from "./Form/UsersForm.jsx";
 import UsersPreview from "./Preview/UsersPreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -331,7 +331,7 @@ export default function Users(props) {
               setSnackOptions={setSnackOptions}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

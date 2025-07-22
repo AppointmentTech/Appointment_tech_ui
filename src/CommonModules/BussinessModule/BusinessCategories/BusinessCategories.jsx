@@ -32,7 +32,7 @@ import {
 /** ------------------ User Components ------------------- */
 import BusinessCategoriesForm from "./Form/BusinessCategoriesForm.jsx";
 import BusinessCategoriesPreview from "./Preview/BusinessCategoriesPreview.jsx";
-import Snackbar from "SnackBar/Snackbar.jsx";
+import SnackBar from "SnackBar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
@@ -309,7 +309,7 @@ export default function BusinessCategories(props) {
               setProcessing={setProcessing}
             />
           )}
-          <Snackbar
+          <SnackBar
             open={snackOpen}
             setOpen={setSnackOpen}
             options={snackOptions}

@@ -69,7 +69,12 @@ import DischargeManagement from "./Dashboards/Views/BusinessDashboard/HospitalsA
 import HospitalRoomManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalRoomManagement.jsx";
 import HospitalStaffManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalStaffManagement.jsx";
 import HospitalBillingManagement from "./Dashboards/Views/BusinessDashboard/HospitalsAdmin/HospitalBillingManagement.jsx";
-
+import GarageAdminDashboard from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageAdminDashboard.jsx";
+import GarageServices from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageServices.jsx";
+import GarageTechnicianManagement from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageTechnicianManagement.jsx";
+import GarageCustomerManagement from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageCustomerManagement.jsx";
+import GarageVehicles from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageVehicles.jsx";
+import GarageBookings from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageBookings.jsx";
 var hist = createBrowserHistory();
 export default function MainRoutes() {
   const context = useContext(AuthContext);
@@ -204,6 +209,12 @@ export default function MainRoutes() {
           <Route exact path="/HospitalRoomManagement" element={<HospitalRoomManagement />} />
           <Route exact path="/HospitalStaffManagement" element={<HospitalStaffManagement />} />
           <Route exact path="/HospitalBillingManagement" element={<HospitalBillingManagement />} />
+          <Route exact path="/GarageAdminDashboard" element={<GarageAdminDashboard />} />
+          <Route exact path="/GarageServices" element={<GarageServices />} />
+          <Route exact path="/GarageTechnicianManagement" element={<GarageTechnicianManagement />} />
+          <Route exact path="/GarageCustomerManagement" element={<GarageCustomerManagement />} />
+          <Route exact path="/GarageVehicles" element={<GarageVehicles />} />
+          <Route exact path="/GarageBookings" element={<GarageBookings />} />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

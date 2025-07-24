@@ -71,17 +71,26 @@ export const sidebarData = {
     {
       name: "Garages",
       items: [
-        { name: "Dashboard", url: "/GarageDashboard" },
+        { name: "Dashboard", url: "/GarageAdminDashboard" },
         { name: "Services Offered", url: "/GarageServices" },
-        { name: "Technician Management", url: "/TechnicianManagement" },
+        { name: "Technician Management", url: "/GarageTechnicianManagement" },
         { name: "Customer Management", url: "/GarageCustomerManagement" },
+        { name: "Vehicle Management", url: "/GarageVehicles" }, // For two-wheelers, cars, autos, trucks
         { name: "Bookings", url: "/GarageBookings" },
+        { name: "Job Cards", url: "/GarageJobCards" }, // Digital job cards with photos, consent
         { name: "Inventory", url: "/GarageInventory" },
         { name: "Parts Management", url: "/GarageParts" },
+        { name: "Supplier Management", url: "/GarageSuppliers" },
         { name: "Service History", url: "/GarageServiceHistory" },
-        { name: "Invoices", url: "/GarageInvoices" },
-        { name: "Reports", url: "/GarageReports" },
-        { name: "Settings", url: "/GarageSettings" },
+        { name: "Invoices & GST", url: "/GarageInvoices" }, // GST-compliant invoices
+        { name: "Payments", url: "/GaragePayments" }, // UPI, Paytm, Razorpay, etc.
+        { name: "Expenses", url: "/GarageExpenses" },
+        { name: "Reports & Analytics", url: "/GarageReports" },
+        { name: "Reminders", url: "/GarageReminders" }, // Insurance, PUC, fitness, service
+        { name: "Offers & Campaigns", url: "/GarageOffers" }, // Festival/seasonal offers
+        { name: "Feedback & Reviews", url: "/GarageFeedback" },
+        { name: "Staff Attendance", url: "/GarageAttendance" }, // Optional: Aadhaar/biometric
+        { name: "Settings", url: "/GarageSettings" }
       ],
       icon: <GarageIcon color="primary" />,
     },

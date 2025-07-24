@@ -75,6 +75,12 @@ import GarageTechnicianManagement from "./Dashboards/Views/BusinessDashboard/Gar
 import GarageCustomerManagement from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageCustomerManagement.jsx";
 import GarageVehicles from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageVehicles.jsx";
 import GarageBookings from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageBookings.jsx";
+import GarageJobCards from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageJobCards.jsx";
+import GarageInventory from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageInventory.jsx";
+import GarageParts from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageParts.jsx";
+import GarageSuppliers from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageSuppliers.jsx";
+import GarageServiceHistory from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageServiceHistory.jsx";
+import GarageInvoices from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageInvoices.jsx";
 var hist = createBrowserHistory();
 export default function MainRoutes() {
   const context = useContext(AuthContext);
@@ -215,6 +221,12 @@ export default function MainRoutes() {
           <Route exact path="/GarageCustomerManagement" element={<GarageCustomerManagement />} />
           <Route exact path="/GarageVehicles" element={<GarageVehicles />} />
           <Route exact path="/GarageBookings" element={<GarageBookings />} />
+          <Route exact path="/GarageJobCards" element={<GarageJobCards />} />
+          <Route exact path="/GarageInventory" element={<GarageInventory />} />
+          <Route exact path="/GarageParts" element={<GarageParts />} />
+          <Route exact path="/GarageSuppliers" element={<GarageSuppliers />} />
+          <Route exact path="/GarageServiceHistory" element={<GarageServiceHistory />} />
+          <Route exact path="/GarageInvoices" element={<GarageInvoices />} />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

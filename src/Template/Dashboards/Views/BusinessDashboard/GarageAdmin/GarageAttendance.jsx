@@ -24,14 +24,9 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
-import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
-import format from "date-fns/format";
-import parse from "date-fns/parse";
-import startOfWeek from "date-fns/startOfWeek";
-import getDay from "date-fns/getDay";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import CustomTableToolbar from "CommonComponents/CustomTableToolbar.js";
+import AttendanceCalendar from "./AttendanceCalendar.jsx";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -45,28 +40,17 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import dayjs from "dayjs";
 
-const locales = {
-  "en-US": require("date-fns/locale/en-US"),
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
-
 const GarageAttendance = () => {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [holidayDialogOpen, setHolidayDialogOpen] = useState(false);
+  const [calendarDialogOpen, setCalendarDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [selectedHoliday, setSelectedHoliday] = useState(null);
+  const [selectedStaff, setSelectedStaff] = useState(null);
   const [selectedIDs, setSelectedIDs] = useState([]);
   const [selectedHolidayIDs, setSelectedHolidayIDs] = useState([]);
-  const [calendarView, setCalendarView] = useState(Views.MONTH);
 
   // Staff data
   const [staffMembers] = useState([
@@ -202,6 +186,30 @@ const GarageAttendance = () => {
     return events;
   }, [records, holidays, theme.palette]);
 
+  // Staff-specific calendar events
+  const getStaffCalendarEvents = (staffId) => {
+    const staffRecords = records.filter(record => record.staffId === staffId);
+    const events = [];
+    
+    staffRecords.forEach(record => {
+      const eventDate = new Date(record.date);
+      events.push({
+        id: `attendance-${record.id}`,
+        title: `${record.status} - ${record.punchIn || 'N/A'} to ${record.punchOut || 'N/A'}`,
+        start: eventDate,
+        end: eventDate,
+        resource: record,
+        type: 'attendance',
+        color: record.status === 'Present' ? theme.palette.success.main : theme.palette.error.main,
+        punchIn: record.punchIn,
+        punchOut: record.punchOut,
+        totalHours: record.totalHours
+      });
+    });
+
+    return events;
+  };
+
   // Staff table columns with actions first
   const staffColumns = [
     {
@@ -212,7 +220,11 @@ const GarageAttendance = () => {
       renderCell: (params) => (
         <Stack direction="row" spacing={1}>
           <Tooltip title="View Attendance Calendar">
-            <IconButton size="small" color="primary">
+            <IconButton 
+              size="small" 
+              color="primary"
+              onClick={() => handleViewStaffCalendar(params.row)}
+            >
               <CalendarMonthIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -419,6 +431,16 @@ const GarageAttendance = () => {
     setSelectedHoliday(null);
   };
 
+  const handleViewStaffCalendar = (staff) => {
+    setSelectedStaff(staff);
+    setCalendarDialogOpen(true);
+  };
+
+  const handleCloseCalendarDialog = () => {
+    setCalendarDialogOpen(false);
+    setSelectedStaff(null);
+  };
+
   const handleSave = () => {
     const newRecord = {
       id: selectedRecord?.id || Date.now(),
@@ -459,101 +481,11 @@ const GarageAttendance = () => {
     setSelectedHolidayIDs([]);
   };
 
-  const eventStyleGetter = (event) => {
-    return {
-      style: {
-        backgroundColor: event.color,
-        borderRadius: '5px',
-        opacity: 0.9,
-        color: 'white',
-        border: '0px',
-        display: 'block',
-        padding: '2px 5px',
-        fontSize: '12px',
-        fontWeight: 'bold'
-      }
-    };
-  };
-
   const presentCount = records.filter((r) => r.status === "Present").length;
   const absentCount = records.filter((r) => r.status === "Absent").length;
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
-  };
-
-  // Custom calendar toolbar
-  const CustomToolbar = (toolbar) => {
-    const goToToday = () => {
-      toolbar.onNavigate('TODAY');
-    };
-
-    const goToPrev = () => {
-      toolbar.onNavigate('PREV');
-    };
-
-    const goToNext = () => {
-      toolbar.onNavigate('NEXT');
-    };
-
-    const viewNames = {
-      month: 'Month',
-      week: 'Week',
-      day: 'Day'
-    };
-
-    const currentView = viewNames[toolbar.view] || toolbar.view;
-
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        p: 2, 
-        backgroundColor: theme.palette.background.paper,
-        borderBottom: `1px solid ${theme.palette.divider}`
-      }}>
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" size="small" onClick={goToToday}>
-            Today
-          </Button>
-          <Button variant="outlined" size="small" onClick={goToPrev}>
-            Back
-          </Button>
-          <Button variant="outlined" size="small" onClick={goToNext}>
-            Next
-          </Button>
-        </Stack>
-        
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-          {toolbar.label}
-        </Typography>
-        
-        <Stack direction="row" spacing={1}>
-          <Button 
-            variant={toolbar.view === 'month' ? 'contained' : 'outlined'} 
-            size="small" 
-            onClick={() => toolbar.onView('month')}
-          >
-            Month
-          </Button>
-          <Button 
-            variant={toolbar.view === 'week' ? 'contained' : 'outlined'} 
-            size="small" 
-            onClick={() => toolbar.onView('week')}
-          >
-            Week
-          </Button>
-          <Button 
-            variant={toolbar.view === 'day' ? 'contained' : 'outlined'} 
-            size="small" 
-            onClick={() => toolbar.onView('day')}
-          >
-            Day
-          </Button>
-        </Stack>
-      </Box>
-    );
   };
 
   return (
@@ -628,49 +560,16 @@ const GarageAttendance = () => {
 
         {/* Tab Content */}
         {activeTab === 0 && (
-          <Paper sx={{ p: 2, height: 600 }}>
-            <Calendar
-              localizer={localizer}
-              events={calendarEvents}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
-              eventPropGetter={eventStyleGetter}
-              views={['month', 'week', 'day']}
-              defaultView="month"
-              view={calendarView}
-              onView={(view) => setCalendarView(view)}
-              tooltipAccessor={(event) => {
-                if (event.type === 'attendance') {
-                  return `${event.title}\nPunch In: ${event.punchIn || 'N/A'}\nPunch Out: ${event.punchOut || 'N/A'}\nTotal Hours: ${event.totalHours}`;
-                }
-                return event.title;
-              }}
-              components={{
-                toolbar: CustomToolbar
-              }}
-              sx={{
-                '& .rbc-calendar': {
-                  backgroundColor: theme.palette.background.paper,
-                  color: theme.palette.text.primary,
-                },
-                '& .rbc-header': {
-                  backgroundColor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  fontWeight: 'bold',
-                },
-                '& .rbc-today': {
-                  backgroundColor: theme.palette.action.hover,
-                },
-                '& .rbc-off-range-bg': {
-                  backgroundColor: theme.palette.action.disabledBackground,
-                },
-                '& .rbc-event': {
-                  backgroundColor: theme.palette.primary.main,
-                },
-              }}
-            />
-          </Paper>
+          <AttendanceCalendar 
+            events={calendarEvents}
+            height={600}
+            title="Attendance Calendar"
+            onEventClick={(event) => {
+              if (event.type === 'attendance') {
+                handleOpenDialog(event.resource);
+              }
+            }}
+          />
         )}
 
         {activeTab === 1 && (
@@ -702,7 +601,8 @@ const GarageAttendance = () => {
               }}
               sx={{
                 "& .MuiDataGrid-cell": {
-                  borderBottom: "1px solid #e0e0e0",
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.primary,
                 },
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: theme.palette.primary.main,
@@ -711,6 +611,19 @@ const GarageAttendance = () => {
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: 'bold',
+                },
+                "& .MuiDataGrid-row": {
+                  backgroundColor: theme.palette.background.paper,
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.palette.background.paper,
+                  borderTop: `1px solid ${theme.palette.divider}`,
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                  backgroundColor: theme.palette.background.paper,
                 },
               }}
             />
@@ -746,7 +659,8 @@ const GarageAttendance = () => {
               }}
               sx={{
                 "& .MuiDataGrid-cell": {
-                  borderBottom: "1px solid #e0e0e0",
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.primary,
                 },
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: theme.palette.primary.main,
@@ -755,6 +669,19 @@ const GarageAttendance = () => {
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: 'bold',
+                },
+                "& .MuiDataGrid-row": {
+                  backgroundColor: theme.palette.background.paper,
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.palette.background.paper,
+                  borderTop: `1px solid ${theme.palette.divider}`,
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                  backgroundColor: theme.palette.background.paper,
                 },
               }}
             />
@@ -790,7 +717,8 @@ const GarageAttendance = () => {
               }}
               sx={{
                 "& .MuiDataGrid-cell": {
-                  borderBottom: "1px solid #e0e0e0",
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.primary,
                 },
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: theme.palette.primary.main,
@@ -799,6 +727,19 @@ const GarageAttendance = () => {
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: 'bold',
+                },
+                "& .MuiDataGrid-row": {
+                  backgroundColor: theme.palette.background.paper,
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.palette.background.paper,
+                  borderTop: `1px solid ${theme.palette.divider}`,
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                  backgroundColor: theme.palette.background.paper,
                 },
               }}
             />
@@ -1005,6 +946,39 @@ const GarageAttendance = () => {
             <Button variant="contained" onClick={handleSaveHoliday}>
               {selectedHoliday?.id ? "Update" : "Add"}
             </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Staff Attendance Calendar Dialog */}
+        <Dialog 
+          open={calendarDialogOpen} 
+          onClose={handleCloseCalendarDialog} 
+          fullWidth 
+          maxWidth="lg"
+          PaperProps={{
+            sx: { height: '90vh' }
+          }}
+        >
+          <DialogTitle>
+            {selectedStaff ? `${selectedStaff.name}'s Attendance Calendar` : 'Staff Attendance Calendar'}
+          </DialogTitle>
+          <DialogContent sx={{ p: 0 }}>
+            {selectedStaff && (
+              <AttendanceCalendar 
+                events={getStaffCalendarEvents(selectedStaff.id)}
+                height={600}
+                title=""
+                onEventClick={(event) => {
+                  if (event.type === 'attendance') {
+                    handleOpenDialog(event.resource);
+                    handleCloseCalendarDialog();
+                  }
+                }}
+              />
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseCalendarDialog}>Close</Button>
           </DialogActions>
         </Dialog>
       </Box>

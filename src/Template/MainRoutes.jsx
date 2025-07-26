@@ -81,6 +81,9 @@ import GarageParts from "./Dashboards/Views/BusinessDashboard/GarageAdmin/Garage
 import GarageSuppliers from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageSuppliers.jsx";
 import GarageServiceHistory from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageServiceHistory.jsx";
 import GarageInvoices from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageInvoices.jsx";
+import GaragePayments from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GaragePayments.jsx";
+import GarageExpenses from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageExpenses.jsx";
+import GarageReports from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageReports.jsx";
 var hist = createBrowserHistory();
 export default function MainRoutes() {
   const context = useContext(AuthContext);
@@ -227,6 +230,9 @@ export default function MainRoutes() {
           <Route exact path="/GarageSuppliers" element={<GarageSuppliers />} />
           <Route exact path="/GarageServiceHistory" element={<GarageServiceHistory />} />
           <Route exact path="/GarageInvoices" element={<GarageInvoices />} />
+          <Route exact path="/GaragePayments" element={<GaragePayments />} />
+          <Route exact path="/GarageExpenses" element={<GarageExpenses />} />
+          <Route exact path="/GarageReports" element={<GarageReports />} />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

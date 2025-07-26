@@ -32,22 +32,12 @@ export const reducer = (state, action) => {
         isAuthenticated: false,
         user: null,
         permissions: null,
-        usertype:null,
+        usertype: null,
         token: null,
       };
     
     default:
-      localStorage.removeItem("user");
-      localStorage.removeItem("permissions");
-      localStorage.removeItem("usertype");
-      localStorage.removeItem("token");
-      return {
-        ...state,
-        isAuthenticated: false,
-        user: null,
-        permissions: null,
-        usertype: null,
-        token: null,
-      };
+      // Don't modify localStorage in default case to prevent infinite loops
+      return state;
   }
 };

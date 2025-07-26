@@ -20,10 +20,11 @@ import {
   Chip,
   FormControl,
   InputLabel,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
@@ -38,6 +39,10 @@ import EventIcon from "@mui/icons-material/Event";
 import PeopleIcon from "@mui/icons-material/People";
 import BeachAccessIcon from "@mui/icons-material/BeachAccess";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import CoffeeIcon from "@mui/icons-material/Coffee";
 import dayjs from "dayjs";
 
 const locales = {
@@ -61,6 +66,7 @@ const GarageAttendance = () => {
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const [selectedIDs, setSelectedIDs] = useState([]);
   const [selectedHolidayIDs, setSelectedHolidayIDs] = useState([]);
+  const [calendarView, setCalendarView] = useState(Views.MONTH);
 
   // Staff data
   const [staffMembers] = useState([
@@ -71,13 +77,83 @@ const GarageAttendance = () => {
     { id: 5, name: "Priya Sharma", position: "Receptionist", phone: "+91 98765 43214", email: "priya@garage.com", joinDate: "2023-04-05" },
   ]);
 
-  // Attendance records
+  // Enhanced attendance records with punch in/out, lunch, and break times
   const [records, setRecords] = useState([
-    { id: 1, staffId: 1, staffName: "Ravi Kumar", date: "2025-01-25", status: "Present", checkIn: "09:00", checkOut: "18:00" },
-    { id: 2, staffId: 2, staffName: "Amit Singh", date: "2025-01-25", status: "Present", checkIn: "08:45", checkOut: "17:30" },
-    { id: 3, staffId: 3, staffName: "Sneha Patel", date: "2025-01-25", status: "Present", checkIn: "09:15", checkOut: "18:15" },
-    { id: 4, staffId: 4, staffName: "Rajesh Kumar", date: "2025-01-25", status: "Absent", checkIn: "", checkOut: "" },
-    { id: 5, staffId: 5, staffName: "Priya Sharma", date: "2025-01-25", status: "Present", checkIn: "08:30", checkOut: "17:45" },
+    { 
+      id: 1, 
+      staffId: 1, 
+      staffName: "Ravi Kumar", 
+      date: "2025-01-25", 
+      status: "Present", 
+      punchIn: "09:00", 
+      punchOut: "18:00",
+      lunchStart: "13:00",
+      lunchEnd: "14:00",
+      breakStart: "11:00",
+      breakEnd: "11:15",
+      totalHours: "9.0",
+      workingHours: "8.0"
+    },
+    { 
+      id: 2, 
+      staffId: 2, 
+      staffName: "Amit Singh", 
+      date: "2025-01-25", 
+      status: "Present", 
+      punchIn: "08:45", 
+      punchOut: "17:30",
+      lunchStart: "12:30",
+      lunchEnd: "13:30",
+      breakStart: "10:30",
+      breakEnd: "10:45",
+      totalHours: "8.75",
+      workingHours: "7.75"
+    },
+    { 
+      id: 3, 
+      staffId: 3, 
+      staffName: "Sneha Patel", 
+      date: "2025-01-25", 
+      status: "Present", 
+      punchIn: "09:15", 
+      punchOut: "18:15",
+      lunchStart: "13:15",
+      lunchEnd: "14:15",
+      breakStart: "11:15",
+      breakEnd: "11:30",
+      totalHours: "9.0",
+      workingHours: "8.0"
+    },
+    { 
+      id: 4, 
+      staffId: 4, 
+      staffName: "Rajesh Kumar", 
+      date: "2025-01-25", 
+      status: "Absent", 
+      punchIn: "", 
+      punchOut: "",
+      lunchStart: "",
+      lunchEnd: "",
+      breakStart: "",
+      breakEnd: "",
+      totalHours: "0.0",
+      workingHours: "0.0"
+    },
+    { 
+      id: 5, 
+      staffId: 5, 
+      staffName: "Priya Sharma", 
+      date: "2025-01-25", 
+      status: "Present", 
+      punchIn: "08:30", 
+      punchOut: "17:45",
+      lunchStart: "12:45",
+      lunchEnd: "13:45",
+      breakStart: "10:45",
+      breakEnd: "11:00",
+      totalHours: "9.25",
+      workingHours: "8.25"
+    },
   ]);
 
   // Holiday data
@@ -102,7 +178,10 @@ const GarageAttendance = () => {
         end: eventDate,
         resource: record,
         type: 'attendance',
-        color: record.status === 'Present' ? '#4caf50' : '#f44336'
+        color: record.status === 'Present' ? theme.palette.success.main : theme.palette.error.main,
+        punchIn: record.punchIn,
+        punchOut: record.punchOut,
+        totalHours: record.totalHours
       });
     });
 
@@ -116,15 +195,40 @@ const GarageAttendance = () => {
         end: eventDate,
         resource: holiday,
         type: 'holiday',
-        color: '#ff9800'
+        color: theme.palette.warning.main
       });
     });
 
     return events;
-  }, [records, holidays]);
+  }, [records, holidays, theme.palette]);
 
-  // Staff table columns
+  // Staff table columns with actions first
   const staffColumns = [
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 200,
+      sortable: false,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1}>
+          <Tooltip title="View Attendance Calendar">
+            <IconButton size="small" color="primary">
+              <CalendarMonthIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit Staff">
+            <IconButton size="small" color="primary">
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete Staff">
+            <IconButton size="small" color="error">
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      ),
+    },
     { field: 'id', headerName: 'ID', width: 70 },
     { 
       field: 'name', 
@@ -143,43 +247,10 @@ const GarageAttendance = () => {
     { field: 'phone', headerName: 'Phone', width: 150 },
     { field: 'email', headerName: 'Email', width: 200 },
     { field: 'joinDate', headerName: 'Join Date', width: 120 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      sortable: false,
-      renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <IconButton size="small" color="primary">
-            <EditIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small" color="error">
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Stack>
-      ),
-    },
   ];
 
-  // Attendance table columns
+  // Enhanced attendance table columns
   const attendanceColumns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'staffName', headerName: 'Staff Name', width: 200 },
-    { field: 'date', headerName: 'Date', width: 120 },
-    { 
-      field: 'status', 
-      headerName: 'Status', 
-      width: 120,
-      renderCell: (params) => (
-        <Chip 
-          label={params.value} 
-          color={params.value === 'Present' ? 'success' : 'error'}
-          size="small"
-        />
-      )
-    },
-    { field: 'checkIn', headerName: 'Check In', width: 100 },
-    { field: 'checkOut', headerName: 'Check Out', width: 100 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -196,15 +267,93 @@ const GarageAttendance = () => {
         </Stack>
       ),
     },
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'staffName', headerName: 'Staff Name', width: 200 },
+    { field: 'date', headerName: 'Date', width: 120 },
+    { 
+      field: 'status', 
+      headerName: 'Status', 
+      width: 120,
+      renderCell: (params) => (
+        <Chip 
+          label={params.value} 
+          color={params.value === 'Present' ? 'success' : 'error'}
+          size="small"
+        />
+      )
+    },
+    { 
+      field: 'punchIn', 
+      headerName: 'Punch In', 
+      width: 100,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <AccessTimeIcon fontSize="small" color="primary" />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </Stack>
+      )
+    },
+    { 
+      field: 'punchOut', 
+      headerName: 'Punch Out', 
+      width: 100,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <AccessTimeIcon fontSize="small" color="secondary" />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </Stack>
+      )
+    },
+    { 
+      field: 'lunchStart', 
+      headerName: 'Lunch Start', 
+      width: 120,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <RestaurantIcon fontSize="small" color="warning" />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </Stack>
+      )
+    },
+    { 
+      field: 'lunchEnd', 
+      headerName: 'Lunch End', 
+      width: 120,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <RestaurantIcon fontSize="small" color="warning" />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </Stack>
+      )
+    },
+    { 
+      field: 'breakStart', 
+      headerName: 'Break Start', 
+      width: 120,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <CoffeeIcon fontSize="small" color="info" />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </Stack>
+      )
+    },
+    { 
+      field: 'breakEnd', 
+      headerName: 'Break End', 
+      width: 120,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <CoffeeIcon fontSize="small" color="info" />
+          <Typography variant="body2">{params.value || '-'}</Typography>
+        </Stack>
+      )
+    },
+    { field: 'totalHours', headerName: 'Total Hours', width: 100 },
+    { field: 'workingHours', headerName: 'Working Hours', width: 120 },
   ];
 
-  // Holiday table columns
+  // Holiday table columns with actions first
   const holidayColumns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'name', headerName: 'Holiday Name', width: 200 },
-    { field: 'date', headerName: 'Date', width: 120 },
-    { field: 'type', headerName: 'Type', width: 150 },
-    { field: 'description', headerName: 'Description', width: 250 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -221,6 +370,11 @@ const GarageAttendance = () => {
         </Stack>
       ),
     },
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'name', headerName: 'Holiday Name', width: 200 },
+    { field: 'date', headerName: 'Date', width: 120 },
+    { field: 'type', headerName: 'Type', width: 150 },
+    { field: 'description', headerName: 'Description', width: 250 },
   ];
 
   const handleOpenDialog = (record = null) => {
@@ -230,8 +384,14 @@ const GarageAttendance = () => {
         staffName: "",
         date: dayjs().format("YYYY-MM-DD"),
         status: "Present",
-        checkIn: "",
-        checkOut: "",
+        punchIn: "",
+        punchOut: "",
+        lunchStart: "",
+        lunchEnd: "",
+        breakStart: "",
+        breakEnd: "",
+        totalHours: "0.0",
+        workingHours: "0.0"
       }
     );
     setDialogOpen(true);
@@ -304,10 +464,13 @@ const GarageAttendance = () => {
       style: {
         backgroundColor: event.color,
         borderRadius: '5px',
-        opacity: 0.8,
+        opacity: 0.9,
         color: 'white',
         border: '0px',
-        display: 'block'
+        display: 'block',
+        padding: '2px 5px',
+        fontSize: '12px',
+        fontWeight: 'bold'
       }
     };
   };
@@ -317,6 +480,80 @@ const GarageAttendance = () => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+  };
+
+  // Custom calendar toolbar
+  const CustomToolbar = (toolbar) => {
+    const goToToday = () => {
+      toolbar.onNavigate('TODAY');
+    };
+
+    const goToPrev = () => {
+      toolbar.onNavigate('PREV');
+    };
+
+    const goToNext = () => {
+      toolbar.onNavigate('NEXT');
+    };
+
+    const viewNames = {
+      month: 'Month',
+      week: 'Week',
+      day: 'Day'
+    };
+
+    const currentView = viewNames[toolbar.view] || toolbar.view;
+
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        p: 2, 
+        backgroundColor: theme.palette.background.paper,
+        borderBottom: `1px solid ${theme.palette.divider}`
+      }}>
+        <Stack direction="row" spacing={1}>
+          <Button variant="outlined" size="small" onClick={goToToday}>
+            Today
+          </Button>
+          <Button variant="outlined" size="small" onClick={goToPrev}>
+            Back
+          </Button>
+          <Button variant="outlined" size="small" onClick={goToNext}>
+            Next
+          </Button>
+        </Stack>
+        
+        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+          {toolbar.label}
+        </Typography>
+        
+        <Stack direction="row" spacing={1}>
+          <Button 
+            variant={toolbar.view === 'month' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => toolbar.onView('month')}
+          >
+            Month
+          </Button>
+          <Button 
+            variant={toolbar.view === 'week' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => toolbar.onView('week')}
+          >
+            Week
+          </Button>
+          <Button 
+            variant={toolbar.view === 'day' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => toolbar.onView('day')}
+          >
+            Day
+          </Button>
+        </Stack>
+      </Box>
+    );
   };
 
   return (
@@ -381,12 +618,12 @@ const GarageAttendance = () => {
 
         {/* Tabs */}
         <Paper sx={{ width: '100%', mb: 3 }}>
-                     <Tabs value={activeTab} onChange={handleTabChange} aria-label="attendance tabs">
-             <Tab icon={<EventIcon />} label="Calendar View" />
-             <Tab icon={<PeopleIcon />} label="Staff Details" />
-             <Tab icon={<AssignmentIcon />} label="Attendance Records" />
-             <Tab icon={<BeachAccessIcon />} label="Holiday List" />
-           </Tabs>
+          <Tabs value={activeTab} onChange={handleTabChange} aria-label="attendance tabs">
+            <Tab icon={<EventIcon />} label="Calendar View" />
+            <Tab icon={<PeopleIcon />} label="Staff Details" />
+            <Tab icon={<AssignmentIcon />} label="Attendance Records" />
+            <Tab icon={<BeachAccessIcon />} label="Holiday List" />
+          </Tabs>
         </Paper>
 
         {/* Tab Content */}
@@ -401,27 +638,57 @@ const GarageAttendance = () => {
               eventPropGetter={eventStyleGetter}
               views={['month', 'week', 'day']}
               defaultView="month"
-              tooltipAccessor={(event) => event.title}
+              view={calendarView}
+              onView={(view) => setCalendarView(view)}
+              tooltipAccessor={(event) => {
+                if (event.type === 'attendance') {
+                  return `${event.title}\nPunch In: ${event.punchIn || 'N/A'}\nPunch Out: ${event.punchOut || 'N/A'}\nTotal Hours: ${event.totalHours}`;
+                }
+                return event.title;
+              }}
+              components={{
+                toolbar: CustomToolbar
+              }}
+              sx={{
+                '& .rbc-calendar': {
+                  backgroundColor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
+                },
+                '& .rbc-header': {
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  fontWeight: 'bold',
+                },
+                '& .rbc-today': {
+                  backgroundColor: theme.palette.action.hover,
+                },
+                '& .rbc-off-range-bg': {
+                  backgroundColor: theme.palette.action.disabledBackground,
+                },
+                '& .rbc-event': {
+                  backgroundColor: theme.palette.primary.main,
+                },
+              }}
             />
           </Paper>
         )}
 
         {activeTab === 1 && (
           <Paper sx={{ p: 2, height: 600 }}>
-                         <DataGrid
-               rows={staffMembers}
-               columns={staffColumns}
-               initialState={{
-                 pagination: {
-                   paginationModel: { page: 0, pageSize: 10 },
-                 },
-               }}
-               pageSizeOptions={[10, 25, 50]}
-               checkboxSelection
-               disableRowSelectionOnClick
-               onRowSelectionModelChange={(newSelection) => {
-                 setSelectedIDs(newSelection);
-               }}
+            <DataGrid
+              rows={staffMembers}
+              columns={staffColumns}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 10 },
+                },
+              }}
+              pageSizeOptions={[10, 25, 50]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              onRowSelectionModelChange={(newSelection) => {
+                setSelectedIDs(newSelection);
+              }}
               components={{
                 Toolbar: CustomTableToolbar,
               }}
@@ -440,162 +707,241 @@ const GarageAttendance = () => {
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: theme.palette.primary.main,
                   color: theme.palette.primary.contrastText,
+                  fontWeight: 'bold',
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: 'bold',
                 },
               }}
             />
           </Paper>
         )}
 
-                 {activeTab === 2 && (
-           <Paper sx={{ p: 2, height: 600 }}>
-             <DataGrid
-               rows={records}
-               columns={attendanceColumns}
-               initialState={{
-                 pagination: {
-                   paginationModel: { page: 0, pageSize: 10 },
-                 },
-               }}
-               pageSizeOptions={[10, 25, 50]}
-               checkboxSelection
-               disableRowSelectionOnClick
-               onRowSelectionModelChange={(newSelection) => {
-                 setSelectedIDs(newSelection);
-               }}
-               components={{
-                 Toolbar: CustomTableToolbar,
-               }}
-               componentsProps={{
-                 toolbar: {
-                   rows: records,
-                   columns: attendanceColumns,
-                   selectedIDs: selectedIDs,
-                   handleDelete: handleDelete,
-                 },
-               }}
-               sx={{
-                 "& .MuiDataGrid-cell": {
-                   borderBottom: "1px solid #e0e0e0",
-                 },
-                 "& .MuiDataGrid-columnHeaders": {
-                   backgroundColor: theme.palette.primary.main,
-                   color: theme.palette.primary.contrastText,
-                 },
-               }}
-             />
-           </Paper>
-         )}
+        {activeTab === 2 && (
+          <Paper sx={{ p: 2, height: 600 }}>
+            <DataGrid
+              rows={records}
+              columns={attendanceColumns}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 10 },
+                },
+              }}
+              pageSizeOptions={[10, 25, 50]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              onRowSelectionModelChange={(newSelection) => {
+                setSelectedIDs(newSelection);
+              }}
+              components={{
+                Toolbar: CustomTableToolbar,
+              }}
+              componentsProps={{
+                toolbar: {
+                  rows: records,
+                  columns: attendanceColumns,
+                  selectedIDs: selectedIDs,
+                  handleDelete: handleDelete,
+                },
+              }}
+              sx={{
+                "& .MuiDataGrid-cell": {
+                  borderBottom: "1px solid #e0e0e0",
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  fontWeight: 'bold',
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+          </Paper>
+        )}
 
-         {activeTab === 3 && (
-           <Paper sx={{ p: 2, height: 600 }}>
-             <DataGrid
-               rows={holidays}
-               columns={holidayColumns}
-               initialState={{
-                 pagination: {
-                   paginationModel: { page: 0, pageSize: 10 },
-                 },
-               }}
-               pageSizeOptions={[10, 25, 50]}
-               checkboxSelection
-               disableRowSelectionOnClick
-               onRowSelectionModelChange={(newSelection) => {
-                 setSelectedHolidayIDs(newSelection);
-               }}
-               components={{
-                 Toolbar: CustomTableToolbar,
-               }}
-               componentsProps={{
-                 toolbar: {
-                   rows: holidays,
-                   columns: holidayColumns,
-                   selectedIDs: selectedHolidayIDs,
-                   handleDelete: handleDeleteHolidays,
-                 },
-               }}
-               sx={{
-                 "& .MuiDataGrid-cell": {
-                   borderBottom: "1px solid #e0e0e0",
-                 },
-                 "& .MuiDataGrid-columnHeaders": {
-                   backgroundColor: theme.palette.primary.main,
-                   color: theme.palette.primary.contrastText,
-                 },
-               }}
-             />
-           </Paper>
-         )}
+        {activeTab === 3 && (
+          <Paper sx={{ p: 2, height: 600 }}>
+            <DataGrid
+              rows={holidays}
+              columns={holidayColumns}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 10 },
+                },
+              }}
+              pageSizeOptions={[10, 25, 50]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              onRowSelectionModelChange={(newSelection) => {
+                setSelectedHolidayIDs(newSelection);
+              }}
+              components={{
+                Toolbar: CustomTableToolbar,
+              }}
+              componentsProps={{
+                toolbar: {
+                  rows: holidays,
+                  columns: holidayColumns,
+                  selectedIDs: selectedHolidayIDs,
+                  handleDelete: handleDeleteHolidays,
+                },
+              }}
+              sx={{
+                "& .MuiDataGrid-cell": {
+                  borderBottom: "1px solid #e0e0e0",
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  fontWeight: 'bold',
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+          </Paper>
+        )}
 
-        {/* Attendance Dialog */}
-        <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        {/* Enhanced Attendance Dialog */}
+        <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
           <DialogTitle>{selectedRecord?.id ? "Update" : "Mark"} Attendance</DialogTitle>
           <DialogContent>
-            <Stack spacing={2} sx={{ mt: 1 }}>
-              <FormControl fullWidth>
-                <InputLabel>Staff Member</InputLabel>
-                <Select
-                  value={selectedRecord?.staffId || ""}
-                  onChange={(e) => {
-                    const staff = staffMembers.find(s => s.id === e.target.value);
-                    setSelectedRecord((prev) => ({ 
-                      ...prev, 
-                      staffId: e.target.value,
-                      staffName: staff ? staff.name : ""
-                    }));
-                  }}
-                >
-                  {staffMembers.map((staff) => (
-                    <MenuItem key={staff.id} value={staff.id}>
-                      {staff.name} - {staff.position}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                label="Date"
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={selectedRecord?.date || ""}
-                onChange={(e) =>
-                  setSelectedRecord((prev) => ({ ...prev, date: e.target.value }))
-                }
-              />
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={selectedRecord?.status || "Present"}
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Staff Member</InputLabel>
+                  <Select
+                    value={selectedRecord?.staffId || ""}
+                    onChange={(e) => {
+                      const staff = staffMembers.find(s => s.id === e.target.value);
+                      setSelectedRecord((prev) => ({ 
+                        ...prev, 
+                        staffId: e.target.value,
+                        staffName: staff ? staff.name : ""
+                      }));
+                    }}
+                  >
+                    {staffMembers.map((staff) => (
+                      <MenuItem key={staff.id} value={staff.id}>
+                        {staff.name} - {staff.position}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Date"
+                  type="date"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.date || ""}
                   onChange={(e) =>
-                    setSelectedRecord((prev) => ({ ...prev, status: e.target.value }))
+                    setSelectedRecord((prev) => ({ ...prev, date: e.target.value }))
                   }
-                >
-                  <MenuItem value="Present">Present</MenuItem>
-                  <MenuItem value="Absent">Absent</MenuItem>
-                  <MenuItem value="Late">Late</MenuItem>
-                  <MenuItem value="Half Day">Half Day</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                label="Check In Time"
-                type="time"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={selectedRecord?.checkIn || ""}
-                onChange={(e) =>
-                  setSelectedRecord((prev) => ({ ...prev, checkIn: e.target.value }))
-                }
-              />
-              <TextField
-                label="Check Out Time"
-                type="time"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={selectedRecord?.checkOut || ""}
-                onChange={(e) =>
-                  setSelectedRecord((prev) => ({ ...prev, checkOut: e.target.value }))
-                }
-              />
-            </Stack>
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={selectedRecord?.status || "Present"}
+                    onChange={(e) =>
+                      setSelectedRecord((prev) => ({ ...prev, status: e.target.value }))
+                    }
+                  >
+                    <MenuItem value="Present">Present</MenuItem>
+                    <MenuItem value="Absent">Absent</MenuItem>
+                    <MenuItem value="Late">Late</MenuItem>
+                    <MenuItem value="Half Day">Half Day</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Time Tracking</Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Punch In Time"
+                  type="time"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.punchIn || ""}
+                  onChange={(e) =>
+                    setSelectedRecord((prev) => ({ ...prev, punchIn: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Punch Out Time"
+                  type="time"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.punchOut || ""}
+                  onChange={(e) =>
+                    setSelectedRecord((prev) => ({ ...prev, punchOut: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Lunch Break</Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Lunch Start Time"
+                  type="time"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.lunchStart || ""}
+                  onChange={(e) =>
+                    setSelectedRecord((prev) => ({ ...prev, lunchStart: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Lunch End Time"
+                  type="time"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.lunchEnd || ""}
+                  onChange={(e) =>
+                    setSelectedRecord((prev) => ({ ...prev, lunchEnd: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Short Break</Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Break Start Time"
+                  type="time"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.breakStart || ""}
+                  onChange={(e) =>
+                    setSelectedRecord((prev) => ({ ...prev, breakStart: e.target.value }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Break End Time"
+                  type="time"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={selectedRecord?.breakEnd || ""}
+                  onChange={(e) =>
+                    setSelectedRecord((prev) => ({ ...prev, breakEnd: e.target.value }))
+                  }
+                />
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}>Cancel</Button>

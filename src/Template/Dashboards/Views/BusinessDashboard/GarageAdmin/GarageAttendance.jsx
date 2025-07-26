@@ -605,17 +605,25 @@ const GarageAttendance = () => {
                   color: theme.palette.text.primary,
                 },
                 "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[100],
+                  color: theme.palette.text.primary,
                   fontWeight: 'bold',
+                  borderBottom: `2px solid ${theme.palette.primary.main}`,
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: 'bold',
+                  color: theme.palette.text.primary,
+                },
+                "& .MuiDataGrid-columnHeader": {
+                  borderRight: `1px solid ${theme.palette.divider}`,
                 },
                 "& .MuiDataGrid-row": {
                   backgroundColor: theme.palette.background.paper,
                   '&:hover': {
                     backgroundColor: theme.palette.action.hover,
+                  },
+                  '&:nth-of-type(even)': {
+                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[50],
                   },
                 },
                 "& .MuiDataGrid-footerContainer": {
@@ -624,6 +632,10 @@ const GarageAttendance = () => {
                 },
                 "& .MuiDataGrid-virtualScroller": {
                   backgroundColor: theme.palette.background.paper,
+                },
+                "& .MuiDataGrid-toolbarContainer": {
+                  backgroundColor: theme.palette.background.paper,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 },
               }}
             />
@@ -663,17 +675,25 @@ const GarageAttendance = () => {
                   color: theme.palette.text.primary,
                 },
                 "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[100],
+                  color: theme.palette.text.primary,
                   fontWeight: 'bold',
+                  borderBottom: `2px solid ${theme.palette.primary.main}`,
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: 'bold',
+                  color: theme.palette.text.primary,
+                },
+                "& .MuiDataGrid-columnHeader": {
+                  borderRight: `1px solid ${theme.palette.divider}`,
                 },
                 "& .MuiDataGrid-row": {
                   backgroundColor: theme.palette.background.paper,
                   '&:hover': {
                     backgroundColor: theme.palette.action.hover,
+                  },
+                  '&:nth-of-type(even)': {
+                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[50],
                   },
                 },
                 "& .MuiDataGrid-footerContainer": {
@@ -682,6 +702,10 @@ const GarageAttendance = () => {
                 },
                 "& .MuiDataGrid-virtualScroller": {
                   backgroundColor: theme.palette.background.paper,
+                },
+                "& .MuiDataGrid-toolbarContainer": {
+                  backgroundColor: theme.palette.background.paper,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 },
               }}
             />
@@ -721,17 +745,25 @@ const GarageAttendance = () => {
                   color: theme.palette.text.primary,
                 },
                 "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[100],
+                  color: theme.palette.text.primary,
                   fontWeight: 'bold',
+                  borderBottom: `2px solid ${theme.palette.primary.main}`,
                 },
                 "& .MuiDataGrid-columnHeaderTitle": {
                   fontWeight: 'bold',
+                  color: theme.palette.text.primary,
+                },
+                "& .MuiDataGrid-columnHeader": {
+                  borderRight: `1px solid ${theme.palette.divider}`,
                 },
                 "& .MuiDataGrid-row": {
                   backgroundColor: theme.palette.background.paper,
                   '&:hover': {
                     backgroundColor: theme.palette.action.hover,
+                  },
+                  '&:nth-of-type(even)': {
+                    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[50],
                   },
                 },
                 "& .MuiDataGrid-footerContainer": {
@@ -740,6 +772,10 @@ const GarageAttendance = () => {
                 },
                 "& .MuiDataGrid-virtualScroller": {
                   backgroundColor: theme.palette.background.paper,
+                },
+                "& .MuiDataGrid-toolbarContainer": {
+                  backgroundColor: theme.palette.background.paper,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 },
               }}
             />

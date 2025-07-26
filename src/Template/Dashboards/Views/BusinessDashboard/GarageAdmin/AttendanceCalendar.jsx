@@ -76,12 +76,6 @@ const AttendanceCalendar = ({
       toolbar.onNavigate('NEXT');
     };
 
-    const viewNames = {
-      month: 'Month',
-      week: 'Week',
-      day: 'Day'
-    };
-
     return (
       <Box sx={{ 
         display: 'flex', 
@@ -291,6 +285,55 @@ const AttendanceCalendar = ({
           },
           '& .rbc-show-more:hover': {
             backgroundColor: theme.palette.primary.light + '20',
+          },
+          // Fix for dark mode column colors
+          '& .rbc-month-row': {
+            backgroundColor: theme.palette.background.paper,
+          },
+          '& .rbc-day-bg': {
+            backgroundColor: theme.palette.background.paper,
+          },
+          '& .rbc-day-bg + .rbc-day-bg': {
+            borderLeft: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-month-row + .rbc-month-row': {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-date-cell': {
+            color: theme.palette.text.primary,
+          },
+          '& .rbc-date-cell.rbc-off-range': {
+            color: theme.palette.text.disabled,
+          },
+          '& .rbc-date-cell.rbc-now': {
+            fontWeight: 'bold',
+            color: theme.palette.primary.main,
+          },
+          '& .rbc-time-view .rbc-header': {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+          },
+          '& .rbc-time-view .rbc-time-header': {
+            backgroundColor: theme.palette.background.paper,
+          },
+          '& .rbc-time-view .rbc-time-content': {
+            backgroundColor: theme.palette.background.paper,
+          },
+          '& .rbc-time-view .rbc-timeslot-group': {
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-time-view .rbc-day-slot .rbc-time-slot': {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-time-view .rbc-time-gutter': {
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+          },
+          '& .rbc-time-view .rbc-time-slot': {
+            backgroundColor: theme.palette.background.paper,
+          },
+          '& .rbc-time-view .rbc-time-slot.rbc-today': {
+            backgroundColor: theme.palette.action.hover,
           },
         }}
       />

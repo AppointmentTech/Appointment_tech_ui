@@ -124,37 +124,66 @@ const GarageAttendance = () => {
         }}
       >
         <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h4" fontWeight="bold">Staff Attendance</Typography>
-          <Button variant="contained" startIcon={<AddCircleIcon />} onClick={() => handleOpenDialog()}>
-            Mark Attendance
-          </Button>
+          <Typography variant="h4" fontWeight="bold" color="text.primary">Staff Attendance</Typography>
+          <Stack direction="row" spacing={2}>
+            <Button 
+              variant="outlined" 
+              startIcon={<AddCircleIcon />} 
+              onClick={() => handleOpenDialog()}
+            >
+              Mark Attendance
+            </Button>
+            <Button 
+              variant="contained" 
+              onClick={() => window.location.href = '/AttendanceCalendar'}
+            >
+              View Calendar
+            </Button>
+          </Stack>
         </Grid>
 
         {/* Summary Cards */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6">{presentCount}</Typography>
-              <Typography variant="body2">Present</Typography>
+            <Paper sx={{ 
+              p: 2,
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+            }}>
+              <Typography variant="h6" color="text.primary">{presentCount}</Typography>
+              <Typography variant="body2" color="text.secondary">Present</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6">{absentCount}</Typography>
-              <Typography variant="body2">Absent</Typography>
+            <Paper sx={{ 
+              p: 2,
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+            }}>
+              <Typography variant="h6" color="text.primary">{absentCount}</Typography>
+              <Typography variant="body2" color="text.secondary">Absent</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} sm={12} md={6}>
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6">{records.length}</Typography>
-              <Typography variant="body2">Total Entries</Typography>
+            <Paper sx={{ 
+              p: 2,
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+            }}>
+              <Typography variant="h6" color="text.primary">{records.length}</Typography>
+              <Typography variant="body2" color="text.secondary">Total Entries</Typography>
             </Paper>
           </Grid>
         </Grid>
 
         {/* Heatmap */}
-        <Paper sx={{ p: 2, mb: 4 }}>
-          <Typography fontWeight="bold" gutterBottom>July 2025 Attendance Heatmap</Typography>
+        <Paper sx={{ 
+          p: 2, 
+          mb: 4,
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+        }}>
+          <Typography fontWeight="bold" gutterBottom color="text.primary">July 2025 Attendance Heatmap</Typography>
           <Grid container spacing={1}>
             {heatmapData.map((day, index) => (
               <Grid item xs={3} sm={1.5} md={1} key={index}>
@@ -169,6 +198,7 @@ const GarageAttendance = () => {
                     justifyContent: "center",
                     color: "#fff",
                     fontWeight: "bold",
+                    border: `1px solid ${theme.palette.divider}`,
                   }}
                 >
                   {dayjs(day.date).date()}
@@ -185,6 +215,8 @@ const GarageAttendance = () => {
               <Paper
                 sx={{
                   p: 3,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.divider}`,
                   borderLeft: `4px solid ${
                     record.status === "Present"
                       ? theme.palette.success.main
@@ -203,14 +235,14 @@ const GarageAttendance = () => {
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                   <Avatar>{record.name.charAt(0)}</Avatar>
                   <Box>
-                    <Typography fontWeight="bold">{record.name}</Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography fontWeight="bold" color="text.primary">{record.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">
                       {dayjs(record.date).format("DD MMM YYYY")}
                     </Typography>
                   </Box>
                 </Stack>
 
-                <Typography variant="body2">
+                <Typography variant="body2" color="text.primary">
                   Status:{" "}
                   <strong
                     style={{
@@ -230,7 +262,7 @@ const GarageAttendance = () => {
 
         {/* Dialog */}
         <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle>{selectedRecord?.id ? "Update" : "Mark"} Attendance</DialogTitle>
+          <DialogTitle color="text.primary">{selectedRecord?.id ? "Update" : "Mark"} Attendance</DialogTitle>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
               <TextField

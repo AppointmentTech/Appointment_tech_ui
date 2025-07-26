@@ -15,8 +15,8 @@ root.render(
   </React.StrictMode>
 );
 
-// Register service worker for caching and offline support
-if ('serviceWorker' in navigator) {
+// Register service worker for caching and offline support (disabled in development)
+if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
@@ -26,28 +26,4 @@ if ('serviceWorker' in navigator) {
         console.log('SW registration failed: ', registrationError);
       });
   });
-}
-
-// Performance monitoring with error handling
-const reportWebVitals = (onPerfEntry) => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      try {
-        getCLS(onPerfEntry);
-        getFID(onPerfEntry);
-        getFCP(onPerfEntry);
-        getLCP(onPerfEntry);
-        getTTFB(onPerfEntry);
-      } catch (error) {
-        console.warn('Web Vitals error:', error);
-      }
-    }).catch((error) => {
-      console.warn('Failed to load web-vitals:', error);
-    });
-  }
-};
-
-// Report web vitals in development
-if (process.env.NODE_ENV === 'development') {
-  reportWebVitals(console.log);
 }

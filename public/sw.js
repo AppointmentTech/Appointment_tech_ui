@@ -12,7 +12,18 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // Cache each URL individually to handle failures gracefully
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            cache.add(url).catch(error => {
+              console.warn(`Failed to cache ${url}:`, error);
+              return null;
+            })
+          )
+        );
+      })
+      .catch((error) => {
+        console.error('Cache opening failed:', error);
       })
   );
 });
@@ -27,8 +38,12 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
         return fetch(event.request);
-      }
-    )
+      })
+      .catch((error) => {
+        console.error('Fetch failed:', error);
+        // Return a fallback response or re-throw
+        return new Response('Network error', { status: 503 });
+      })
   );
 });
 

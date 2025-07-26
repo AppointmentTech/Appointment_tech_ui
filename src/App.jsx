@@ -1,12 +1,5 @@
 /** Primary Import Declaration */
-import React, {
-  useEffect,
-  useContext,
-  useState,
-  useReducer,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useContext, useState, useReducer, useMemo } from "react";
 
 /** MUI Themes */
 import { ThemeProvider } from "@mui/material/styles";
@@ -21,32 +14,24 @@ import { ThemeContext } from "./ContextOrRedux/ThemeProvider.js";
 import { AuthContext, reducer } from "./ContextOrRedux/AuthContext.js";
 import { decryptText } from "./CommonMethods/Encryption.js";
 import MainRoutes from "./Template/MainRoutes.jsx";
-import { debugRender, logError, measurePerformance } from "./CommonMethods/DebugUtils.js";
 
-// Memoized loading component
-const LoadingSpinner = React.memo(() => {
-  debugRender('LoadingSpinner');
-  return (
-    <Box
-      sx={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <CircularProgress />
-    </Box>
-  );
-});
+// Simple loading component
+const LoadingSpinner = () => (
+  <Box
+    sx={{
+      width: "100vw",
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <CircularProgress />
+  </Box>
+);
 
-LoadingSpinner.displayName = 'LoadingSpinner';
-
-export default function App(props) {
-  debugRender('App');
-  
-  /** State and Reducer for Authentication Context */
+export default function App() {
+  // Auth state
   const initialState = {
     isAuthenticated: false,
     user: null,
@@ -57,68 +42,68 @@ export default function App(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [loading, setLoading] = useState(true);
   
-  /** State and Reducer for Theme Context */
+  // Theme context
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const themeMode = useContext(ThemeContext);
-  const darkMode = themeMode.state.darkMode;
-
-  // Memoized theme to prevent unnecessary re-renders
+  
+  // Memoized theme
   const theme = useMemo(() => {
-    return measurePerformance('Theme Creation', () => darkMode ? darkTheme : lightTheme);
-  }, [darkMode]);
+    return themeMode.state.darkMode ? darkTheme : lightTheme;
+  }, [themeMode.state.darkMode]);
 
   // Memoized auth context value
   const authContextValue = useMemo(() => ({ state, dispatch }), [state]);
 
-  // Memoized verification function - removed dependencies to prevent infinite loop
-  const verifyAuth = useCallback(() => {
-    return measurePerformance('Auth Verification', () => {
+  // Initialize app - run only once
+  useEffect(() => {
+    const initializeApp = () => {
       try {
-        const userbytes = localStorage.getItem("user") && decryptText(localStorage.getItem("user"));
-        const user = userbytes ? JSON.parse(userbytes) : null;
+        // Set theme
+        const savedDarkMode = localStorage.getItem("darkMode");
+        if (prefersDarkMode && savedDarkMode === "true") {
+          themeMode.dispatch({ type: "DARKMODE" });
+        } else {
+          themeMode.dispatch({ type: "LIGHTMODE" });
+        }
         
-        const accessbytes = localStorage.getItem("permissions") && decryptText(localStorage.getItem("permissions"));
-        const permissions = accessbytes ? JSON.parse(accessbytes) : null;
-        
-        const usertypebytes = localStorage.getItem("usertype") && decryptText(localStorage.getItem("usertype"));
-        const usertype = usertypebytes ? JSON.parse(usertypebytes) : null;
-        
+        // Check authentication
+        const userbytes = localStorage.getItem("user");
+        const accessbytes = localStorage.getItem("permissions");
+        const usertypebytes = localStorage.getItem("usertype");
         const token = localStorage.getItem("token");
 
-        if (user && permissions && usertype && token) {
-          dispatch({
-            type: "LOGIN",
-            payload: {
-              user,
-              permissions,
-              token,
-              usertype,
-            },
-          });
+        if (userbytes && accessbytes && usertypebytes && token) {
+          try {
+            const user = JSON.parse(decryptText(userbytes));
+            const permissions = JSON.parse(decryptText(accessbytes));
+            const usertype = JSON.parse(decryptText(usertypebytes));
+
+            if (user && permissions && usertype) {
+              dispatch({
+                type: "LOGIN",
+                payload: { user, permissions, usertype, token },
+              });
+            } else {
+              dispatch({ type: "LOGOUT" });
+            }
+          } catch (error) {
+            console.error("Error parsing auth data:", error);
+            dispatch({ type: "LOGOUT" });
+          }
         } else {
           dispatch({ type: "LOGOUT" });
         }
       } catch (error) {
-        logError(error, 'Auth Verification');
+        console.error("Error initializing app:", error);
         dispatch({ type: "LOGOUT" });
+      } finally {
+        setLoading(false);
       }
-    });
-  }, []); // Empty dependency array to prevent infinite loop
+    };
 
-  useEffect(() => {
-    // Set theme based on preference
-    if (prefersDarkMode && localStorage.getItem("darkMode") === "true") {
-      themeMode.dispatch({ type: "DARKMODE" });
-    } else {
-      themeMode.dispatch({ type: "LIGHTMODE" });
-    }
-    
-    // Verify authentication
-    verifyAuth();
-    setLoading(false);
-  }, []); // Empty dependency array to run only once on mount
+    initializeApp();
+  }, []); // Empty dependency array - run only once
 
-  // Early return for loading state
   if (loading) {
     return <LoadingSpinner />;
   }

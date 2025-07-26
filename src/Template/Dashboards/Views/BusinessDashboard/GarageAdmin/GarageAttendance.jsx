@@ -17,7 +17,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import dayjs from "dayjs";

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CommonHeader from 'Template/Dashboards/Components/CommonHeader.jsx';
+import CommonHeader from '@template/Dashboards/Components/CommonHeader.jsx';
 import {
   Box, Typography, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, Chip, Tooltip, InputAdornment, Grid, Card, CardContent, Divider, List, ListItem
 } from '@mui/material';

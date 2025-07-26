@@ -14,7 +14,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
-import { ThemeContext } from 'ContextOrRedux/ThemeProvider.js';
+import { ThemeContext } from '@context/ThemeProvider.js';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'ContextOrRedux/AuthContext.js';

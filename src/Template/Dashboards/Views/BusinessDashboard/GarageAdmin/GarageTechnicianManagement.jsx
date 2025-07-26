@@ -23,8 +23,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import BadgeIcon from '@mui/icons-material/Badge';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as ReTooltip, ResponsiveContainer, Legend } from 'recharts';
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
-import CustomTableToolbar from "CommonComponents/CustomTableToolbar.js";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
+import CustomTableToolbar from "@components/CustomTableToolbar.js";
 
 const mockTechnicians = [
   { id: 1, name: 'Amit Kumar', skill: 'Engine', email: 'amit.kumar@example.com', phone: '9876543210', status: 'Active', experience: 5 },

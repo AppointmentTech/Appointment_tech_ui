@@ -28,8 +28,8 @@ import {
   Checkbox,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
-import CustomTableToolbar from "CommonComponents/CustomTableToolbar.js";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
+import CustomTableToolbar from "@components/CustomTableToolbar.js";
 import {
   Payment,
   AccountBalance,

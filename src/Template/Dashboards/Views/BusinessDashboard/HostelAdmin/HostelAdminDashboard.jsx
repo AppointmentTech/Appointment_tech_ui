@@ -48,7 +48,7 @@ import CheckCircle from "@mui/icons-material/CheckCircle";
 import Warning from "@mui/icons-material/Warning";
 import Error from "@mui/icons-material/Error";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import UserStayRequest from "./UserStayRequest/UserStayRequest.jsx";
 
 export default function HostelAdminDashboard() {

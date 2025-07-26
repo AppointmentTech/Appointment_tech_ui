@@ -33,14 +33,14 @@ import {
   Grid as MuiGrid,
   CardActions,
 } from "@mui/material";
-import SnackBar from "../../../../../SnackBar/SnackBar.jsx";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import { DataGrid } from "@mui/x-data-grid";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import BedIcon from "@mui/icons-material/Hotel";
 import CustomTableToolbar from "../../../../../CommonComponents/CustomTableToolbar";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import AddCircleOutline from "@mui/icons-material/AddCircleOutline";
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

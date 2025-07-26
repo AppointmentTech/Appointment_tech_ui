@@ -68,6 +68,8 @@ module.exports = {
         '@template': path.resolve(__dirname, 'src/Template'),
         '@context': path.resolve(__dirname, 'src/ContextOrRedux'),
         '@services': path.resolve(__dirname, 'src/services'),
+        '@snackbar': path.resolve(__dirname, 'src/SnackBar'),
+        '@commonmethods': path.resolve(__dirname, 'src/CommonMethods'),
       };
 
       return webpackConfig;

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "ContextOrRedux/ThemeProvider.js";
+import { ThemeContext } from "@context/ThemeProvider.js";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
@@ -37,10 +37,10 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShareIcon from "@mui/icons-material/Share";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import { useMediaQuery } from "@mui/material";
-import { authPostRecord } from "services/services";
-import SnackBar from "SnackBar/SnackBar.jsx";
+import { authPostRecord } from "@services/services";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
-import { sidebarData as adminSidebarData, moduleData, additionalMenuItems as adminAdditionalMenuItems } from "CommonComponents/SidebarData.js";
+import { sidebarData as adminSidebarData, moduleData, additionalMenuItems as adminAdditionalMenuItems } from "@components/SidebarData.js";
 // If you have a separate coadminSidebarData, import it here
 // import { sidebarData as coadminSidebarData, additionalMenuItems as coadminAdditionalMenuItems } from "...";
 import MailIcon from "@mui/icons-material/Mail";

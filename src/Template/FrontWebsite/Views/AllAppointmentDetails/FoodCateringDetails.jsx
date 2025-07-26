@@ -31,8 +31,8 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import SortIcon from "@mui/icons-material/Sort";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
-import Header from "Template/FrontWebsite/Components/Header.jsx";
-import Footer from "Template/FrontWebsite/Components/Footer.jsx";
+import Header from "@template/FrontWebsite/Components/Header.jsx";
+import Footer from "@template/FrontWebsite/Components/Footer.jsx";
 
 export default function FoodCateringDetails() {
   const [filters, setFilters] = useState({

@@ -32,7 +32,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import { DataGrid } from "@mui/x-data-grid";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 // Add FullCalendar import (if available)
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';

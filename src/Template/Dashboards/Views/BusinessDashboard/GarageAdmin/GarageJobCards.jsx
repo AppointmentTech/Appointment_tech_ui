@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Grid, Paper, Typography, Button, IconButton, Chip, Avatar, Stack, Divider, Tooltip, Drawer, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, InputLabel, FormControl, List, ListItem, ListItemAvatar, ListItemText, Card, CardContent, useMediaQuery } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
-import CustomTableToolbar from "CommonComponents/CustomTableToolbar.js";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
+import CustomTableToolbar from "@components/CustomTableToolbar.js";
 import { useTheme } from '@mui/material/styles';
 import { WhatsApp, Print, Edit, Delete, Payment, AssignmentInd, DirectionsCar, Person, AccessTime, Done, Cancel, Sms, Email, MoreHoriz, ExpandMore, ExpandLess, AttachMoney, Receipt, Group, Build, Timeline, FileCopy, CloudUpload, Add, Event, Phone, Star, VerifiedUser, Info, CheckCircle, ErrorOutline } from '@mui/icons-material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from 'recharts';

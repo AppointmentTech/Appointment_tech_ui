@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
-import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
+import CoAdminHeader from "@template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import Typography from '@mui/material/Typography';

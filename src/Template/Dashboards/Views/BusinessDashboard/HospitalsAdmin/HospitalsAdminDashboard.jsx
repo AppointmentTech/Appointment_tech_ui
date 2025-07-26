@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { ThemeContext } from "ContextOrRedux/ThemeProvider.js";
+import { ThemeContext } from "@context/ThemeProvider.js";
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   TextField
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import BedIcon from "@mui/icons-material/Hotel";
 import WardIcon from "@mui/icons-material/MeetingRoom";
 import InventoryIcon from "@mui/icons-material/Inventory";

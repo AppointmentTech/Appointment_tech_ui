@@ -8,7 +8,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import SnackBar from "../../../../../../SnackBar/SnackBar.jsx";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import { DataGrid } from "@mui/x-data-grid";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CustomTableToolbar from "../../../../../../CommonComponents/CustomTableToolbar";

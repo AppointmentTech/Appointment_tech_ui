@@ -22,13 +22,13 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import SnackBar from "SnackBar/SnackBar.jsx";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import {
   authPostRecord,
   getRecord,
   postMultipleRecords,
-} from "services/services";
-import { AuthContext } from "ContextOrRedux/AuthContext";
+} from "@services/services";
+import { AuthContext } from "@context/AuthContext";
 import { onlyPassword, onlyEmail } from "CommonMethods/Validatations";
 import GoogleAuth from "../../../../CommonComponents/GoogleAuth.jsx";
 import MenuItem from "@mui/material/MenuItem";

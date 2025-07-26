@@ -14,7 +14,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer
 } from "recharts";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 
 const GarageFeedback = () => {
   const theme = useTheme();

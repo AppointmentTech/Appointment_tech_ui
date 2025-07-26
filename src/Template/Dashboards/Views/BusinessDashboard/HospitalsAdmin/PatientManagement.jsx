@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CommonHeader from 'Template/Dashboards/Components/CommonHeader.jsx';
+import CommonHeader from '@template/Dashboards/Components/CommonHeader.jsx';
 import {
   Container,
   Grid,
@@ -33,9 +33,9 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import CustomTableToolbar from "CommonComponents/CustomTableToolbar";
+import CustomTableToolbar from "@components/CustomTableToolbar";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
-import SnackBar from 'SnackBar/SnackBar.jsx';
+import SnackBar from '@snackbar/SnackBar.jsx';
 import { DataGrid } from "@mui/x-data-grid";
 import TodayIcon from '@mui/icons-material/Today';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';

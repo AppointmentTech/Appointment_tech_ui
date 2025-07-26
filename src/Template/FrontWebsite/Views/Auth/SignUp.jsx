@@ -29,14 +29,14 @@ import {
 } from "@mui/material";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import SnackBar from "SnackBar/SnackBar.jsx";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import {
   authPostRecord,
   getRecord,
   postMultipleRecords,
   setAuthToken,
-} from "services/services";
-import { AuthContext } from "ContextOrRedux/AuthContext";
+} from "@services/services";
+import { AuthContext } from "@context/AuthContext";
 import GoogleAuth from "CommonComponents/GoogleAuth.jsx";
 import IndianStatesAndDistricts from "../../../../CommonComponents/IndianStatesAndDistricts.json";
 import {

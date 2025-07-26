@@ -28,8 +28,8 @@ import AboutBanner from "./Sections/AboutBanner.jsx";
 import GetToKnow from "./Sections/GetToKnow.jsx";
 import WhyChooseUs from "./Sections/WhyChooseUs.jsx";
 import WhatOurCustomersSay from "./Sections/WhatOurCustomersSay.jsx";
-import Header from 'Template/FrontWebsite/Components/Header.jsx';
-import Footer from 'Template/FrontWebsite/Components/Footer.jsx';
+import Header from '@template/FrontWebsite/Components/Header.jsx';
+import Footer from '@template/FrontWebsite/Components/Footer.jsx';
 // import WhatWeOffer from "./Sections/WhatWeOffer.jsx";
 export default function AboutPage() {
 

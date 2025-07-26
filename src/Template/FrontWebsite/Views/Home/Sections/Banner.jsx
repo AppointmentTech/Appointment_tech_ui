@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { ThemeContext } from "ContextOrRedux/ThemeProvider.js";
+import { ThemeContext } from "@context/ThemeProvider.js";
 
 // Categories Array
 const categories = [

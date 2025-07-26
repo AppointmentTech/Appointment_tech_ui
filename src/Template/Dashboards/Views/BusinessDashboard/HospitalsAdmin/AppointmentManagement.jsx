@@ -17,12 +17,12 @@ import {
   MenuItem,
   Chip,
 } from "@mui/material";
-import SnackBar from "../../../../../SnackBar/SnackBar.jsx";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import { DataGrid } from "@mui/x-data-grid";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import CustomTableToolbar from "../../../../../CommonComponents/CustomTableToolbar";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 
 // Mock data for appointments

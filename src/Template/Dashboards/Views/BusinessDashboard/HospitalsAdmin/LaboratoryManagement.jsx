@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CommonHeader from 'Template/Dashboards/Components/CommonHeader.jsx';
+import CommonHeader from '@template/Dashboards/Components/CommonHeader.jsx';
 import { Box, Card, Typography, Button, IconButton, Drawer, TextField, MenuItem, Stack, Grid, Divider, Paper, useTheme, alpha } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
@@ -8,7 +8,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { DataGrid } from '@mui/x-data-grid';
-import SnackBar from '../../../../../SnackBar/SnackBar.jsx';
+import SnackBar from '@snackbar/SnackBar.jsx';
 import CustomTableToolbar from '../../../../../CommonComponents/CustomTableToolbar';
 import ScienceIcon from '@mui/icons-material/Science';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

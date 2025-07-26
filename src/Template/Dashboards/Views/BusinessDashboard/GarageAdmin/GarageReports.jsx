@@ -9,7 +9,7 @@ import {
   Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import {
   PieChart,
   BarChart,

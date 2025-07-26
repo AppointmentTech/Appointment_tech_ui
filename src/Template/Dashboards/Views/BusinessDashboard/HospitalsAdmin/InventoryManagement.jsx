@@ -36,7 +36,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CustomTableToolbar from "../../../../../CommonComponents/CustomTableToolbar";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 // For QR/Barcode: use 'qrcode.react' and 'react-barcode' if available, else mock
 import { QRCodeSVG } from 'qrcode.react';

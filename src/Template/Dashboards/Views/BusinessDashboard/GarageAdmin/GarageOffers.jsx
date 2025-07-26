@@ -20,7 +20,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
+import CommonHeader from "@template/Dashboards/Components/CommonHeader.jsx";
 import dayjs from "dayjs";
 
 const GarageOffers = () => {

@@ -14,7 +14,7 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import BusinessIcon from "@mui/icons-material/Business";
 import CommonHeader from "../../Components/CommonHeader.jsx";
-import { sidebarData } from "CommonComponents/SidebarData.js";
+import { sidebarData } from "@components/SidebarData.js";
 import { useTheme } from "@mui/material/styles";
 
 const AdminDashboard = () => {

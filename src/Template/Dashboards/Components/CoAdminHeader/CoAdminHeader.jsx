@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "ContextOrRedux/ThemeProvider.js";
+import { ThemeContext } from "@context/ThemeProvider.js";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
@@ -40,10 +40,10 @@ import ShareIcon from "@mui/icons-material/Share";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useMediaQuery } from "@mui/material";
-import { authPostRecord } from "services/services";
-import SnackBar from "SnackBar/SnackBar.jsx";
+import { authPostRecord } from "@services/services";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
-import { sidebarData, additionalMenuItems } from "CommonComponents/SidebarData.js";
+import { sidebarData, additionalMenuItems } from "@components/SidebarData.js";
 
 const API_Logout = "api/v1/authrouter/logout";
 const drawerWidth = 300;

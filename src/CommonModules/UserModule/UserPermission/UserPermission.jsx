@@ -32,15 +32,15 @@ import {
 /** ------------------ User Components ------------------- */
 import UserPermissionForm from "./Form/UserPermissionForm.jsx";
 import UserPermissionPreview from "./Preview/UserPermissionPreview.jsx";
-import SnackBar from "SnackBar/SnackBar.jsx";
+import SnackBar from "@snackbar/SnackBar.jsx";
 import {
   postRecord,
   handleResponse,
   getRecord,
   putRecord,
-} from "services/services";
+} from "@services/services";
 import { AuthContext } from "../../../ContextOrRedux/AuthContext";
-import { CheckRouteAccess } from "commonmethods/Authorization";
+import { CheckRouteAccess } from "@commonmethods/Authorization";
 /** ------------------ Icons ----------------------------- */
 import ListIcon from "@mui/icons-material/List";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";

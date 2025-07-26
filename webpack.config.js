@@ -14,7 +14,7 @@ module.exports = (env, argv) => {
     entry: "./src/index.js",
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: isProduction ? "[name].[contenthash].js" : "main.js",
+      filename: isProduction ? "[name].[contenthash].js" : "[name].js",
       chunkFilename: isProduction ? "[name].[contenthash].chunk.js" : "[name].chunk.js",
       publicPath: "/",
       clean: true,
@@ -43,21 +43,27 @@ module.exports = (env, argv) => {
           },
           mui: {
             test: /[\\/]node_modules[\\/]@mui[\\/]/,
-            name: "mui",
+            name: "mui-vendor",
             chunks: "all",
             priority: 20,
           },
           charts: {
             test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2|recharts)[\\/]/,
-            name: "charts",
+            name: "charts-vendor",
             chunks: "all",
             priority: 15,
           },
           calendar: {
             test: /[\\/]node_modules[\\/]@fullcalendar[\\/]/,
-            name: "calendar",
+            name: "calendar-vendor",
             chunks: "all",
             priority: 15,
+          },
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: "react-vendor",
+            chunks: "all",
+            priority: 25,
           },
         },
       },
@@ -78,6 +84,9 @@ module.exports = (env, argv) => {
       hot: true,
       compress: true,
       port: 3000,
+      static: {
+        directory: path.join(__dirname, "public"),
+      },
     },
     module: {
       rules: [

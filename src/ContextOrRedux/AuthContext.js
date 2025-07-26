@@ -1,5 +1,5 @@
 import React, { createContext, useReducer } from "react";
-import { encryptText, decryptText } from "commonmethods/Encryption.js";
+import { encryptText, decryptText } from "../CommonMethods/Encryption.js";
 export const AuthContext = createContext();
 
 export const reducer = (state, action) => {

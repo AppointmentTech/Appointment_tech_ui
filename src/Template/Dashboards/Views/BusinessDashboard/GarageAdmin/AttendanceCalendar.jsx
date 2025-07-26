@@ -1,115 +1,299 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
-  Grid,
-  Typography,
   Paper,
-  Tooltip,
-  useMediaQuery,
+  Typography,
+  Button,
+  Stack,
   useTheme,
 } from "@mui/material";
-import dayjs from "dayjs";
+import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
+import format from "date-fns/format";
+import parse from "date-fns/parse";
+import startOfWeek from "date-fns/startOfWeek";
+import getDay from "date-fns/getDay";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
-const AttendanceCalendar = () => {
+const locales = {
+  "en-US": require("date-fns/locale/en-US"),
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+const AttendanceCalendar = ({ 
+  events = [], 
+  height = 500, 
+  showToolbar = true,
+  onEventClick,
+  onDateSelect,
+  customToolbar,
+  title = "Attendance Calendar"
+}) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [calendarView, setCalendarView] = useState(Views.MONTH);
 
-  const year = 2025;
-  const month = 6; // 0-indexed: 6 = July
+  // Calendar events with theme colors
+  const calendarEvents = useMemo(() => {
+    return events.map(event => ({
+      ...event,
+      color: event.color || theme.palette.primary.main,
+    }));
+  }, [events, theme.palette]);
 
-  const holidays = ["2025-07-10", "2025-07-21"];
-  const leaves = {
-    "2025-07-05": { name: "Amit Singh", type: "Sick Leave" },
-    "2025-07-14": { name: "Ravi Kumar", type: "Casual Leave" },
+  const eventStyleGetter = (event) => {
+    return {
+      style: {
+        backgroundColor: event.color,
+        borderRadius: '5px',
+        opacity: 0.9,
+        color: 'white',
+        border: '0px',
+        display: 'block',
+        padding: '2px 5px',
+        fontSize: '12px',
+        fontWeight: 'bold'
+      }
+    };
   };
 
-  const daysInMonth = dayjs(`${year}-${month + 1}-01`).daysInMonth();
-  const startDay = dayjs(`${year}-${month + 1}-01`).day(); // 0 = Sunday
+  // Custom calendar toolbar
+  const CustomToolbar = (toolbar) => {
+    const goToToday = () => {
+      toolbar.onNavigate('TODAY');
+    };
 
-  const generateCalendarDays = () => {
-    const calendar = [];
-    for (let i = 0; i < startDay; i++) {
-      calendar.push(null);
-    }
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      calendar.push({
-        date: dateStr,
-        isHoliday: holidays.includes(dateStr),
-        leave: leaves[dateStr] || null,
-        day,
-      });
-    }
-    return calendar;
-  };
+    const goToPrev = () => {
+      toolbar.onNavigate('PREV');
+    };
 
-  const calendarData = generateCalendarDays();
+    const goToNext = () => {
+      toolbar.onNavigate('NEXT');
+    };
 
-  const getCellColor = (item) => {
-    if (!item) return "#f0f0f0";
-    if (item.isHoliday) return "#f44336";
-    if (item.leave) return "#fdd835";
-    return "#e0f7fa";
-  };
+    const viewNames = {
+      month: 'Month',
+      week: 'Week',
+      day: 'Day'
+    };
 
-  const getCellText = (item) => {
-    if (!item) return "";
-    if (item.isHoliday) return "Holiday";
-    if (item.leave) return `${item.leave.name}\n${item.leave.type}`;
-    return "Working Day";
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        p: 2, 
+        backgroundColor: theme.palette.background.paper,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        borderRadius: '8px 8px 0 0'
+      }}>
+        <Stack direction="row" spacing={1}>
+          <Button 
+            variant="outlined" 
+            size="small" 
+            onClick={goToToday}
+            sx={{ 
+              borderColor: theme.palette.primary.main,
+              color: theme.palette.primary.main,
+              '&:hover': {
+                borderColor: theme.palette.primary.dark,
+                backgroundColor: theme.palette.primary.light + '20'
+              }
+            }}
+          >
+            Today
+          </Button>
+          <Button 
+            variant="outlined" 
+            size="small" 
+            onClick={goToPrev}
+            sx={{ 
+              borderColor: theme.palette.primary.main,
+              color: theme.palette.primary.main,
+              '&:hover': {
+                borderColor: theme.palette.primary.dark,
+                backgroundColor: theme.palette.primary.light + '20'
+              }
+            }}
+          >
+            Back
+          </Button>
+          <Button 
+            variant="outlined" 
+            size="small" 
+            onClick={goToNext}
+            sx={{ 
+              borderColor: theme.palette.primary.main,
+              color: theme.palette.primary.main,
+              '&:hover': {
+                borderColor: theme.palette.primary.dark,
+                backgroundColor: theme.palette.primary.light + '20'
+              }
+            }}
+          >
+            Next
+          </Button>
+        </Stack>
+        
+        <Typography variant="h6" sx={{ 
+          fontWeight: 'bold',
+          color: theme.palette.text.primary
+        }}>
+          {toolbar.label}
+        </Typography>
+        
+        <Stack direction="row" spacing={1}>
+          <Button 
+            variant={toolbar.view === 'month' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => toolbar.onView('month')}
+            sx={{
+              backgroundColor: toolbar.view === 'month' ? theme.palette.primary.main : 'transparent',
+              color: toolbar.view === 'month' ? theme.palette.primary.contrastText : theme.palette.primary.main,
+              borderColor: theme.palette.primary.main,
+              '&:hover': {
+                backgroundColor: toolbar.view === 'month' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
+              }
+            }}
+          >
+            Month
+          </Button>
+          <Button 
+            variant={toolbar.view === 'week' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => toolbar.onView('week')}
+            sx={{
+              backgroundColor: toolbar.view === 'week' ? theme.palette.primary.main : 'transparent',
+              color: toolbar.view === 'week' ? theme.palette.primary.contrastText : theme.palette.primary.main,
+              borderColor: theme.palette.primary.main,
+              '&:hover': {
+                backgroundColor: toolbar.view === 'week' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
+              }
+            }}
+          >
+            Week
+          </Button>
+          <Button 
+            variant={toolbar.view === 'day' ? 'contained' : 'outlined'} 
+            size="small" 
+            onClick={() => toolbar.onView('day')}
+            sx={{
+              backgroundColor: toolbar.view === 'day' ? theme.palette.primary.main : 'transparent',
+              color: toolbar.view === 'day' ? theme.palette.primary.contrastText : theme.palette.primary.main,
+              borderColor: theme.palette.primary.main,
+              '&:hover': {
+                backgroundColor: toolbar.view === 'day' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
+              }
+            }}
+          >
+            Day
+          </Button>
+        </Stack>
+      </Box>
+    );
   };
 
   return (
-    <Paper sx={{ p: 2, mb: 4 }}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        📅 July 2025 Attendance Calendar
-      </Typography>
-
-      {/* Calendar Grid */}
-      <Grid container spacing={1}>
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, idx) => (
-          <Grid item xs={isMobile ? 1.7 : 1.7} key={idx}>
-            <Typography align="center" fontWeight="bold">
-              {day}
-            </Typography>
-          </Grid>
-        ))}
-
-        {calendarData.map((item, idx) => (
-          <Grid item xs={isMobile ? 1.7 : 1.7} key={idx}>
-            <Tooltip
-              title={item ? getCellText(item) : ""}
-              arrow
-              placement="top"
-            >
-              <Box
-                sx={{
-                  height: 60,
-                  backgroundColor: getCellColor(item),
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#000",
-                  fontWeight: "bold",
-                  whiteSpace: "pre-line",
-                  textAlign: "center",
-                  fontSize: isMobile ? 12 : 14,
-                }}
-              >
-                {item?.day || ""}
-              </Box>
-            </Tooltip>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Legend */}
-      <Box sx={{ mt: 3 }}>
-        <Typography variant="body2">
-          <strong>Legend:</strong> 🟥 Holiday | 🟨 Leave | 🟦 Working Day
+    <Paper sx={{ 
+      p: 2, 
+      height: height,
+      backgroundColor: theme.palette.background.paper,
+      border: `1px solid ${theme.palette.divider}`
+    }}>
+      {title && (
+        <Typography variant="h6" sx={{ 
+          mb: 2, 
+          fontWeight: 'bold',
+          color: theme.palette.text.primary
+        }}>
+          {title}
         </Typography>
-      </Box>
+      )}
+      <Calendar
+        localizer={localizer}
+        events={calendarEvents}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: height - (title ? 80 : 40) }}
+        eventPropGetter={eventStyleGetter}
+        views={['month', 'week', 'day']}
+        defaultView="month"
+        view={calendarView}
+        onView={(view) => setCalendarView(view)}
+        onSelectEvent={onEventClick}
+        onSelectSlot={onDateSelect}
+        selectable
+        tooltipAccessor={(event) => {
+          if (event.type === 'attendance') {
+            return `${event.title}\nPunch In: ${event.punchIn || 'N/A'}\nPunch Out: ${event.punchOut || 'N/A'}\nTotal Hours: ${event.totalHours}`;
+          }
+          return event.title;
+        }}
+        components={{
+          toolbar: customToolbar || CustomToolbar
+        }}
+        sx={{
+          '& .rbc-calendar': {
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+          },
+          '& .rbc-header': {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            fontWeight: 'bold',
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-today': {
+            backgroundColor: theme.palette.action.hover,
+          },
+          '& .rbc-off-range-bg': {
+            backgroundColor: theme.palette.action.disabledBackground,
+          },
+          '& .rbc-off-range': {
+            color: theme.palette.text.disabled,
+          },
+          '& .rbc-event': {
+            backgroundColor: theme.palette.primary.main,
+          },
+          '& .rbc-month-view': {
+            border: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-time-view': {
+            border: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-day-view': {
+            border: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-time-header': {
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-time-content': {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-timeslot-group': {
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-day-slot .rbc-time-slot': {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          '& .rbc-current-time-indicator': {
+            backgroundColor: theme.palette.error.main,
+          },
+          '& .rbc-show-more': {
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.primary.main,
+            border: `1px solid ${theme.palette.primary.main}`,
+          },
+          '& .rbc-show-more:hover': {
+            backgroundColor: theme.palette.primary.light + '20',
+          },
+        }}
+      />
     </Paper>
   );
 };

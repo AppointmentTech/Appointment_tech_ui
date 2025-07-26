@@ -84,6 +84,11 @@ import GarageInvoices from "./Dashboards/Views/BusinessDashboard/GarageAdmin/Gar
 import GaragePayments from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GaragePayments.jsx";
 import GarageExpenses from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageExpenses.jsx";
 import GarageReports from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageReports.jsx";
+import GarageReminders from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageReminders.jsx";
+import GarageOffers from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageOffers.jsx";
+import GarageFeedback from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageFeedback.jsx";
+import GarageAttendance from "./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageAttendance.jsx";
+import AttendanceCalendar from "./Dashboards/Views/BusinessDashboard/GarageAdmin/AttendanceCalendar.jsx";
 var hist = createBrowserHistory();
 export default function MainRoutes() {
   const context = useContext(AuthContext);
@@ -233,6 +238,11 @@ export default function MainRoutes() {
           <Route exact path="/GaragePayments" element={<GaragePayments />} />
           <Route exact path="/GarageExpenses" element={<GarageExpenses />} />
           <Route exact path="/GarageReports" element={<GarageReports />} />
+          <Route exact path="/GarageReminders" element={<GarageReminders />} />
+          <Route exact path="/GarageOffers" element={<GarageOffers />} />
+          <Route exact path="/GarageFeedback" element={<GarageFeedback />} />
+          <Route exact path="/GarageAttendance" element={<GarageAttendance />} />
+          <Route exact path="/AttendanceCalendar" element={<AttendanceCalendar />} />
         </Route>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/SignIn" element={<SignIn />} />

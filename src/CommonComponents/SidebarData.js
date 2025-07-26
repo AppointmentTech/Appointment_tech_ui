@@ -90,7 +90,7 @@ export const sidebarData = {
         { name: "Offers & Campaigns", url: "/GarageOffers" }, // Festival/seasonal offers
         { name: "Feedback & Reviews", url: "/GarageFeedback" },
         { name: "Staff Attendance", url: "/GarageAttendance" }, // Optional: Aadhaar/biometric
-        { name: "Settings", url: "/GarageSettings" }
+        { name: "Settings", url: "/Settings" }
       ],
       icon: <GarageIcon color="primary" />,
     },

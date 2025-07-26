@@ -12,6 +12,8 @@ import { useTheme } from "@mui/material/styles";
 import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import {
   PieChart,
+  BarChart,
+  Bar,
   Pie,
   Cell,
   LineChart,
@@ -63,6 +65,66 @@ const GarageReports = () => {
     { label: "Invoice Count", value: "134" },
     { label: "Technician with Most Jobs", value: "Amit Singh" },
   ];
+  const customerGrowth = [
+    { month: "Jan", customers: 20 },
+    { month: "Feb", customers: 25 },
+    { month: "Mar", customers: 30 },
+    { month: "Apr", customers: 40 },
+  ];
+  const technicianJobs = [
+    { technician: "Amit", jobs: 22 },
+    { technician: "Vikram", jobs: 18 },
+    { technician: "Sandeep", jobs: 16 },
+    { technician: "Rahul", jobs: 14 },
+  ];
+  const vehicleTypes = [
+    { type: "Two-Wheelers", count: 50, color: "#4caf50" },
+    { type: "Cars", count: 30, color: "#2196f3" },
+    { type: "Trucks", count: 10, color: "#ff9800" },
+    { type: "Auto", count: 5, color: "#9c27b0" },
+  ];
+  const bookingStats = [
+    { service: "AC Service", count: 25 },
+    { service: "Battery", count: 20 },
+    { service: "Engine", count: 18 },
+    { service: "Wheel Align.", count: 12 },
+  ];
+  const inventoryTrend = [
+    { month: "Jan", stock: 120 },
+    { month: "Feb", stock: 100 },
+    { month: "Mar", stock: 140 },
+    { month: "Apr", stock: 110 },
+  ];
+  const invoiceStats = [
+    { month: "Jan", count: 22 },
+    { month: "Feb", count: 28 },
+    { month: "Mar", count: 30 },
+    { month: "Apr", count: 35 },
+  ];
+  const reminders = [
+    { type: "Insurance", count: 14 },
+    { type: "PUC", count: 12 },
+    { type: "Fitness", count: 8 },
+    { type: "Service", count: 25 },
+  ];
+  const campaignPerformance = [
+    { campaign: "Festival Offer", clicks: 120, conversions: 30 },
+    { campaign: "Monsoon Checkup", clicks: 90, conversions: 20 },
+    { campaign: "Battery Promo", clicks: 75, conversions: 18 },
+  ];
+  const feedbackRatings = [
+    { month: "Jan", rating: 4.2 },
+    { month: "Feb", rating: 4.0 },
+    { month: "Mar", rating: 4.5 },
+    { month: "Apr", rating: 4.3 },
+  ];
+  const staffAttendance = [
+    { day: "Mon", present: 12, absent: 2 },
+    { day: "Tue", present: 13, absent: 1 },
+    { day: "Wed", present: 14, absent: 0 },
+    { day: "Thu", present: 11, absent: 3 },
+    { day: "Fri", present: 13, absent: 1 },
+  ];
 
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -80,7 +142,8 @@ const GarageReports = () => {
           Garage Reports
         </Typography>
         <Typography variant="body1" color="textSecondary" sx={{ mb: 3 }}>
-          Consolidated view of all financials including revenue, expenses, payments, and service data.
+          Consolidated view of all financials including revenue, expenses,
+          payments, and service data.
         </Typography>
 
         {/* Metrics */}
@@ -115,7 +178,12 @@ const GarageReports = () => {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <RechartsTooltip />
-                  <Line type="monotone" dataKey="revenue" stroke="#4caf50" strokeWidth={2} />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#4caf50"
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </Paper>
@@ -130,7 +198,12 @@ const GarageReports = () => {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <RechartsTooltip />
-                  <Line type="monotone" dataKey="expense" stroke="#f44336" strokeWidth={2} />
+                  <Line
+                    type="monotone"
+                    dataKey="expense"
+                    stroke="#f44336"
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </Paper>
@@ -158,10 +231,206 @@ const GarageReports = () => {
               </ResponsiveContainer>
             </Paper>
           </Grid>
+          {/* Customer Growth */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">Customer Growth</Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={customerGrowth}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="customers"
+                    stroke="#9c27b0"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+
+          {/* Technician Jobs */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">
+                Technician Job Distribution
+              </Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={technicianJobs}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="technician" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Bar dataKey="jobs" fill="#03a9f4" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+
+          {/* Vehicle Types */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">
+                Vehicle Type Distribution
+              </Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={vehicleTypes}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    dataKey="count"
+                  >
+                    {vehicleTypes.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+
+          {/* Booking Volume */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">
+                Booking Volume by Service
+              </Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={bookingStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="service" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Bar dataKey="count" fill="#ff5722" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          {/* Inventory Stock Trend */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">Inventory Stock Trend</Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={inventoryTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="stock"
+                    stroke="#8bc34a"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          {/* Invoice Count by Month */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">Invoice Count by Month</Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={invoiceStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Bar dataKey="count" fill="#795548" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          {/* Reminder Frequency */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">Reminder Frequency</Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={reminders}
+                    dataKey="count"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                  >
+                    {reminders.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill="#03a9f4" />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          {/* Campaign Performance */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">Campaign Performance</Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={campaignPerformance}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="campaign" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Bar dataKey="clicks" fill="#03a9f4" />
+                  <Bar dataKey="conversions" fill="#ff9800" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          {/* Feedback Ratings Over Time */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">
+                Feedback Ratings Over Time
+              </Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={feedbackRatings}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis domain={[0, 5]} />
+                  <RechartsTooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="rating"
+                    stroke="#ff5722"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          {/* Staff Attendance Overview */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 2, height: 300 }}>
+              <Typography fontWeight="bold">
+                Staff Attendance Overview
+              </Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={staffAttendance}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Bar dataKey="present" stackId="a" fill="#4caf50" />
+                  <Bar dataKey="absent" stackId="a" fill="#f44336" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
 
           {/* Detailed Breakdown */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, height: 300, overflow: 'auto' }}>
+            <Paper sx={{ p: 2, height: 300, overflow: "auto" }}>
               <Typography fontWeight="bold" gutterBottom>
                 Additional Insights
               </Typography>

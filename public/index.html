@@ -6,45 +6,66 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <meta name="description" content="" />
-    <meta name="keywords" content="" />
+    <meta name="description" content="Appointment management system for various business types including hostels, hospitals, garages, and more." />
+    <meta name="keywords" content="appointment, booking, management, hostel, hospital, garage, business" />
     <meta name="robots" content="index, follow" />
-    <meta property="og:title" content="Project name" />
-    <meta property="og:site_name" content="Project name" />
+    <meta property="og:title" content="Appointment Management System" />
+    <meta property="og:site_name" content="Appointment Management System" />
     <meta property="og:url" content="#" />
-    <meta property="og:description" content="" />
+    <meta property="og:description" content="Comprehensive appointment and booking management system for various business types." />
     <meta property="og:type" content="business.business" />
     <meta
       http-equiv="Content-Security-Policy"
       content="upgrade-insecure-requests"
     />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"></noscript>
+    
+    <!-- Preload Material Icons -->
+    <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></noscript>
 
-    <title>
-       Appointment project
-    </title>
+    <title>Appointment Management System</title>
     <link rel="shortcut icon" href="favicon.ico" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      charset="UTF-8"
-      href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
-    />
+    
+    <!-- Inline critical CSS for faster rendering -->
+    <style>
+      /* Critical CSS for initial render */
+      body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading spinner styles */
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+      }
+      
+      /* Prevent layout shift */
+      * {
+        box-sizing: border-box;
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading fallback -->
+      <div class="loading-spinner">
+        <div>Loading...</div>
+      </div>
+    </div>
   </body>
 </html>

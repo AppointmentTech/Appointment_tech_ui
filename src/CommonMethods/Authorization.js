@@ -1,4 +1,4 @@
-import { encryptText, decryptText } from "commonmethods/Encryption.js";
+import { encryptText, decryptText } from "./Encryption.js";
 import moment from "moment";
 export function CheckRouteAccess(pathname) {
   let justPathname = "/" + pathname.split("/")[1];

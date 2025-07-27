@@ -54,18 +54,13 @@ import {
 import dayjs from "dayjs";
 import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import CustomTableToolbar from "CommonComponents/CustomTableToolbar.js";
-
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 const GarageExpenses = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
-  const [addDialog, setAddDialog] = useState(false);
-  const [filterDialog, setFilterDialog] = useState(false);
-
-  // Mock expense data
-  const expenseData = [
+  // State for expenses (was static mock data)
+  const [expenses, setExpenses] = useState([
     {
       id: 1,
       expenseId: "EXP-001",
@@ -99,7 +94,42 @@ const GarageExpenses = () => {
       expenseDate: "2024-01-05",
       notes: "Monthly electricity bill",
     },
-  ];
+  ]);
+
+  // State for add/edit dialog
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [addDialog, setAddDialog] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState({
+    category: "",
+    vendor: "",
+    amount: "",
+    paymentMethod: "Cash",
+    status: "Pending",
+    expenseDate: "",
+    notes: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
+
+  // State for filter dialog
+  const [filterDialog, setFilterDialog] = useState(false);
+  const [filter, setFilter] = useState({
+    status: "all",
+    fromDate: "",
+    toDate: "",
+  });
+
+  // Delete dialog state
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, expense: null });
+
+  // Filtered expenses
+  const filteredExpenses = expenses.filter((exp) => {
+    let statusMatch = filter.status === "all" || exp.status === filter.status;
+    let fromMatch = !filter.fromDate || (exp.expenseDate && dayjs(exp.expenseDate).isAfter(dayjs(filter.fromDate).subtract(1, 'day')));
+    let toMatch = !filter.toDate || (exp.expenseDate && dayjs(exp.expenseDate).isBefore(dayjs(filter.toDate).add(1, 'day')));
+    return statusMatch && fromMatch && toMatch;
+  });
 
   // Metrics / cards data
   const metrics = [
@@ -164,6 +194,16 @@ const GarageExpenses = () => {
     }
   };
 
+  // Handle delete
+  const handleDelete = (expense) => {
+    setDeleteDialog({ open: true, expense });
+  };
+  const confirmDelete = () => {
+    setExpenses((prev) => prev.filter(e => e !== deleteDialog.expense));
+    setDeleteDialog({ open: false, expense: null });
+  };
+  const cancelDelete = () => setDeleteDialog({ open: false, expense: null });
+
   // Table columns
   const columns = [
     {
@@ -176,7 +216,8 @@ const GarageExpenses = () => {
           <Tooltip title="View Details">
             <IconButton
               size="small"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setSelectedExpense(params.row);
                 setDrawerOpen(true);
               }}
@@ -185,8 +226,27 @@ const GarageExpenses = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Edit">
-            <IconButton size="small">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditMode(true);
+                setForm({ ...params.row });
+                setAddDialog(true);
+              }}
+            >
               <Edit fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(params.row);
+              }}
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" color="error" />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -225,12 +285,100 @@ const GarageExpenses = () => {
         const date = dayjs(params?.row?.expenseDate);
         return date.isValid() ? date.format("DD/MM/YYYY") : "Pending";
       },
-    //   valueGetter: (params) => {
-    //     const d = dayjs(params.row.expenseDate);
-    //     return d.isValid() ? d.format("DD/MM/YYYY") : "Pending";
-    //   },
     },
   ];
+
+  // Handle form input change
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Validate form
+  const validateForm = () => {
+    let errors = {};
+    if (!form.category) errors.category = "Category is required";
+    if (!form.vendor) errors.vendor = "Vendor is required";
+    if (!form.amount || isNaN(form.amount) || Number(form.amount) <= 0) errors.amount = "Valid amount required";
+    if (!form.status) errors.status = "Status is required";
+    return errors;
+  };
+
+  // Handle add/edit submit
+  const handleFormSubmit = () => {
+    const errors = validateForm();
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+    if (editMode) {
+      // Edit existing expense
+      setExpenses((prev) =>
+        prev.map((exp) =>
+          exp.id === form.id ? { ...form, amount: Number(form.amount) } : exp
+        )
+      );
+    } else {
+      // Add new expense
+      const newId = expenses.length ? Math.max(...expenses.map((e) => e.id)) + 1 : 1;
+      setExpenses((prev) => [
+        ...prev,
+        {
+          ...form,
+          id: newId,
+          expenseId: `EXP-${String(newId).padStart(3, "0")}`,
+          amount: Number(form.amount),
+        },
+      ]);
+    }
+    setAddDialog(false);
+    setEditMode(false);
+    setForm({
+      category: "",
+      vendor: "",
+      amount: "",
+      paymentMethod: "Cash",
+      status: "Pending",
+      expenseDate: "",
+      notes: "",
+    });
+    setFormErrors({});
+  };
+
+  // Handle dialog open/close
+  const handleAddDialogOpen = () => {
+    setEditMode(false);
+    setForm({
+      category: "",
+      vendor: "",
+      amount: "",
+      paymentMethod: "Cash",
+      status: "Pending",
+      expenseDate: "",
+      notes: "",
+    });
+    setFormErrors({});
+    setAddDialog(true);
+  };
+
+  const handleAddDialogClose = () => {
+    setAddDialog(false);
+    setEditMode(false);
+    setForm({
+      category: "",
+      vendor: "",
+      amount: "",
+      paymentMethod: "Cash",
+      status: "Pending",
+      expenseDate: "",
+      notes: "",
+    });
+    setFormErrors({});
+  };
+
+  // Handle filter change
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilter((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -349,7 +497,7 @@ const GarageExpenses = () => {
 
         {/* Quick Actions */}
         <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap sx={{ mb: 3 }}>
-          <Button variant="contained" startIcon={<Add />} onClick={() => setAddDialog(true)}>
+          <Button variant="contained" startIcon={<Add />} onClick={handleAddDialogOpen}>
             Add Expense
           </Button>
           <Button variant="outlined" startIcon={<FilterList />} onClick={() => setFilterDialog(true)}>
@@ -360,13 +508,15 @@ const GarageExpenses = () => {
         {/* Expenses Table */}
         <Paper sx={{ height: 400, mb: 3 }}>
           <DataGrid
-            rows={expenseData}
+            rows={filteredExpenses}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5, 10, 25]}
             checkboxSelection
             disableSelectionOnClick
-            onRowClick={(params) => {
+            onRowClick={(params, event) => {
+              // Prevent drawer open if clicking action buttons
+              if (event.target.closest('button')) return;
               setSelectedExpense(params.row);
               setDrawerOpen(true);
             }}
@@ -515,38 +665,102 @@ const GarageExpenses = () => {
           )}
         </Drawer>
 
-        {/* Add Expense Dialog */}
-        <Dialog open={addDialog} onClose={() => setAddDialog(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Add Expense</DialogTitle>
+        {/* Add/Edit Expense Dialog */}
+        <Dialog open={addDialog} onClose={handleAddDialogClose} maxWidth="sm" fullWidth>
+          <DialogTitle>{editMode ? "Edit Expense" : "Add Expense"}</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Category" size="small" />
+                <TextField
+                  fullWidth
+                  label="Category"
+                  name="category"
+                  size="small"
+                  value={form.category}
+                  onChange={handleFormChange}
+                  error={!!formErrors.category}
+                  helperText={formErrors.category}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Vendor" size="small" />
+                <TextField
+                  fullWidth
+                  label="Vendor"
+                  name="vendor"
+                  size="small"
+                  value={form.vendor}
+                  onChange={handleFormChange}
+                  error={!!formErrors.vendor}
+                  helperText={formErrors.vendor}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Amount" size="small" type="number" />
+                <TextField
+                  fullWidth
+                  label="Amount"
+                  name="amount"
+                  size="small"
+                  type="number"
+                  value={form.amount}
+                  onChange={handleFormChange}
+                  error={!!formErrors.amount}
+                  helperText={formErrors.amount}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small" error={!!formErrors.status}>
                   <InputLabel>Status</InputLabel>
-                  <Select label="Status">
+                  <Select
+                    label="Status"
+                    name="status"
+                    value={form.status}
+                    onChange={handleFormChange}
+                  >
                     <MenuItem value="Paid">Paid</MenuItem>
                     <MenuItem value="Pending">Pending</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Payment Method"
+                  name="paymentMethod"
+                  size="small"
+                  value={form.paymentMethod}
+                  onChange={handleFormChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Expense Date"
+                  name="expenseDate"
+                  size="small"
+                  type="date"
+                  value={form.expenseDate}
+                  onChange={handleFormChange}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
               <Grid item xs={12}>
-                <TextField fullWidth label="Notes" multiline rows={3} size="small" />
+                <TextField
+                  fullWidth
+                  label="Notes"
+                  name="notes"
+                  multiline
+                  rows={3}
+                  size="small"
+                  value={form.notes}
+                  onChange={handleFormChange}
+                />
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setAddDialog(false)}>Cancel</Button>
-            <Button variant="contained" onClick={() => setAddDialog(false)}>
-              Add
+            <Button onClick={handleAddDialogClose}>Cancel</Button>
+            <Button variant="contained" onClick={handleFormSubmit}>
+              {editMode ? "Update" : "Add"}
             </Button>
           </DialogActions>
         </Dialog>
@@ -559,7 +773,12 @@ const GarageExpenses = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Status</InputLabel>
-                  <Select label="Status">
+                  <Select
+                    label="Status"
+                    name="status"
+                    value={filter.status}
+                    onChange={handleFilterChange}
+                  >
                     <MenuItem value="all">All</MenuItem>
                     <MenuItem value="Paid">Paid</MenuItem>
                     <MenuItem value="Pending">Pending</MenuItem>
@@ -567,10 +786,28 @@ const GarageExpenses = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="From Date" type="date" size="small" />
+                <TextField
+                  fullWidth
+                  label="From Date"
+                  name="fromDate"
+                  type="date"
+                  size="small"
+                  value={filter.fromDate}
+                  onChange={handleFilterChange}
+                  InputLabelProps={{ shrink: true }}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="To Date" type="date" size="small" />
+                <TextField
+                  fullWidth
+                  label="To Date"
+                  name="toDate"
+                  type="date"
+                  size="small"
+                  value={filter.toDate}
+                  onChange={handleFilterChange}
+                  InputLabelProps={{ shrink: true }}
+                />
               </Grid>
             </Grid>
           </DialogContent>
@@ -581,6 +818,18 @@ const GarageExpenses = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Drawer anchor="bottom" open={deleteDialog.open} onClose={cancelDelete}>
+          <Box sx={{ p: 3, textAlign: "center" }}>
+            <Typography variant="h6" gutterBottom>Delete Expense?</Typography>
+            <Typography color="textSecondary" sx={{ mb: 2 }}>
+              Are you sure you want to delete this expense? This action cannot be undone.
+            </Typography>
+            <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mr: 2 }}>Delete</Button>
+            <Button onClick={cancelDelete}>Cancel</Button>
+          </Box>
+        </Drawer>
       </Box>
     </Box>
   );

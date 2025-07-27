@@ -13,6 +13,8 @@ import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import Tooltip from '@mui/material/Tooltip';
+import Avatar from '@mui/material/Avatar';
 
 const locales = {
   "en-US": require("date-fns/locale/en-US"),
@@ -37,6 +39,7 @@ const AttendanceCalendar = ({
 }) => {
   const theme = useTheme();
   const [calendarView, setCalendarView] = useState(Views.MONTH);
+  const [calendarDate, setCalendarDate] = useState(new Date());
 
   // Calendar events with theme colors
   const calendarEvents = useMemo(() => {
@@ -65,15 +68,35 @@ const AttendanceCalendar = ({
   // Custom calendar toolbar
   const CustomToolbar = (toolbar) => {
     const goToToday = () => {
-      toolbar.onNavigate('TODAY');
+      setCalendarDate(new Date());
     };
 
     const goToPrev = () => {
-      toolbar.onNavigate('PREV');
+      let newDate;
+      if (calendarView === 'month') {
+        newDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1);
+      } else if (calendarView === 'week') {
+        newDate = new Date(calendarDate);
+        newDate.setDate(newDate.getDate() - 7);
+      } else if (calendarView === 'day') {
+        newDate = new Date(calendarDate);
+        newDate.setDate(newDate.getDate() - 1);
+      }
+      setCalendarDate(newDate);
     };
 
     const goToNext = () => {
-      toolbar.onNavigate('NEXT');
+      let newDate;
+      if (calendarView === 'month') {
+        newDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1);
+      } else if (calendarView === 'week') {
+        newDate = new Date(calendarDate);
+        newDate.setDate(newDate.getDate() + 7);
+      } else if (calendarView === 'day') {
+        newDate = new Date(calendarDate);
+        newDate.setDate(newDate.getDate() + 1);
+      }
+      setCalendarDate(newDate);
     };
 
     return (
@@ -143,45 +166,45 @@ const AttendanceCalendar = ({
         
         <Stack direction="row" spacing={1}>
           <Button 
-            variant={toolbar.view === 'month' ? 'contained' : 'outlined'} 
+            variant={calendarView === 'month' ? 'contained' : 'outlined'} 
             size="small" 
-            onClick={() => toolbar.onView('month')}
+            onClick={() => setCalendarView('month')}
             sx={{
-              backgroundColor: toolbar.view === 'month' ? theme.palette.primary.main : 'transparent',
-              color: toolbar.view === 'month' ? theme.palette.primary.contrastText : theme.palette.primary.main,
+              backgroundColor: calendarView === 'month' ? theme.palette.primary.main : 'transparent',
+              color: calendarView === 'month' ? theme.palette.primary.contrastText : theme.palette.primary.main,
               borderColor: theme.palette.primary.main,
               '&:hover': {
-                backgroundColor: toolbar.view === 'month' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
+                backgroundColor: calendarView === 'month' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
               }
             }}
           >
             Month
           </Button>
           <Button 
-            variant={toolbar.view === 'week' ? 'contained' : 'outlined'} 
+            variant={calendarView === 'week' ? 'contained' : 'outlined'} 
             size="small" 
-            onClick={() => toolbar.onView('week')}
+            onClick={() => setCalendarView('week')}
             sx={{
-              backgroundColor: toolbar.view === 'week' ? theme.palette.primary.main : 'transparent',
-              color: toolbar.view === 'week' ? theme.palette.primary.contrastText : theme.palette.primary.main,
+              backgroundColor: calendarView === 'week' ? theme.palette.primary.main : 'transparent',
+              color: calendarView === 'week' ? theme.palette.primary.contrastText : theme.palette.primary.main,
               borderColor: theme.palette.primary.main,
               '&:hover': {
-                backgroundColor: toolbar.view === 'week' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
+                backgroundColor: calendarView === 'week' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
               }
             }}
           >
             Week
           </Button>
           <Button 
-            variant={toolbar.view === 'day' ? 'contained' : 'outlined'} 
+            variant={calendarView === 'day' ? 'contained' : 'outlined'} 
             size="small" 
-            onClick={() => toolbar.onView('day')}
+            onClick={() => setCalendarView('day')}
             sx={{
-              backgroundColor: toolbar.view === 'day' ? theme.palette.primary.main : 'transparent',
-              color: toolbar.view === 'day' ? theme.palette.primary.contrastText : theme.palette.primary.main,
+              backgroundColor: calendarView === 'day' ? theme.palette.primary.main : 'transparent',
+              color: calendarView === 'day' ? theme.palette.primary.contrastText : theme.palette.primary.main,
               borderColor: theme.palette.primary.main,
               '&:hover': {
-                backgroundColor: toolbar.view === 'day' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
+                backgroundColor: calendarView === 'day' ? theme.palette.primary.dark : theme.palette.primary.light + '20'
               }
             }}
           >
@@ -190,6 +213,31 @@ const AttendanceCalendar = ({
         </Stack>
       </Box>
     );
+  };
+
+  // Custom event rendering
+  const EventComponent = ({ event }) => {
+    if (event.type === 'attendance') {
+      return (
+        <Tooltip title={`Staff: ${event.resource.staffName}\nStatus: ${event.resource.status}\nPunch In: ${event.resource.punchIn || 'N/A'}\nPunch Out: ${event.resource.punchOut || 'N/A'}\nTotal Hours: ${event.resource.totalHours}`.replace(/\n/g, '\u000A')} placement="top" arrow>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Avatar sx={{ width: 24, height: 24, fontSize: 12 }}>{event.resource.staffName?.charAt(0)}</Avatar>
+            <span>{event.title}</span>
+          </Stack>
+        </Tooltip>
+      );
+    }
+    if (event.type === 'holiday') {
+      return (
+        <Tooltip title={`Holiday: ${event.title}\n${event.description || ''}`.replace(/\n/g, '\u000A')} placement="top" arrow>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <span role="img" aria-label="holiday">🎉</span>
+            <span>{event.title}</span>
+          </Stack>
+        </Tooltip>
+      );
+    }
+    return <span>{event.title}</span>;
   };
 
   return (
@@ -218,22 +266,20 @@ const AttendanceCalendar = ({
         views={['month', 'week', 'day']}
         defaultView="month"
         view={calendarView}
-        onView={(view) => setCalendarView(view)}
+        date={calendarDate}
+        onView={setCalendarView}
+        onNavigate={setCalendarDate}
         onSelectEvent={onEventClick}
         onSelectSlot={onDateSelect}
         selectable
-        tooltipAccessor={(event) => {
-          if (event.type === 'attendance') {
-            return `${event.title}\nPunch In: ${event.punchIn || 'N/A'}\nPunch Out: ${event.punchOut || 'N/A'}\nTotal Hours: ${event.totalHours}`;
-          }
-          return event.title;
-        }}
+        tooltipAccessor={null}
         components={{
-          toolbar: customToolbar || CustomToolbar
+          toolbar: customToolbar || CustomToolbar,
+          event: EventComponent
         }}
         sx={{
           '& .rbc-calendar': {
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.background.paper,
             color: theme.palette.text.primary,
           },
           '& .rbc-header': {
@@ -242,55 +288,93 @@ const AttendanceCalendar = ({
             fontWeight: 'bold',
             borderBottom: `1px solid ${theme.palette.divider}`,
           },
+          // Force today cell highlight in dark mode
           '& .rbc-today': {
-            backgroundColor: theme.palette.action.hover,
+            backgroundColor: theme.palette.mode === 'dark' ? '#ff9800 !important' : theme.palette.action.hover,
+            color: theme.palette.mode === 'dark' ? '#fff !important' : 'inherit',
+            border: `2px solid ${theme.palette.mode === 'dark' ? '#ffb74d !important' : theme.palette.primary.main}`,
+            boxSizing: 'border-box',
+            zIndex: 1,
           },
           '& .rbc-off-range-bg': {
-            backgroundColor: theme.palette.action.disabledBackground,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
           },
           '& .rbc-off-range': {
             color: theme.palette.text.disabled,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
           },
           '& .rbc-event': {
             backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: '5px',
+            fontWeight: 'bold',
+            fontSize: '12px',
           },
-          '& .rbc-month-view': {
+          '& .rbc-month-view': theme.palette.mode === 'dark' ? {
             border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
           },
-          '& .rbc-time-view': {
+          '& .rbc-time-view': theme.palette.mode === 'dark' ? {
             border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
           },
-          '& .rbc-day-view': {
+          '& .rbc-day-view': theme.palette.mode === 'dark' ? {
             border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
           },
           '& .rbc-time-header': {
             borderBottom: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.background.paper,
           },
-          '& .rbc-time-content': {
+          '& .rbc-time-content': theme.palette.mode === 'dark' ? {
             borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
           },
           '& .rbc-timeslot-group': {
             borderBottom: `1px solid ${theme.palette.divider}`,
           },
-          '& .rbc-day-slot .rbc-time-slot': {
+          '& .rbc-day-slot .rbc-time-slot': theme.palette.mode === 'dark' ? {
             borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
           },
           '& .rbc-current-time-indicator': {
             backgroundColor: theme.palette.error.main,
           },
           '& .rbc-show-more': {
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.background.paper,
             color: theme.palette.primary.main,
             border: `1px solid ${theme.palette.primary.main}`,
           },
           '& .rbc-show-more:hover': {
             backgroundColor: theme.palette.primary.light + '20',
           },
-          // Fix for dark mode column colors
-          '& .rbc-month-row': {
+          // Zebra striping for dark mode
+          '& .rbc-month-row': theme.palette.mode === 'dark' ? {
+            backgroundColor: theme.palette.grey[900],
+          } : {
             backgroundColor: theme.palette.background.paper,
           },
-          '& .rbc-day-bg': {
+          '& .rbc-month-row:nth-of-type(even)': theme.palette.mode === 'dark' ? {
+            backgroundColor: theme.palette.grey[800],
+          } : {},
+          '& .rbc-day-bg': theme.palette.mode === 'dark' ? {
+            backgroundColor: theme.palette.grey[900],
+          } : {
             backgroundColor: theme.palette.background.paper,
           },
           '& .rbc-day-bg + .rbc-day-bg': {
@@ -299,41 +383,66 @@ const AttendanceCalendar = ({
           '& .rbc-month-row + .rbc-month-row': {
             borderTop: `1px solid ${theme.palette.divider}`,
           },
-          '& .rbc-date-cell': {
+          '& .rbc-date-cell': theme.palette.mode === 'dark' ? {
             color: theme.palette.text.primary,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background.paper,
           },
-          '& .rbc-date-cell.rbc-off-range': {
+          '& .rbc-date-cell.rbc-off-range': theme.palette.mode === 'dark' ? {
             color: theme.palette.text.disabled,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            color: theme.palette.text.disabled,
+            backgroundColor: theme.palette.grey[100],
           },
           '& .rbc-date-cell.rbc-now': {
             fontWeight: 'bold',
-            color: theme.palette.primary.main,
+            color: theme.palette.mode === 'dark' ? '#fff !important' : theme.palette.primary.main,
+            backgroundColor: theme.palette.mode === 'dark' ? '#ff9800 !important' : theme.palette.action.selected,
+            border: `2px solid ${theme.palette.mode === 'dark' ? '#ffb74d !important' : theme.palette.primary.main}`,
+            borderRadius: '6px',
+            zIndex: 2,
           },
           '& .rbc-time-view .rbc-header': {
             backgroundColor: theme.palette.primary.main,
             color: theme.palette.primary.contrastText,
           },
           '& .rbc-time-view .rbc-time-header': {
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.background.paper,
           },
-          '& .rbc-time-view .rbc-time-content': {
+          '& .rbc-time-view .rbc-time-content': theme.palette.mode === 'dark' ? {
+            backgroundColor: theme.palette.grey[900],
+          } : {
             backgroundColor: theme.palette.background.paper,
           },
           '& .rbc-time-view .rbc-timeslot-group': {
             borderBottom: `1px solid ${theme.palette.divider}`,
           },
-          '& .rbc-time-view .rbc-day-slot .rbc-time-slot': {
+          '& .rbc-time-view .rbc-day-slot .rbc-time-slot': theme.palette.mode === 'dark' ? {
             borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.grey[900],
+          } : {
+            borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
           },
-          '& .rbc-time-view .rbc-time-gutter': {
+          '& .rbc-time-view .rbc-time-gutter': theme.palette.mode === 'dark' ? {
+            backgroundColor: theme.palette.grey[900],
+            color: theme.palette.text.primary,
+          } : {
             backgroundColor: theme.palette.background.paper,
             color: theme.palette.text.primary,
           },
-          '& .rbc-time-view .rbc-time-slot': {
+          '& .rbc-time-view .rbc-time-slot': theme.palette.mode === 'dark' ? {
+            backgroundColor: theme.palette.grey[900],
+          } : {
             backgroundColor: theme.palette.background.paper,
           },
           '& .rbc-time-view .rbc-time-slot.rbc-today': {
-            backgroundColor: theme.palette.action.hover,
+            backgroundColor: theme.palette.mode === 'dark' ? theme.palette.secondary.main : theme.palette.action.hover,
+            border: `2px solid ${theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.primary.main}`,
+            zIndex: 1,
           },
         }}
       />

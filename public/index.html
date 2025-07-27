@@ -58,10 +58,15 @@
         width: 96px;
         height: 96px;
         border-radius: 50%;
-        border: 8px solid #e0e0e0;
-        border-top: 8px solid;
-        border-image: linear-gradient(90deg, #1976d2 0%, #43a047 50%, #fbc02d 100%) 1;
-        animation: spin 1.3s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+        background: conic-gradient(
+          #1976d2 0deg 90deg,   /* primary */
+          #43a047 90deg 180deg, /* success */
+          #fbc02d 180deg 270deg,/* warning */
+          #e53935 270deg 360deg /* error */
+        );
+        mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+        -webkit-mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+        animation: spin 1.2s linear infinite;
         margin-bottom: 24px;
         box-shadow: 0 6px 32px 0 rgba(25, 118, 210, 0.12);
       }

@@ -1,11 +1,5 @@
 /** Primary Import Declaration */
-import React, {
-  useEffect,
-  useContext,
-  useState,
-  useReducer,
-  useMemo,
-} from "react";
+import React, { useEffect, useContext, useState, useReducer, useMemo } from "react";
 
 /** MUI Themes */
 import { ThemeProvider } from "@mui/material/styles";
@@ -15,13 +9,29 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { Box } from "@mui/material";
 /** App Route Component */
 /** Theming and Styling */
-import { darkTheme, lightTheme } from "theme.js";
+import { darkTheme, lightTheme } from "./theme.js";
 import { ThemeContext } from "./ContextOrRedux/ThemeProvider.js";
 import { AuthContext, reducer } from "./ContextOrRedux/AuthContext.js";
 import { decryptText } from "commonmethods/Encryption.js";
 import MainRoutes from "./Template/MainRoutes.jsx";
-export default function App(props) {
-  /** State and Reducer for Authentication Context */
+
+// Simple loading component
+const LoadingSpinner = () => (
+  <Box
+    sx={{
+      width: "100vw",
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <CircularProgress />
+  </Box>
+);
+
+export default function App() {
+  // Auth state
   const initialState = {
     isAuthenticated: false,
     user: null,
@@ -31,91 +41,81 @@ export default function App(props) {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
   const [loading, setLoading] = useState(true);
-  // const authContextValue = useMemo(() => ({ state, dispatch }), [state]);
-  /** State and Reducer for Theme Context */
+  
+  // Theme context
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const themeMode = useContext(ThemeContext);
-  const darkMode = themeMode.state.darkMode;
-  // useEffect(() => {
-  //   prefersDarkMode
-  //     ? themeMode.dispatch({ type: "DARKMODE" })
-  //     : themeMode.dispatch({ type: "LIGHTMODE" });
-  // }, [prefersDarkMode]);
-  useEffect(() => {
-    let componentMounted = true;
-    if (prefersDarkMode && localStorage.getItem("darkMode") === "true") {
-      themeMode.dispatch({ type: "DARKMODE" });
-    } else {
-      themeMode.dispatch({ type: "LIGHTMODE" });
-    }
-    verifyAuth();
+  
+  // Memoized theme
+  const theme = useMemo(() => {
+    return themeMode.state.darkMode ? darkTheme : lightTheme;
+  }, [themeMode.state.darkMode]);
 
-    setLoading(false);
-    return () => {
-      componentMounted = false;
+  // Memoized auth context value
+  const authContextValue = useMemo(() => ({ state, dispatch }), [state]);
+
+  // Initialize app - run only once
+  useEffect(() => {
+    const initializeApp = () => {
+      try {
+        // Set theme
+        const savedDarkMode = localStorage.getItem("darkMode");
+        if (prefersDarkMode && savedDarkMode === "true") {
+          themeMode.dispatch({ type: "DARKMODE" });
+        } else {
+          themeMode.dispatch({ type: "LIGHTMODE" });
+        }
+        
+        // Check authentication
+        const userbytes = localStorage.getItem("user");
+        const accessbytes = localStorage.getItem("permissions");
+        const usertypebytes = localStorage.getItem("usertype");
+        const token = localStorage.getItem("token");
+
+        if (userbytes && accessbytes && usertypebytes && token) {
+          try {
+            const user = JSON.parse(decryptText(userbytes));
+            const permissions = JSON.parse(decryptText(accessbytes));
+            const usertype = JSON.parse(decryptText(usertypebytes));
+
+            if (user && permissions && usertype) {
+              dispatch({
+                type: "LOGIN",
+                payload: { user, permissions, usertype, token },
+              });
+            } else {
+              dispatch({ type: "LOGOUT" });
+            }
+          } catch (error) {
+            console.error("Error parsing auth data:", error);
+            dispatch({ type: "LOGOUT" });
+          }
+        } else {
+          dispatch({ type: "LOGOUT" });
+        }
+      } catch (error) {
+        console.error("Error initializing app:", error);
+        dispatch({ type: "LOGOUT" });
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
-  const verifyAuth = () => {
-    var userbytes =
-      localStorage.getItem("user") && decryptText(localStorage.getItem("user"));
-    var user = JSON.parse(userbytes);
-    var accessbytes =
-      localStorage.getItem("permissions") &&
-      decryptText(localStorage.getItem("permissions"));
-    var permissions = accessbytes && JSON.parse(accessbytes);
-    var usertypebytes =
-      localStorage.getItem("usertype") &&
-      decryptText(localStorage.getItem("usertype"));
-    var usertype = JSON.parse(usertypebytes);
-    var tokenbyte =
-      localStorage.getItem("token") && localStorage.getItem("token");
-    var token = tokenbyte;
-    if (user && permissions && usertype && token) {
-      dispatch({
-        type: "LOGIN",
-        payload: {
-          user,
-          permissions,
-          token,
-          usertype,
-          // indentMode,
-        },
-      });
-    } else {
-      dispatch({ type: "LOGOUT" });
-    }
-  };
+
+    initializeApp();
+  }, []); // Empty dependency array - run only once
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      {loading ? (
-        <Box
-          sx={{
-            width: "100vw",
-            height: "100vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      ) : (
-        <AuthContext.Provider
-          value={{
-            state,
-            dispatch,
-          }}
-        >
-          <ThemeContext.Provider value={themeMode}>
-            <CssBaseline />
-            <MainRoutes />
-            {/* {!loading && <MainRoutes />} */}
-            {/* <MainApp verifyAuth={verifyAuth} /> */}
-          </ThemeContext.Provider>
-        </AuthContext.Provider>
-      )}
-      {/* <CssBaseline />
-      <MainRoutes /> */}
+    <ThemeProvider theme={theme}>
+      <AuthContext.Provider value={authContextValue}>
+        <ThemeContext.Provider value={themeMode}>
+          <CssBaseline />
+          <MainRoutes />
+        </ThemeContext.Provider>
+      </AuthContext.Provider>
     </ThemeProvider>
   );
 }

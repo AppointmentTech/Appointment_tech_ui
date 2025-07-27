@@ -8,6 +8,7 @@ import {
   Typography,
   InputAdornment,
   Grid,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -67,6 +68,7 @@ const categories = [
 export default function UniqueSearchAndCategories() {
   const themeMode = useContext(ThemeContext);
   const darkMode = themeMode.state.darkMode;
+  const theme = useTheme();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -79,20 +81,82 @@ export default function UniqueSearchAndCategories() {
       sx={{
         minHeight: "100vh",
         background: darkMode
-          ? "#131010ff" // Or any dark background
-          : "linear-gradient(200deg, #615EFC,#6D67E4)",
-        //  : "linear-gradient(to right, #2C4C9C,#4F75FF,615EFC,AAC4FF,615EFC)",
+          ? `linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)`
+          : `linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%)`,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: 4,
+        py: { xs: 3, md: 6 },
+        transition: "background 0.5s ease-in-out",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Left Decorative Element */}
+      <Box
+        sx={{
+          position: "absolute",
+          left: 0,
+          top: "10%",
+          width: "300px",
+          height: "400px",
+          background: darkMode
+            ? `linear-gradient(45deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))`
+            : `linear-gradient(45deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25))`,
+          borderRadius: "50% 50% 50% 50% / 60% 60% 40% 40%",
+          transform: "rotate(-15deg)",
+          zIndex: 0,
+          opacity: darkMode ? 0.6 : 1,
+        }}
+      />
+      
+      {/* Right Decorative Element */}
+      <Box
+        sx={{
+          position: "absolute",
+          right: 0,
+          bottom: "20%",
+          width: "250px",
+          height: "350px",
+          background: darkMode
+            ? `linear-gradient(-45deg, rgba(236, 72, 153, 0.1), rgba(239, 68, 68, 0.1))`
+            : `linear-gradient(-45deg, rgba(236, 72, 153, 0.25), rgba(239, 68, 68, 0.25))`,
+          borderRadius: "50% 50% 50% 50% / 40% 40% 60% 60%",
+          transform: "rotate(20deg)",
+          zIndex: 0,
+          opacity: darkMode ? 0.6 : 1,
+        }}
+      />
+      
+      {/* Center Decorative Circle */}
+      <Box
+        sx={{
+          position: "absolute",
+          left: "50%",
+          top: "60%",
+          transform: "translateX(-50%)",
+          width: "200px",
+          height: "200px",
+          background: darkMode
+            ? `radial-gradient(circle, rgba(34, 197, 94, 0.1), transparent)`
+            : `radial-gradient(circle, rgba(34, 197, 94, 0.25), transparent)`,
+          borderRadius: "50%",
+          zIndex: 0,
+          opacity: darkMode ? 0.4 : 0.9,
+        }}
+      />
+
       <Container maxWidth="lg">
+       <Box sx={{ position: "relative", zIndex: 1 }}>
         <Typography
           variant="h4"
           textAlign="center"
-          sx={{ fontWeight: "bold", mb: 4, color: "white" }}
+          sx={{
+            fontWeight: "bold",
+            mb: 4,
+            color: darkMode ? "#ffffff" : "#1e293b",
+            transition: "color 0.5s",
+          }}
         >
           Discover Your Interests
         </Typography>
@@ -100,17 +164,25 @@ export default function UniqueSearchAndCategories() {
         {/* Search Section */}
         <Box
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: 2,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: darkMode
-              ? "rgba(223, 216, 216, 0.83)"
-              : "rgba(255, 255, 255, 1)",
-            borderRadius: "16px",
-            padding: "10px",
-            boxShadow: 7,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: 2.5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: darkMode
+              ? 'rgba(44, 62, 80, 0.75)'
+              : 'rgba(96, 165, 250, 0.18)', // more visible blue for light mode
+            borderRadius: 4,
+            p: { xs: 2, md: 3 },
+            boxShadow: darkMode
+              ? '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+              : '0 8px 32px 0 rgba(80,80,180,0.10)',
+            mb: 4,
+            transition: 'background 0.5s',
+            backdropFilter: 'blur(10px)',
+            border: darkMode
+              ? '1.5px solid rgba(255,255,255,0.08)'
+              : '1.5px solid #60a5fa', // blue-400 border for light mode
           }}
         >
           <TextField
@@ -124,7 +196,17 @@ export default function UniqueSearchAndCategories() {
                 </InputAdornment>
               ),
             }}
-            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor: darkMode ? '#34495e' : '#f8fafc',
+                color: darkMode ? '#fff' : '#222',
+              },
+              input: {
+                color: darkMode ? '#fff' : '#222',
+              },
+              transition: 'background 0.5s',
+            }}
           />
           <TextField
             fullWidth
@@ -139,13 +221,32 @@ export default function UniqueSearchAndCategories() {
                 </InputAdornment>
               ),
             }}
-            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                backgroundColor: darkMode ? '#34495e' : '#f8fafc',
+                color: darkMode ? '#fff' : '#222',
+              },
+              input: {
+                color: darkMode ? '#fff' : '#222',
+              },
+              transition: 'background 0.5s',
+            }}
           />
           <Button
             variant="contained"
             color="primary"
             size="large"
-            sx={{ borderRadius: "12px", px: 4, textTransform: "none" }}
+            sx={{
+              borderRadius: 2,
+              px: 4,
+              textTransform: "none",
+              fontWeight: 700,
+              boxShadow: 3,
+              ml: { md: 1 },
+              height: 56,
+              fontSize: "1.1rem",
+            }}
           >
             Search
           </Button>
@@ -153,7 +254,14 @@ export default function UniqueSearchAndCategories() {
 
         {/* Browse Categories */}
         <Box sx={{ mt: 6, mb: 2, display: "flex", justifyContent: "center" }}>
-          <Typography variant="h5" sx={{ fontWeight: "bold", color: "#fff" }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              color: darkMode ? "#ffffff" : "#1e293b",
+              transition: "color 0.5s",
+            }}
+          >
             Browse Categories
           </Typography>
         </Box>
@@ -178,40 +286,43 @@ export default function UniqueSearchAndCategories() {
                     sx={{
                       width: 250,
                       height: 220,
-                      backgroundColor: "#fdf8f1", // base cream
+                      backgroundColor: darkMode ? '#2c3e50' : '#ffffff',
                       borderRadius: "20px",
                       overflow: "hidden",
                       position: "relative",
                       textAlign: "center",
-                      boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)",
+                      boxShadow: darkMode
+                        ? "0 8px 24px rgba(0,0,0,0.45)"
+                        : "0 8px 20px rgba(0,0,0,0.08)",
                       cursor: "pointer",
                       transition: "all 0.4s ease",
                       "&:hover": {
-                        backgroundColor: "#fff",
+                        backgroundColor: darkMode ? '#34495e' : '#f8fafc',
+                        boxShadow: darkMode
+                          ? "0 12px 32px rgba(0,0,0,0.65)"
+                          : "0 12px 30px rgba(0,0,0,0.12)",
                       },
                       "&:hover .hoverfooter": {
                         height: "90px",
                       },
                       "&:hover .hoverHeader": {
                         height: "90px",
-                        backgroundColor: "white",
+                        backgroundColor: darkMode ? '#2c3e50' : '#ffffff',
                       },
                       "&:hover .profileImage": {
-                        border: "4px solid",
-                        borderColor:"#1c1c1fff",
+                        border: `4px solid ${theme.palette.primary.main}`,
                         transform: "scale(1.05)",
                       },
-                      // "&:hover .categoryTitle": {
-                      //   opacity: 1,
-                      //   color:"black",
-                      // }
+                      "&:hover .categoryTitle": {
+                        color: "#ffffff",
+                      }
                     }}
                   >
                     {/* hover footer */}
                     <Box
                       className="hoverfooter"
                       sx={{
-                        backgroundColor: "#8576FF",
+                        backgroundColor: theme.palette.primary.main,
                         height: "0px",
                         width: "100%",
                         position: "absolute",
@@ -227,7 +338,7 @@ export default function UniqueSearchAndCategories() {
                     <Box
                       className="hoverHeader"
                       sx={{
-                        backgroundColor: "#8576FF",
+                        backgroundColor: theme.palette.primary.main,
                         height: "100px",
                         width: "100%",
                         borderBottomLeftRadius: "50% 20%",
@@ -254,6 +365,7 @@ export default function UniqueSearchAndCategories() {
                         zIndex: 2,
                         position: "relative",
                         transition: "all 0.3s ease",
+                        border: `3px solid ${theme.palette.primary.light}`,
                       }}
                     />
 
@@ -261,15 +373,16 @@ export default function UniqueSearchAndCategories() {
                     <Typography
                       variant="body2"
                       fontWeight="bold"
+                      className="categoryTitle"
                       sx={{
                         px: 1,
-                        color: "primary",
+                        color: darkMode ? theme.palette.primary.light : "#1e293b",
                         textTransform: "capitalize",
                         fontSize: "0.95rem",
                         mt: 1,
                         zIndex: 2,
                         position: "relative",
-                        "&:hover": { color: "#101110ff" },
+                        transition: "color 0.3s",
                       }}
                     >
                       {category.title}
@@ -285,6 +398,7 @@ export default function UniqueSearchAndCategories() {
             </Typography>
           )}
         </Grid>
+       </Box>
       </Container>
     </Box >
   );

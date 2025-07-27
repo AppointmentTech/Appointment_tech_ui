@@ -1,3 +1,4 @@
+package-lock.json
 # Ignore environment variable files
 .env
 .*env
@@ -26,5 +27,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # editor directories and files
-package-lock.json
 yarn.lock

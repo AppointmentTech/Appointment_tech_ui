@@ -1,8 +1,6 @@
 const CACHE_NAME = 'appointment-app-v1';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/favicon.ico',
 ];
 

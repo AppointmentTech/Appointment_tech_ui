@@ -1054,7 +1054,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, punchIn: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1064,7 +1064,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, punchOut: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -1077,7 +1077,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, lunchStart: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1087,7 +1087,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, lunchEnd: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -1100,7 +1100,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, breakStart: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1110,7 +1110,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, breakEnd: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
               </Grid>
@@ -1187,7 +1187,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, punchIn: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1197,7 +1197,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, punchOut: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1207,7 +1207,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, lunchStart: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1217,7 +1217,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, lunchEnd: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1227,7 +1227,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, breakStart: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -1237,7 +1237,7 @@ const GarageAttendance = () => {
                     onChange={(val) =>
                       setSelectedRecord((prev) => ({ ...prev, breakEnd: val ? val.format('HH:mm') : '' }))
                     }
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    textField={<TextField fullWidth />}
                   />
                 </Grid>
               </Grid>

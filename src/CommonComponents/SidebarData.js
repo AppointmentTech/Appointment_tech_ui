@@ -115,7 +115,7 @@ export const sidebarData = {
         { name: "Dashboard", url: "/FoodCateringDashboard" },
         { name: "Menu Management", url: "/MenuManagement" },
         { name: "Hostel Management", url: "/HostelCateringManagement" },
-        { name: "Personal Catering", url: "/PersonalCatering" },
+        { name: "Personal Catering", url: "/PersonalCateringManagement" },
         { name: "Bookings", url: "/FoodCateringBookings" },
         { name: "Inventory", url: "/FoodCateringInventory" },
         { name: "Invoices", url: "/FoodCateringInvoices" },

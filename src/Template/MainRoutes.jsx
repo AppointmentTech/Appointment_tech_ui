@@ -87,7 +87,14 @@ const GarageOffers = lazy(() => import("./Dashboards/Views/BusinessDashboard/Gar
 const GarageFeedback = lazy(() => import("./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageFeedback.jsx"));
 const GarageAttendance = lazy(() => import("./Dashboards/Views/BusinessDashboard/GarageAdmin/GarageAttendance.jsx"));
 const AttendanceCalendar = lazy(() => import("./Dashboards/Views/BusinessDashboard/GarageAdmin/AttendanceCalendar.jsx"));
-
+const FoodCateringDashboard = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/FoodCateringDashboard.jsx"));
+const MenuManagement = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/MenuManagement.jsx"));
+const HostelCateringManagement = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/HostelCateringManagement.jsx"));
+const PersonalCateringManagement = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/PersonalCateringManagement.jsx"));
+const FoodCateringBookings = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/FoodCateringBookings.jsx"));
+const FoodCateringInventory = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/FoodCateringInventory.jsx"));
+const FoodCateringInvoices = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/FoodCateringInvoices.jsx"));
+const FoodCateringReports = lazy(() => import("./Dashboards/Views/BusinessDashboard/FoodCateringAdmin/FoodCateringReports.jsx"));
 // Loading component
 const LoadingSpinner = () => (
   <Box
@@ -254,6 +261,14 @@ export default function MainRoutes() {
             <Route exact path="/GarageFeedback" element={<GarageFeedback />} />
             <Route exact path="/GarageAttendance" element={<GarageAttendance />} />
             <Route exact path="/AttendanceCalendar" element={<AttendanceCalendar />} />
+            <Route exact path="/FoodCateringDashboard" element={<FoodCateringDashboard />} />
+            <Route exact path="/MenuManagement" element={<MenuManagement />} />
+            <Route exact path="/HostelCateringManagement" element={<HostelCateringManagement />} />
+            <Route exact path="/PersonalCateringManagement" element={<PersonalCateringManagement />} />
+            <Route exact path="/FoodCateringBookings" element={<FoodCateringBookings />} />
+            <Route exact path="/FoodCateringInventory" element={<FoodCateringInventory />} />
+            <Route exact path="/FoodCateringInvoices" element={<FoodCateringInvoices />} />
+            <Route exact path="/FoodCateringReports" element={<FoodCateringReports />} />
           </Route>
           <Route exact path="/" element={<Home />} />
           <Route exact path="/SignIn" element={<SignIn />} />

@@ -45,7 +45,7 @@ import { CheckRouteAccess } from "commonmethods/Authorization";
 import ListIcon from "@mui/icons-material/List";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import AdminHeader from "../../../Template/Dashboards/Components/AdminHeader/AdminHeader.jsx";
+import CommonHeader from "../../../Template/Dashboards/Components/CommonHeader.jsx";
 /** ------------------ Media Imports --------------------- */
 /** ------------------ Style Components ------------------ */
 /** ------------------ API Declarations ------------------ */
@@ -240,7 +240,7 @@ export default function BusinessManUsers(props) {
   return (
     <React.Fragment>
       <Box sx={{ display: "flex" }}>
-        <AdminHeader />
+        <CommonHeader />
         <Container
           sx={{ my: 10, minWidth: "76vw !important", minHeight: "70vh" }}
         >

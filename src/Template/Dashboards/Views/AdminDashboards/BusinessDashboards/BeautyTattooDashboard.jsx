@@ -10,7 +10,7 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import StarIcon from "@mui/icons-material/Star";
 import FaceRetouchingNaturalIcon from "@mui/icons-material/FaceRetouchingNatural";
 import PersonIcon from "@mui/icons-material/Person";
-import AdminHeader from "../../../Components/AdminHeader/AdminHeader.jsx";
+import CommonHeader from "../../../Components/CommonHeader.jsx";
 
 const BeautyTattooDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,7 +80,7 @@ const BeautyTattooDashboard = () => {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <AdminHeader />
+        <CommonHeader />
         <Box sx={{ 
           flexGrow: 1, 
           p: 3, 

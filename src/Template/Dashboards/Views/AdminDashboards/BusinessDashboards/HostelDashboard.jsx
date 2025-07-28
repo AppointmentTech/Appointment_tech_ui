@@ -10,7 +10,7 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import StarIcon from "@mui/icons-material/Star";
 import HotelIcon from "@mui/icons-material/Hotel";
 import BedIcon from "@mui/icons-material/Bed";
-import AdminHeader from "../../../Components/AdminHeader/AdminHeader.jsx";
+import CommonHeader from "../../../Components/CommonHeader.jsx";
 
 const HostelDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,7 +80,7 @@ const HostelDashboard = () => {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <AdminHeader />
+        <CommonHeader />
         <Box sx={{ 
           flexGrow: 1, 
           p: 3, 

@@ -10,9 +10,11 @@ import {
   Container,
   Paper,
   IconButton,
+  useTheme,
 } from "@mui/material";
 
 export default function GetToKnow() {
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -32,7 +34,7 @@ export default function GetToKnow() {
           textTransform="uppercase"
           textAlign="center"
           gutterBottom
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, color: theme.palette.text.primary }}
         >
           Get To Know Us
         </Typography>
@@ -48,8 +50,7 @@ export default function GetToKnow() {
         <Box
           sx={{
             width: "100%",
-            bgcolor: "#fafafa",
-            // borderRight: "1px solid #ddd",
+            bgcolor: theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.grey[50],
             display: {
               xs: "flex",
               sm: "flex",
@@ -62,6 +63,7 @@ export default function GetToKnow() {
             justifyContent: "center",
             padding: "20px 10px",
             borderRadius: "16px",
+            border: `1px solid ${theme.palette.divider}`,
           }}
         >
           <Tabs
@@ -78,10 +80,10 @@ export default function GetToKnow() {
                 padding: "15px 30px",
                 fontSize: "1.1rem",
                 fontWeight: "600",
-                color: "#222",
+                color: theme.palette.text.primary,
                 "&.Mui-selected": {
-                  backgroundColor: "#222",
-                  color: "white",
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                   borderRadius: "8px",
                 },
               },
@@ -98,8 +100,7 @@ export default function GetToKnow() {
           <Box
             sx={{
               width: 250,
-              bgcolor: "#fafafa",
-              // borderRight: "1px solid #ddd",
+              bgcolor: theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.grey[50],
               display: {
                 xs: "none",
                 sm: "none",
@@ -112,6 +113,7 @@ export default function GetToKnow() {
               justifyContent: "center",
               padding: "20px 10px",
               borderRadius: "16px",
+              border: `1px solid ${theme.palette.divider}`,
             }}
           >
             <Tabs
@@ -125,10 +127,10 @@ export default function GetToKnow() {
                   padding: "35px 30px",
                   fontSize: "1.1rem",
                   fontWeight: "600",
-                  color: "#222",
+                  color: theme.palette.text.primary,
                   "&.Mui-selected": {
-                    backgroundColor: "#222",
-                    color: "white",
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
                     borderRadius: "8px",
                   },
                 },
@@ -146,10 +148,10 @@ export default function GetToKnow() {
             {/* <Paper sx={{ padding: "40px", borderRadius: "10px", boxShadow: 3 }}> */}
             {activeTab === 0 && (
               <Box
-                style={{
+                sx={{
                   padding: "60px 10px",
                   textAlign: "center",
-                  backgroundColor: "#f0f4f8",
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[100],
                   borderRadius: "16px",
                 }}
               >
@@ -157,21 +159,23 @@ export default function GetToKnow() {
                   Our Mission
                 </Typography>
                 <Paper
-                  style={{
+                  sx={{
                     padding: "40px",
                     margin: "0 auto",
-                    backgroundColor: "#ffffff",
+                    backgroundColor: theme.palette.background.paper,
                     borderRadius: "12px",
-                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+                    boxShadow: theme.palette.mode === 'dark' 
+                      ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+                      : "0px 4px 20px rgba(0, 0, 0, 0.1)",
                     maxWidth: "900px",
+                    border: `1px solid ${theme.palette.divider}`,
                   }}
                 >
                   <Typography
                     variant="h5"
                     color="primary"
-                    style={{
+                    sx={{
                       fontWeight: "bold",
-                      // color: '#1976d2',
                       marginBottom: "20px",
                     }}
                   >
@@ -179,8 +183,8 @@ export default function GetToKnow() {
                   </Typography>
                   <Typography
                     variant="h6"
-                    style={{
-                      color: "#666666",
+                    sx={{
+                      color: theme.palette.text.secondary,
                       marginBottom: "20px",
                     }}
                   >
@@ -192,7 +196,7 @@ export default function GetToKnow() {
                   <Typography
                     variant="h6"
                     color="primary"
-                    style={{ fontStyle: "italic" }}
+                    sx={{ fontStyle: "italic" }}
                   >
                     *"Innovation in Action, Change in Progress."*
                   </Typography>
@@ -201,10 +205,10 @@ export default function GetToKnow() {
             )}
             {activeTab === 1 && (
               <Box
-                style={{
+                sx={{
                   padding: "60px 10px",
                   textAlign: "center",
-                  backgroundColor: "#e8eaf6",
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[50],
                   borderRadius: "16px",
                 }}
               >
@@ -212,21 +216,23 @@ export default function GetToKnow() {
                   Our Vision
                 </Typography>
                 <Paper
-                  style={{
+                  sx={{
                     padding: "40px",
                     margin: "0 auto",
-                    backgroundColor: "#ffffff",
+                    backgroundColor: theme.palette.background.paper,
                     borderRadius: "12px",
-                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+                    boxShadow: theme.palette.mode === 'dark' 
+                      ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+                      : "0px 4px 20px rgba(0, 0, 0, 0.1)",
                     maxWidth: "900px",
+                    border: `1px solid ${theme.palette.divider}`,
                   }}
                 >
                   <Typography
                     variant="h5"
                     color="primary"
-                    style={{
+                    sx={{
                       fontWeight: "bold",
-                      //  color: '#1976d2',
                       marginBottom: "20px",
                     }}
                   >
@@ -234,8 +240,8 @@ export default function GetToKnow() {
                   </Typography>
                   <Typography
                     variant="h6"
-                    style={{
-                      color: "#666666",
+                    sx={{
+                      color: theme.palette.text.secondary,
                       marginBottom: "20px",
                     }}
                   >
@@ -246,7 +252,7 @@ export default function GetToKnow() {
                   <Typography
                     variant="h6"
                     color="primary"
-                    style={{ fontStyle: "italic" }}
+                    sx={{ fontStyle: "italic" }}
                   >
                     *"Building Tomorrow, Today."*
                   </Typography>
@@ -255,10 +261,10 @@ export default function GetToKnow() {
             )}
             {activeTab === 2 && (
               <Box
-                style={{
+                sx={{
                   padding: "60px 10px",
                   textAlign: "center",
-                  backgroundColor: "#f0f4f8",
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[100],
                   borderRadius: "16px",
                 }}
               >
@@ -268,26 +274,28 @@ export default function GetToKnow() {
                 <Grid container spacing={4} justifyContent="center">
                   <Grid item xs={12} sm={4}>
                     <Paper
-                      style={{
+                      sx={{
                         padding: "30px",
                         textAlign: "center",
                         borderRadius: "8px",
-                        boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-                        backgroundColor: "#ffffff",
+                        boxShadow: theme.palette.mode === 'dark' 
+                          ? "0px 4px 15px rgba(0, 0, 0, 0.3)" 
+                          : "0px 4px 15px rgba(0, 0, 0, 0.1)",
+                        backgroundColor: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
                       }}
                     >
                       <Typography
                         variant="h5"
                         color="primary"
-                        style={{
+                        sx={{
                           fontWeight: "bold",
-                          // color: '#1976d2',
                           marginBottom: "15px",
                         }}
                       >
                         Integrity
                       </Typography>
-                      <Typography variant="body1" style={{ color: "#666666" }}>
+                      <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
                         "We uphold the highest standards of honesty,
                         transparency, and responsibility in everything we do."
                       </Typography>
@@ -295,26 +303,28 @@ export default function GetToKnow() {
                   </Grid>
                   <Grid item xs={12} sm={4}>
                     <Paper
-                      style={{
+                      sx={{
                         padding: "30px",
                         textAlign: "center",
                         borderRadius: "8px",
-                        boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-                        backgroundColor: "#ffffff",
+                        boxShadow: theme.palette.mode === 'dark' 
+                          ? "0px 4px 15px rgba(0, 0, 0, 0.3)" 
+                          : "0px 4px 15px rgba(0, 0, 0, 0.1)",
+                        backgroundColor: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
                       }}
                     >
                       <Typography
                         variant="h5"
                         color="primary"
-                        style={{
+                        sx={{
                           fontWeight: "bold",
-                          // color: '#1976d2',
                           marginBottom: "15px",
                         }}
                       >
                         Innovation
                       </Typography>
-                      <Typography variant="body1" style={{ color: "#666666" }}>
+                      <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
                         "We embrace creativity and strive to provide
                         groundbreaking solutions that solve real-world
                         challenges."
@@ -323,26 +333,28 @@ export default function GetToKnow() {
                   </Grid>
                   <Grid item xs={12} sm={4}>
                     <Paper
-                      style={{
+                      sx={{
                         padding: "30px",
                         textAlign: "center",
                         borderRadius: "8px",
-                        boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-                        backgroundColor: "#ffffff",
+                        boxShadow: theme.palette.mode === 'dark' 
+                          ? "0px 4px 15px rgba(0, 0, 0, 0.3)" 
+                          : "0px 4px 15px rgba(0, 0, 0, 0.1)",
+                        backgroundColor: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
                       }}
                     >
                       <Typography
                         variant="h5"
                         color="primary"
-                        style={{
+                        sx={{
                           fontWeight: "bold",
-                          // color: '#1976d2',
                           marginBottom: "15px",
                         }}
                       >
                         Excellence
                       </Typography>
-                      <Typography variant="body1" style={{ color: "#666666" }}>
+                      <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
                         "We continually aim for excellence in everything we do,
                         delivering results that surpass expectations."
                       </Typography>
@@ -352,7 +364,7 @@ export default function GetToKnow() {
                 <Typography
                   variant="h6"
                   color="primary"
-                  style={{ fontStyle: "italic", marginTop: "30px" }}
+                  sx={{ fontStyle: "italic", marginTop: "30px" }}
                 >
                   *"Integrity, Innovation, Excellence – The Cornerstones of Our
                   Journey."*

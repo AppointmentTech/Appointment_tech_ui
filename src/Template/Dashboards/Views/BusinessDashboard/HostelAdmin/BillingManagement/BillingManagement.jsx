@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
-import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
+import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import Typography from '@mui/material/Typography';
@@ -595,7 +595,7 @@ export default function BillingManagement() {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <CoAdminHeader />
+        <CommonHeader />
         <Box 
           sx={{ 
             flexGrow: 1, 

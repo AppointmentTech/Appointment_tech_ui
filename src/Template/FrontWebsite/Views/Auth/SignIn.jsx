@@ -19,6 +19,7 @@ import {
   FormLabel,
   Checkbox,
   FormGroup,
+  useTheme,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -40,6 +41,7 @@ const API_Add_Bussinessman =
 const API_Get_All_Bussiness_Type = "api/v1/businesstype/all-businesstypes";
 
 export default function SignIn() {
+  const theme = useTheme();
   let navigate = useNavigate();
   const initialLoginState = {
     User_Email: "",
@@ -388,21 +390,205 @@ export default function SignIn() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundImage: `url("https://img.freepik.com/premium-vector/technology-background-with-hitech-digital-data_29971-1134.jpg?w=1060")`,
+          backgroundImage: theme.palette.mode === 'dark' 
+            ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.paper} 100%)`
+            : `url("https://img.freepik.com/premium-vector/technology-background-with-hitech-digital-data_29971-1134.jpg?w=1060")`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           padding: 2,
         }}
       >
+           {/* Modern Decorative Elements */}
+         <Box
+          sx={{
+            position: "absolute",
+            top: "20%",
+            right: "15%",
+            width: "150px",
+            height: "150px",
+            borderRadius: "50%",
+            background: theme.palette.mode === 'dark'
+              ? "rgba(46, 204, 113, 0.1)"
+              : `${theme.palette.secondary.main}20`,
+            animation: "pulse 4s ease-in-out infinite",
+            backdropFilter: "blur(15px)",
+            border: theme.palette.mode === 'dark' 
+              ? "1px solid rgba(46, 204, 113, 0.2)"
+              : `1px solid ${theme.palette.secondary.main}30`,
+            "@keyframes pulse": {
+              "0%, 100%": {
+                transform: "scale(1)",
+                opacity: 0.5,
+              },
+              "50%": {
+                transform: "scale(1.1)",
+                opacity: 0.8,
+              },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "25%",
+            left: "20%",
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            background: theme.palette.mode === 'dark'
+              ? "rgba(52, 152, 219, 0.1)"
+              : `${theme.palette.info.main}20`,
+            animation: "bounce 5s ease-in-out infinite",
+            backdropFilter: "blur(15px)",
+            border: theme.palette.mode === 'dark' 
+              ? "1px solid rgba(52, 152, 219, 0.2)"
+              : `1px solid ${theme.palette.info.main}30`,
+            "@keyframes bounce": {
+              "0%, 100%": {
+                transform: "translateY(0px)",
+              },
+              "50%": {
+                transform: "translateY(-30px)",
+              },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            top: "60%",
+            right: "25%",
+            width: "80px",
+            height: "80px",
+            borderRadius: "50%",
+            background: theme.palette.mode === 'dark'
+              ? "rgba(155, 89, 182, 0.1)"
+              : `${theme.palette.warning.main}15`,
+            animation: "rotate 8s linear infinite",
+            backdropFilter: "blur(15px)",
+            border: theme.palette.mode === 'dark' 
+              ? "1px solid rgba(155, 89, 182, 0.2)"
+              : `1px solid ${theme.palette.warning.main}30`,
+            "@keyframes rotate": {
+              "0%": {
+                transform: "rotate(0deg)",
+              },
+              "100%": {
+                transform: "rotate(360deg)",
+              },
+            },
+          }}
+        />
+        {/* Modern Decorative Lines */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "15%",
+            left: "5%",
+            width: "3px",
+            height: "120px",
+            background: theme.palette.mode === 'dark'
+              ? "linear-gradient(to bottom, transparent, rgba(255, 103, 31, 0.3), transparent)"
+              : `linear-gradient(to bottom, transparent, ${theme.palette.primary.main}40, transparent)`,
+            animation: "glow 3s ease-in-out infinite",
+            borderRadius: "2px",
+            backdropFilter: "blur(5px)",
+            "@keyframes glow": {
+              "0%, 100%": {
+                opacity: 0.3,
+              },
+              "50%": {
+                opacity: 1,
+              },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "10%",
+            right: "10%",
+            width: "4px",
+            height: "100px",
+            background: theme.palette.mode === 'dark'
+              ? "linear-gradient(to top, transparent, rgba(46, 204, 113, 0.3), transparent)"
+              : `linear-gradient(to top, transparent, ${theme.palette.secondary.main}40, transparent)`,
+            animation: "glow 4s ease-in-out infinite reverse",
+            borderRadius: "2px",
+            backdropFilter: "blur(5px)",
+          }}
+        />
+        {/* Modern Geometric Shapes */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "35%",
+            left: "8%",
+            width: "60px",
+            height: "60px",
+            background: theme.palette.mode === 'dark'
+              ? "rgba(241, 196, 15, 0.1)"
+              : `${theme.palette.warning.main}20`,
+            borderRadius: "12px",
+            animation: "slide 6s ease-in-out infinite",
+            backdropFilter: "blur(15px)",
+            border: theme.palette.mode === 'dark' 
+              ? "1px solid rgba(241, 196, 15, 0.2)"
+              : `1px solid ${theme.palette.warning.main}30`,
+            "@keyframes slide": {
+              "0%, 100%": {
+                transform: "translateX(0px) rotate(0deg)",
+              },
+              "50%": {
+                transform: "translateX(20px) rotate(180deg)",
+              },
+            },
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "20%",
+            right: "8%",
+            width: "40px",
+            height: "40px",
+            background: theme.palette.mode === 'dark'
+              ? "rgba(231, 76, 60, 0.1)"
+              : `${theme.palette.error.main}15`,
+            borderRadius: "8px",
+            animation: "fade 7s ease-in-out infinite",
+            backdropFilter: "blur(15px)",
+            border: theme.palette.mode === 'dark' 
+              ? "1px solid rgba(231, 76, 60, 0.2)"
+              : `1px solid ${theme.palette.error.main}30`,
+            "@keyframes fade": {
+              "0%, 100%": {
+                opacity: 0.3,
+                transform: "scale(0.8)",
+              },
+              "50%": {
+                opacity: 0.8,
+                transform: "scale(1.2)",
+              },
+            },
+          }}
+        />
         <Box
           sx={{
             width: { xs: "90%", sm: "70%", md: "40%" },
-            backgroundColor: "rgba(255, 255, 255)",
+            backgroundColor: theme.palette.mode === 'dark' 
+              ? 'rgba(27, 38, 44, 0.95)' 
+              : 'rgba(255, 255, 255, 0.95)',
             borderRadius: 4,
-            boxShadow: 5,
+            boxShadow: theme.palette.mode === 'dark' 
+              ? '0 8px 32px rgba(0, 0, 0, 0.5)' 
+              : '0 8px 32px rgba(0, 0, 0, 0.1)',
             padding: 4,
-            backdropFilter: "blur(5px)",
+            backdropFilter: "blur(10px)",
+            border: theme.palette.mode === 'dark' 
+              ? '1px solid rgba(255, 255, 255, 0.1)' 
+              : '1px solid rgba(255, 255, 255, 0.2)',
           }}
         >
           {/* Logo Section */}
@@ -413,20 +599,28 @@ export default function SignIn() {
             }}
           >
             <Avatar
-              sx={{
-                backgroundColor: "primary.main",
+               sx={{
+                backgroundColor: theme.palette.primary.main,
                 width: 70,
                 height: 70,
                 margin: "0 auto",
+                boxShadow: theme.palette.mode === 'dark' 
+                  ? '0 4px 20px rgba(255, 103, 31, 0.3)' 
+                  : '0 4px 20px rgba(255, 82, 0, 0.2)',
               }}
             >
-              <LockOutlinedIcon sx={{ fontSize: 36 }} />
+              <LockOutlinedIcon sx={{ fontSize: 36, color: theme.palette.primary.contrastText }} />
             </Avatar>
             <Typography
               variant="h5"
               fontWeight="bold"
               mt={2}
               color="primary.main"
+              sx={{
+                textShadow: theme.palette.mode === 'dark' 
+                  ? '0 2px 4px rgba(255, 103, 31, 0.3)' 
+                  : 'none',
+              }}
             >
               Welcome Back
             </Typography>

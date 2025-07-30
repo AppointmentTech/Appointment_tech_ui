@@ -23,12 +23,13 @@ const ProtectedRoute = ({
   children,
 }) => {
   if (!isAllowed) {
+    // Check if user is authenticated but doesn't have permission
+    if (currentUser && currentUser.User_Type_Id === 2) {
+      return <Navigate to="/error/403" replace />;
+    }
     return <Navigate to={redirectPath} replace />;
   } else {
     return children ? children : <Outlet />;
-    // if (currentUser.User_Type_Id === 2)
-    //   return <Navigate to={"/CustomErrors/" + 305} replace />;
-    // else return children ? children : <Outlet />;
   }
 };
 

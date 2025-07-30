@@ -161,7 +161,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
 import { BarChart as RechartsBarChart, Bar, LineChart, Line, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
-import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
+import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 
@@ -410,7 +410,7 @@ export default function Reports() {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <CoAdminHeader />
+        <CommonHeader />
         <Box 
           sx={{ 
             flexGrow: 1, 

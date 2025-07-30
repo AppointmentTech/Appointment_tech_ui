@@ -1,4 +1,5 @@
 import React from 'react';
+import ErrorBoundaryFallback from '../Template/ErrorPages/ErrorBoundaryFallback.jsx';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -12,33 +13,34 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
+    // Log the error to console and any error reporting service
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    
+    // You can also send to error reporting service here
+    // Example: logErrorToService(error, errorInfo);
+    
     this.setState({
       error: error,
       errorInfo: errorInfo
     });
   }
 
+  handleReset = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null
+    });
+  };
+
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
-        <div style={{ 
-          padding: '20px', 
-          textAlign: 'center',
-          fontFamily: 'Arial, sans-serif'
-        }}>
-          <h2>Something went wrong.</h2>
-          <p>We're sorry, but something unexpected happened. Please try refreshing the page.</p>
-          {process.env.NODE_ENV === 'development' && this.state.error && (
-            <details style={{ whiteSpace: 'pre-wrap', marginTop: '20px' }}>
-              <summary>Error Details (Development)</summary>
-              <p>{this.state.error.toString()}</p>
-              <p>{this.state.errorInfo.componentStack}</p>
-            </details>
-          )}
-        </div>
+        <ErrorBoundaryFallback
+          error={this.state.error}
+          errorInfo={this.state.errorInfo}
+          onReset={this.handleReset}
+        />
       );
     }
 

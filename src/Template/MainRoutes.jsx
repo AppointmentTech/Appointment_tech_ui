@@ -5,6 +5,13 @@ import { CircularProgress, Box } from "@mui/material";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import { AuthContext } from "../ContextOrRedux/AuthContext.js";
 
+// Error Pages - Lazy loaded
+const Error404 = lazy(() => import("./ErrorPages/Error404.jsx"));
+const Error403 = lazy(() => import("./ErrorPages/Error403.jsx"));
+const Error500 = lazy(() => import("./ErrorPages/Error500.jsx"));
+const ErrorMaintenance = lazy(() => import("./ErrorPages/ErrorMaintenance.jsx"));
+const ErrorDemo = lazy(() => import("./ErrorPages/ErrorDemo.jsx"));
+
 // Lazy load components for code splitting
 const Home = lazy(() => import("./FrontWebsite/Views/Home/Home.jsx"));
 const SignIn = lazy(() => import("./FrontWebsite/Views/Auth/SignIn.jsx"));
@@ -300,6 +307,15 @@ export default function MainRoutes() {
             path="/BeautyTattooDetails"
             element={<BeautyTattooDetails />}
           />
+          
+          {/* Error Routes */}
+          <Route exact path="/error/403" element={<Error403 />} />
+          <Route exact path="/error/500" element={<Error500 />} />
+          <Route exact path="/error/maintenance" element={<ErrorMaintenance />} />
+          <Route exact path="/error/demo" element={<ErrorDemo />} />
+          
+          {/* Catch-all route for 404 */}
+          <Route path="*" element={<Error404 />} />
         </Routes>
       </Suspense>
     </Router>

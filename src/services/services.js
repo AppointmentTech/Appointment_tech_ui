@@ -72,6 +72,8 @@ export const uploadRecord = (url, data) => {
   });
 };
 
+import { ErrorHandler } from '../CommonMethods/ErrorHandler.js';
+
 export const handleResponse = (response) => {
   if (response.status === 200 && response.data) {
     if (response.data.result) {
@@ -108,6 +110,25 @@ export const handleResponse = (response) => {
       message:
         "Error:" + response.message + " Something happened. Report to Admin",
     };
+  }
+};
+
+/**
+ * Enhanced error handling for API calls
+ * @param {Error} error - The error object
+ * @param {Function} showSnackbar - Function to show snackbar notifications
+ * @param {Function} navigate - React Router navigate function
+ */
+export const handleApiError = (error, showSnackbar, navigate) => {
+  if (error?.response) {
+    // HTTP error with response
+    ErrorHandler.handleHttpError(error, navigate, showSnackbar);
+  } else if (error?.request) {
+    // Network error
+    ErrorHandler.handleNetworkError(error, showSnackbar);
+  } else {
+    // Other errors
+    ErrorHandler.handleRuntimeError(error, null, showSnackbar);
   }
 };
 

@@ -61,7 +61,7 @@ import Save from "@mui/icons-material/Save";
 import Cancel from "@mui/icons-material/Cancel";
 import { DataGrid } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
-import CoAdminHeader from "Template/Dashboards/Components/CoAdminHeader/CoAdminHeader.jsx";
+import CommonHeader from "Template/Dashboards/Components/CommonHeader.jsx";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 export default function RoomManagement() {
@@ -441,7 +441,7 @@ export default function RoomManagement() {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <CoAdminHeader />
+        <CommonHeader />
         <Box 
           sx={{ 
             flexGrow: 1, 

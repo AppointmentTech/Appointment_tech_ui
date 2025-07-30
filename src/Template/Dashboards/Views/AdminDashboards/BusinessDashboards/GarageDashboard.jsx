@@ -10,7 +10,7 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import StarIcon from "@mui/icons-material/Star";
 import GarageIcon from "@mui/icons-material/Garage";
 import BuildIcon from "@mui/icons-material/Build";
-import AdminHeader from "../../../Components/AdminHeader/AdminHeader.jsx";
+import CommonHeader from "../../../Components/CommonHeader.jsx";
 
 const GarageDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,7 +80,7 @@ const GarageDashboard = () => {
         height: "100vh",
         overflow: "hidden"
       }}>
-        <AdminHeader />
+        <CommonHeader />
         <Box sx={{ 
           flexGrow: 1, 
           p: 3, 

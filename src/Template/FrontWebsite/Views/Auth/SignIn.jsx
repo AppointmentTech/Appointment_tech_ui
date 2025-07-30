@@ -92,33 +92,27 @@ export default function SignIn() {
     authPostRecord(API_Login, loginObj)
       .then((response) => {
         if (response.status === "success") {
-          if (response) {
-            let result = response;
-            if (result.status === "success") {
-              setSnackOptions({
-                color: result.color,
-                message: result.message,
-              });
-              setSnackOpen(true);
-              var contextData = {
-                user: result.data.user_info,
-                permissions: result.data.user_permission,
-                token: result.data.access_token,
-                usertype: result.data.user_type,
-              };
-              dispatch({ type: "LOGIN", payload: contextData });
-              navigate(response.data.default_page);
-            } else {
-              setSnackOptions({
-                color: result.color,
-                message: result.message,
-              });
-              setSnackOpen(true);
-            }
+          const result = response;
+          if (result.status === "success") {
+            setSnackOptions({
+              color: result.color,
+              message: result.message,
+            });
+            setSnackOpen(true);
+            const contextData = {
+              user: result.data.user_info,
+              usertype: result.data.user_type, // { User_Type_Id, User_Type_Name, Default_Page }
+              permissions: result.data.user_permission, // Array of permission objects
+              token: result.data.access_token,
+            };
+            dispatch({ type: "LOGIN", payload: contextData });
+            // Always redirect to the user's default page from context
+            const defaultPage = result.data.user_type.Default_Page;
+            navigate(defaultPage, { replace: true });
           } else {
             setSnackOptions({
-              color: "error",
-              message: response.data,
+              color: result.color,
+              message: result.message,
             });
             setSnackOpen(true);
           }
@@ -134,7 +128,7 @@ export default function SignIn() {
       .catch((err) => {
         setSnackOptions({
           color: "error",
-          message: err.response.data.detail,
+          message: err.response?.data?.detail || "Login failed",
         });
         setSnackOpen(true);
         setLoading(false);

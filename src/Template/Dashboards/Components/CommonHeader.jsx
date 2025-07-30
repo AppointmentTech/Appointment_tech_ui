@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "ContextOrRedux/ThemeProvider.js";
 import { useTheme } from "@mui/material/styles";
@@ -41,16 +41,82 @@ import { authPostRecord } from "services/services";
 import SnackBar from "SnackBar/SnackBar.jsx";
 import { AuthContext } from "ContextOrRedux/AuthContext";
 import { sidebarData as adminSidebarData, moduleData, additionalMenuItems as adminAdditionalMenuItems } from "CommonComponents/SidebarData.js";
-// If you have a separate coadminSidebarData, import it here
-// import { sidebarData as coadminSidebarData, additionalMenuItems as coadminAdditionalMenuItems } from "...";
+import { useEnhancedNavigation } from "CommonMethods/NavigationUtils.js";
 import MailIcon from "@mui/icons-material/Mail";
 import Popover from "@mui/material/Popover";
 import Chip from "@mui/material/Chip";
 import CloseIcon from "@mui/icons-material/Close";
+import { styled } from "@mui/material/styles";
 
 const API_Logout = "api/v1/authrouter/logout";
 const drawerWidth = 300;
 const collapsedDrawerWidth = 80;
+
+// Styled components for better design
+const StyledAppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open, collapsed }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && !collapsed && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+  ...(open && collapsed && {
+    marginLeft: collapsedDrawerWidth,
+    width: `calc(100% - ${collapsedDrawerWidth}px)`,
+  }),
+}));
+
+const StyledDrawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open, collapsed }) => ({
+    width: collapsed ? collapsedDrawerWidth : drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    ...(open && !collapsed && {
+      '& .MuiDrawer-paper': {
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+        overflowX: 'hidden',
+        backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
+        borderRight: `1px solid ${theme.palette.divider}`,
+      },
+    }),
+    ...(open && collapsed && {
+      '& .MuiDrawer-paper': {
+        width: collapsedDrawerWidth,
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+        overflowX: 'hidden',
+        backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
+        borderRight: `1px solid ${theme.palette.divider}`,
+      },
+    }),
+    ...(!open && {
+      '& .MuiDrawer-paper': {
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+        width: theme.spacing(7),
+        overflowX: 'hidden',
+      },
+    }),
+  })
+);
 
 export default function CommonHeader({ role: propRole }) {
   const navigate = useNavigate();
@@ -60,9 +126,11 @@ export default function CommonHeader({ role: propRole }) {
   const themeMode = useContext(ThemeContext);
   const darkMode = themeMode.state.darkMode;
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
-  const [open, setOpen] = React.useState(!isMobile);
-  const [collapsed, setCollapsed] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  
+  // State management
+  const [open, setOpen] = useState(!isMobile);
+  const [collapsed, setCollapsed] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedService, setSelectedService] = useState({});
   const [selectedModules, setSelectedModules] = useState({});
   const [snackOpen, setSnackOpen] = useState(false);
@@ -71,6 +139,23 @@ export default function CommonHeader({ role: propRole }) {
     message: "Hi",
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Enhanced navigation hook
+  const { 
+    navigateToBusiness, 
+    navigateToBusinessModule, 
+    navigateToAdmin, 
+    navigateToStaff,
+    navigateToDefaultPage,
+    getCurrentRouteMetadata,
+    isRouteActive,
+    getAccessibleRoutes,
+    getUserPermissionSummary,
+    canAccessCurrentPage,
+    userType,
+    userPermissions,
+    user
+  } = useEnhancedNavigation();
 
   // Popover state for messages and notifications
   const [msgAnchorEl, setMsgAnchorEl] = useState(null);
@@ -81,6 +166,7 @@ export default function CommonHeader({ role: propRole }) {
   const handleNotifClick = (event) => setNotifAnchorEl(event.currentTarget);
   const handleMsgClose = () => setMsgAnchorEl(null);
   const handleNotifClose = () => setNotifAnchorEl(null);
+  
   // Sample data (use state for removal)
   const [messages, setMessages] = useState([
     { id: 1, sender: "Support", text: "Welcome to AppointmentTech!", time: "2 min ago" },
@@ -96,58 +182,136 @@ export default function CommonHeader({ role: propRole }) {
   const handleRemoveMessage = (id) => setMessages((msgs) => msgs.filter((m) => m.id !== id));
   const handleRemoveNotification = (id) => setNotifications((notifs) => notifs.filter((n) => n.id !== id));
 
-  // Determine role: from prop, context, or default to 'admin'
-  let userRole = propRole;
-  if (!userRole && context?.state?.usertype?.name) {
-    userRole = context.state.usertype.name.toLowerCase();
-  }
-  if (!userRole) userRole = "admin";
+  // Get actual user data from context based on database structure
+  const actualUserType = context?.state?.usertype?.User_Type_Name || 'guest';
+  const actualUserPermissions = context?.state?.permissions || [];
+  const actualUser = context?.state?.user;
 
-  // Sidebar/menu data based on role
-  let sidebarData = adminSidebarData;
-  let additionalMenuItems = adminAdditionalMenuItems;
-  let dashboardRoute = "/AdminDashboard";
-  let panelTitle = "Admin Panel";
-  if (userRole === "coadmin") {
-    // If you have coadminSidebarData, use it here
-    sidebarData = adminSidebarData; // Replace with coadminSidebarData if available
-    additionalMenuItems = adminAdditionalMenuItems; // Replace with coadminAdditionalMenuItems if available
-    dashboardRoute = "/CoAdminDashboard";
-    panelTitle = "Co-Admin Panel";
-  }
-
-  const openProfile = Boolean(anchorEl);
-  const currentDrawerWidth = collapsed ? collapsedDrawerWidth : drawerWidth;
-
+  // Debug logging
   useEffect(() => {
-    if (isMobile) {
-      setOpen(false);
-      setCollapsed(false);
-    } else {
-      setOpen(true);
-    }
-  }, [isMobile]);
+    console.log('CommonHeader - User Data:', {
+      actualUserType,
+      actualUserPermissions,
+      actualUser,
+      userType,
+      userPermissions,
+      user
+    });
+  }, [actualUserType, actualUserPermissions, actualUser, userType, userPermissions, user]);
 
+  // Determine role: from prop, context, or default based on actual user type
+  let userRole = propRole;
+  if (!userRole && actualUserType) {
+    userRole = actualUserType;
+  }
+  if (!userRole) userRole = 'guest';
+
+  // Get appropriate sidebar data based on actual user type
+  let sidebarData, additionalMenuItems;
+  if (userRole === 'Admin') {
+    sidebarData = adminSidebarData;
+    additionalMenuItems = adminAdditionalMenuItems;
+  } else {
+    // For other roles, use the same data for now
+    sidebarData = adminSidebarData;
+    additionalMenuItems = adminAdditionalMenuItems;
+  }
+
+  // Enhanced navigation handlers with proper error handling
+  const handleNavigation = useCallback((item, options = {}) => {
+    try {
+      console.log('Navigation attempt:', { item, userType: actualUserType, userPermissions: actualUserPermissions });
+      
+      // Get current route metadata safely
+      const currentRoute = getCurrentRouteMetadata ? getCurrentRouteMetadata() : {};
+      
+      // Determine navigation type based on item
+      if (item.url && item.url.includes('/dashboard/')) {
+        // Business dashboard navigation
+        const businessType = item.params?.businessType || currentRoute.businessType;
+        const businessId = item.params?.businessId || currentRoute.businessId;
+        
+        if (businessType && businessId) {
+          return navigateToBusiness(businessType, businessId, {
+            trackAnalytics: true,
+            userRole: actualUserType,
+            userPermissions: actualUserPermissions
+          });
+        }
+      } else if (item.url && item.url.includes('/management/')) {
+        // Business module navigation
+        const businessType = item.params?.businessType || currentRoute.businessType;
+        const businessId = item.params?.businessId || currentRoute.businessId;
+        const module = item.url.split('/').pop();
+        
+        if (businessType && businessId && module) {
+          return navigateToBusinessModule(businessType, businessId, module, {
+            trackAnalytics: true,
+            userRole: actualUserType,
+            userPermissions: actualUserPermissions
+          });
+        }
+      } else if (item.url && item.url.includes('/admin/')) {
+        // Admin module navigation
+        const module = item.url.split('/').pop();
+        return navigateToAdmin(module, {
+          trackAnalytics: true,
+          userRole: actualUserType,
+          userPermissions: actualUserPermissions
+        });
+      } else if (item.url && item.url.includes('/staff/')) {
+        // Staff module navigation
+        const module = item.url.split('/').pop();
+        return navigateToStaff(module, {
+          trackAnalytics: true,
+          userRole: actualUserType,
+          userPermissions: actualUserPermissions
+        });
+      } else {
+        // Fallback to regular navigation
+        console.log('Using fallback navigation to:', item.url);
+        return navigate(item.url, { 
+          state: { 
+            from: window.location.pathname,
+            timestamp: Date.now()
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Show error message to user
+      setSnackOptions({
+        color: "error",
+        message: "Navigation failed. Please try again."
+      });
+      setSnackOpen(true);
+    }
+  }, [navigateToBusiness, navigateToBusinessModule, navigateToAdmin, navigateToStaff, getCurrentRouteMetadata, actualUserType, actualUserPermissions, navigate]);
+
+  // Enhanced drawer toggle with animation
   const handleDrawerToggle = () => {
     setIsTransitioning(true);
-    setCollapsed(!collapsed);
+    setOpen(!open);
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
+  // Enhanced section toggle
   const handleToggle = (sectionName) => {
-    setSelectedService((prevState) => ({
-      ...prevState,
-      [sectionName]: !prevState[sectionName],
+    setSelectedService(prev => ({
+      ...prev,
+      [sectionName]: !prev[sectionName]
     }));
   };
 
+  // Enhanced module toggle
   const handleModules = (moduleName) => {
-    setSelectedModules((prevState) => ({
-      ...prevState,
-      [moduleName]: !prevState[moduleName],
+    setSelectedModules(prev => ({
+      ...prev,
+      [moduleName]: !prev[moduleName]
     }));
   };
 
+  // Enhanced profile handling
   const handleProfileOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -156,6 +320,7 @@ export default function CommonHeader({ role: propRole }) {
     setAnchorEl(null);
   };
 
+  // Enhanced drawer open/close
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -164,810 +329,556 @@ export default function CommonHeader({ role: propRole }) {
     setOpen(false);
   };
 
-  const handleLogout = () => {
-    var tokenData = {
-      token: context.state.token,
-    };
-    authPostRecord(API_Logout, tokenData)
-      .then((response) => {
-        if (response.status === "success") {
-          setSnackOptions({
-            color: response.color,
-            message: response.message,
-          });
-          dispatch({ type: "LOGOUT" });
-        } else {
-          setSnackOptions({
-            color: response.color,
-            message: response.message,
-          });
-        }
-        setSnackOpen(true);
-      })
-      .catch((err) => {
+  // Enhanced logout with confirmation
+  const handleLogout = async () => {
+    try {
+      const response = await authPostRecord(API_Logout);
+      if (response.status === 200) {
+        dispatch({ type: "LOGOUT" });
+        navigate("/SignIn");
         setSnackOptions({
-          color: "error",
-          message: err.response.data.detail,
+          color: "success",
+          message: "Logged out successfully"
         });
         setSnackOpen(true);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      setSnackOptions({
+        color: "error",
+        message: "Logout failed. Please try again."
       });
+      setSnackOpen(true);
+    }
+  };
+
+  // Enhanced dashboard navigation using actual user type from database
+  const handleDashboardNavigation = () => {
+    try {
+      console.log('Dashboard navigation attempt:', {
+        userType: actualUserType,
+        defaultPage: context.state.usertype?.Default_Page
+      });
+      
+      // Use actual user type's default page from database
+      const dashboardRoute = context.state.usertype?.Default_Page || "/AdminDashboard";
+      console.log('Navigating to dashboard:', dashboardRoute);
+      
+      navigate(dashboardRoute, {
+        state: { 
+          from: window.location.pathname,
+          timestamp: Date.now()
+        }
+      });
+    } catch (error) {
+      console.error('Dashboard navigation error:', error);
+      setSnackOptions({
+        color: "error",
+        message: "Navigation failed. Please try again."
+      });
+      setSnackOpen(true);
+    }
+  };
+
+  // Calculate current drawer width
+  const currentDrawerWidth = collapsed ? collapsedDrawerWidth : drawerWidth;
+
+  // Get user permission summary
+  const userPermissionSummary = getUserPermissionSummary ? getUserPermissionSummary() : {
+    canView: false,
+    canCreate: false,
+    canUpdate: false,
+    canDelete: false
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <MuiAppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          background: darkMode 
-            ? "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)" 
-            : "linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)",
-          color: darkMode ? "#e2e8f0" : "#1e293b",
-          borderBottom: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
-          backdropFilter: "blur(20px)",
-          zIndex: theme.zIndex.drawer + 1,
-          transition: theme.transitions.create(["width", "margin"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
-          ...(open && !isMobile && {
-            marginLeft: currentDrawerWidth,
-            width: `calc(100% - ${currentDrawerWidth}px)`,
-            transition: theme.transitions.create(["width", "margin"], {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-          }),
-        }}
-      >
+      
+      {/* Enhanced AppBar */}
+      <StyledAppBar position="fixed" open={open} collapsed={collapsed}>
         <Toolbar sx={{ 
-          minHeight: { xs: 64, sm: 70 },
-          px: { xs: 2, sm: 3 },
+          display: 'flex', 
+          justifyContent: 'space-between',
+          backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+          color: darkMode ? '#e2e8f0' : '#1e293b',
+          borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`
         }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: { xs: 2, sm: 3 },
-              ...(open && !isMobile && { display: "none" }),
-              borderRadius: "12px",
-              "&:hover": {
-                backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.04)",
-                transform: "scale(1.05)",
-              },
-              transition: "all 0.2s ease-in-out",
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Typography 
-              variant="h4" 
-              component="div" 
-              sx={{ 
-                fontWeight: 800,
-                background: darkMode 
-                  ? "linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%)" 
-                  : "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                letterSpacing: "-0.5px",
-                fontSize: { xs: "1.5rem", sm: "2rem" },
+          {/* Left Section */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerToggle}
+              edge="start"
+              sx={{
+                marginRight: 2,
+                color: darkMode ? '#e2e8f0' : '#1e293b',
+                '&:hover': {
+                  backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'
+                }
               }}
             >
+              <MenuIcon />
+            </IconButton>
+            
+            <Typography variant="h6" noWrap component="div" sx={{ 
+              fontWeight: 600,
+              color: darkMode ? '#e2e8f0' : '#1e293b'
+            }}>
               AppointmentTech
             </Typography>
           </Box>
+
+          {/* Center Section - Navigation Breadcrumb */}
           <Box sx={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: { xs: 1, sm: 1.5 },
-            "& .MuiIconButton-root": {
-              borderRadius: "12px",
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.04)",
-                transform: "translateY(-2px)",
-                boxShadow: darkMode 
-                  ? "0 4px 12px rgba(0,0,0,0.3)" 
-                  : "0 4px 12px rgba(0,0,0,0.15)",
-              },
-            },
+            display: { xs: 'none', md: 'flex' }, 
+            alignItems: 'center',
+            flex: 1,
+            justifyContent: 'center'
           }}>
-            <Tooltip
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              arrow
-              placement="bottom"
-            >
-              <IconButton
-                color="inherit"
-                onClick={() =>
-                  themeMode.dispatch({
-                    type: darkMode ? "LIGHTMODE" : "DARKMODE",
-                  })
+            <Typography variant="body2" sx={{ 
+              color: darkMode ? '#94a3b8' : '#64748b',
+              fontWeight: 500
+            }}>
+              {actualUserType} Dashboard
+            </Typography>
+          </Box>
+
+          {/* Right Section */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Theme Toggle */}
+            <IconButton
+              onClick={() => themeMode.dispatch({ type: "TOGGLE" })}
+              sx={{
+                color: darkMode ? '#e2e8f0' : '#1e293b',
+                '&:hover': {
+                  backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'
                 }
-                sx={{ p: 1.5 }}
-              >
-                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Messages" arrow placement="bottom">
-              <IconButton size="large" color="inherit" onClick={handleMsgClick}>
-                <Badge badgeContent={messages.length} color="error" sx={{
-                  "& .MuiBadge-badge": {
-                    fontSize: "0.7rem",
-                    height: "18px",
-                    minWidth: "18px",
-                    borderRadius: "9px",
-                    background: darkMode ? "#ef4444" : "#dc2626",
+              }}
+            >
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+
+            {/* Messages */}
+            <IconButton
+              onClick={handleMsgClick}
+              sx={{
+                color: darkMode ? '#e2e8f0' : '#1e293b',
+                '&:hover': {
+                  backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'
+                }
+              }}
+            >
+              <Badge badgeContent={messages.length} color="error">
+                <MailIcon />
+              </Badge>
+            </IconButton>
+
+            {/* Notifications */}
+            <IconButton
+              onClick={handleNotifClick}
+              sx={{
+                color: darkMode ? '#e2e8f0' : '#1e293b',
+                '&:hover': {
+                  backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'
+                }
+              }}
+            >
+              <Badge badgeContent={notifications.length} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+
+            {/* User Profile */}
+            <Tooltip title="Account settings">
+              <IconButton
+                onClick={handleProfileOpen}
+                sx={{
+                  color: darkMode ? '#e2e8f0' : '#1e293b',
+                  '&:hover': {
+                    backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'
                   }
+                }}
+              >
+                <Avatar sx={{ 
+                  width: 32, 
+                  height: 32,
+                  backgroundColor: darkMode ? '#475569' : '#e2e8f0',
+                  color: darkMode ? '#e2e8f0' : '#1e293b'
                 }}>
-                  <MailIcon />
-                </Badge>
+                  {actualUser?.name?.charAt(0) || actualUserType?.charAt(0) || 'U'}
+                </Avatar>
               </IconButton>
-              <Popover
-                open={openMsg}
-                anchorEl={msgAnchorEl}
-                onClose={handleMsgClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{
-                  sx: {
-                    mt: 1,
-                    minWidth: 320,
-                    borderRadius: 2,
-                    boxShadow: 6,
-                    background: darkMode ? '#1e293b' : '#fff',
-                    color: darkMode ? '#e2e8f0' : '#1e293b',
-                    p: 1,
-                  }
-                }}
-              >
-                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: 700 }}>Messages</Typography>
-                <Divider />
-                {messages.map((msg) => (
-                  <Box key={msg.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, '&:hover .remove-btn': { opacity: 1 }, borderRadius: 1, cursor: 'pointer', position: 'relative' }}>
-                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 16 }}>{msg.sender.charAt(0)}</Avatar>
-                    <Box flex={1}>
-                      <Typography variant="body2" fontWeight={600}>{msg.sender}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: 13 }}>{msg.text}</Typography>
-                    </Box>
-                    <Typography variant="caption" color="text.secondary">{msg.time}</Typography>
-                    <IconButton size="small" onClick={() => handleRemoveMessage(msg.id)} sx={{ ml: 1, opacity: 0, transition: 'opacity 0.2s', position: 'absolute', right: 4, top: 4 }} className="remove-btn">
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                ))}
-                {messages.length === 0 && <Typography sx={{ px: 2, py: 2, color: 'text.secondary' }}>No messages</Typography>}
-              </Popover>
             </Tooltip>
-            <Tooltip title="Notifications" arrow placement="bottom">
-              <IconButton size="large" color="inherit" onClick={handleNotifClick}>
-                <Badge badgeContent={notifications.length} color="error" sx={{
-                  "& .MuiBadge-badge": {
-                    fontSize: "0.7rem",
-                    height: "18px",
-                    minWidth: "18px",
-                    borderRadius: "9px",
-                    background: darkMode ? "#ef4444" : "#dc2626",
-                  }
-                }}>
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <Popover
-                open={openNotif}
-                anchorEl={notifAnchorEl}
-                onClose={handleNotifClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{
-                  sx: {
-                    mt: 1,
-                    minWidth: 340,
-                    borderRadius: 2,
-                    boxShadow: 6,
-                    background: darkMode ? '#1e293b' : '#fff',
-                    color: darkMode ? '#e2e8f0' : '#1e293b',
-                    p: 1,
-                  }
-                }}
-              >
-                <Typography variant="subtitle2" sx={{ px: 2, py: 1, fontWeight: 700 }}>Notifications</Typography>
-                <Divider />
-                {notifications.map((notif) => (
-                  <Box key={notif.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, '&:hover .remove-btn': { opacity: 1 }, borderRadius: 1, cursor: 'pointer', position: 'relative' }}>
-                    <Chip label={notif.type} size="small" color={notif.type} sx={{ mr: 1, textTransform: 'capitalize' }} />
-                    <Box flex={1}>
-                      <Typography variant="body2" fontWeight={600}>{notif.text}</Typography>
-                      <Typography variant="caption" color="text.secondary">{notif.time}</Typography>
-                    </Box>
-                    <IconButton size="small" onClick={() => handleRemoveNotification(notif.id)} sx={{ ml: 1, opacity: 0, transition: 'opacity 0.2s', position: 'absolute', right: 4, top: 4 }} className="remove-btn">
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                ))}
-                {notifications.length === 0 && <Typography sx={{ px: 2, py: 2, color: 'text.secondary' }}>No notifications</Typography>}
-              </Popover>
-            </Tooltip>
-            <Box sx={{ ml: 1 }}>
-              <Tooltip title="Account settings" arrow placement="bottom">
-                <IconButton
-                  size="large"
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-haspopup="true"
-                  color="inherit"
-                  onClick={handleProfileOpen}
-                  sx={{
-                    border: `2px solid ${darkMode ? "#475569" : "#cbd5e1"}`,
-                    borderRadius: "14px",
-                    "&:hover": {
-                      borderColor: darkMode ? "#60a5fa" : "#3b82f6",
-                      transform: "scale(1.05)",
-                    },
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                >
-                  <AccountCircle />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                anchorEl={anchorEl}
-                id="account-menu"
-                open={openProfile}
-                onClose={handleProfileClose}
-                onClick={handleProfileClose}
-                slotProps={{
-                  paper: {
-                    elevation: 12,
-                    sx: {
-                      overflow: "visible",
-                      filter: darkMode 
-                        ? "drop-shadow(0px 12px 32px rgba(0,0,0,0.4))" 
-                        : "drop-shadow(0px 12px 32px rgba(0,0,0,0.15))",
-                      mt: 2,
-                      borderRadius: "16px",
-                      minWidth: 220,
-                      background: darkMode ? "#1e293b" : "#ffffff",
-                      border: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
-                      "& .MuiAvatar-root": {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
-                      },
-                      "&::before": {
-                        content: '""',
-                        display: "block",
-                        position: "absolute",
-                        top: 0,
-                        right: 16,
-                        width: 12,
-                        height: 12,
-                        bgcolor: darkMode ? "#1e293b" : "#ffffff",
-                        borderLeft: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
-                        borderTop: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
-                        transform: "translateY(-50%) rotate(45deg)",
-                        zIndex: 0,
-                      },
-                    },
-                  },
-                }}
-                transformOrigin={{ horizontal: "right", vertical: "top" }}
-                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-              >
-                <MenuItem
-                  onClick={() => navigate(context.state.usertype.Default_Page)}
-                  sx={{ 
-                    borderRadius: "12px", 
-                    mx: 1, 
-                    my: 0.5, 
-                    py: 1.5,
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    }
-                  }}
-                >
-                  <Avatar sx={{ width: 28, height: 28, mr: 2 }} />
-                  Dashboard
-                </MenuItem>
-                <MenuItem 
-                  onClick={handleProfileClose}
-                  sx={{ 
-                    borderRadius: "12px", 
-                    mx: 1, 
-                    my: 0.5, 
-                    py: 1.5,
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    }
-                  }}
-                >
-                  <Avatar sx={{ width: 28, height: 28, mr: 2 }} />
-                  Profile
-                </MenuItem>
-                <Divider sx={{ my: 1.5, borderColor: darkMode ? "#334155" : "#e2e8f0" }} />
-                <MenuItem 
-                  onClick={handleProfileClose}
-                  sx={{ 
-                    borderRadius: "12px", 
-                    mx: 1, 
-                    my: 0.5, 
-                    py: 1.5,
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    }
-                  }}
-                >
-                  <ListItemIcon>
-                    <PersonAdd fontSize="small" />
-                  </ListItemIcon>
-                  Add another account
-                </MenuItem>
-                <MenuItem 
-                  onClick={handleProfileClose}
-                  sx={{ 
-                    borderRadius: "12px", 
-                    mx: 1, 
-                    my: 0.5, 
-                    py: 1.5,
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    }
-                  }}
-                >
-                  <ListItemIcon>
-                    <Settings fontSize="small" />
-                  </ListItemIcon>
-                  Settings
-                </MenuItem>
-                <MenuItem 
-                  onClick={handleLogout}
-                  sx={{ 
-                    borderRadius: "12px", 
-                    mx: 1, 
-                    my: 0.5,
-                    py: 1.5,
-                    color: darkMode ? "#f87171" : "#dc2626",
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(248,113,113,0.1)" : "rgba(220,38,38,0.1)",
-                    }
-                  }}
-                >
-                  <ListItemIcon>
-                    <Logout fontSize="small" />
-                  </ListItemIcon>
-                  Logout
-                </MenuItem>
-              </Menu>
-            </Box>
           </Box>
         </Toolbar>
-      </MuiAppBar>
-      {/* ...Drawer and sidebar rendering, same as AdminHeader, but use role-based data... */}
-      <MuiDrawer
-        variant={isMobile ? "temporary" : "permanent"}
-        open={open}
-        onClose={isMobile ? handleDrawerClose : undefined}
-        sx={{
-          width: currentDrawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: currentDrawerWidth,
-            boxSizing: "border-box",
-            background: darkMode 
-              ? "linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%)" 
-              : "linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)",
-            borderRight: `1px solid ${darkMode ? "#475569" : "#e2e8f0"}`,
-            boxShadow: darkMode 
-              ? "4px 0 20px rgba(0,0,0,0.5)" 
-              : "4px 0 20px rgba(0,0,0,0.1)",
-            transition: theme.transitions.create("width", {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-            overflowX: "hidden",
-            "&::-webkit-scrollbar": {
-              width: "6px",
-            },
-            "&::-webkit-scrollbar-track": {
-              background: "transparent",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: darkMode ? "#64748b" : "#cbd5e1",
-              borderRadius: "3px",
-            },
-            "&::-webkit-scrollbar-thumb:hover": {
-              background: darkMode ? "#94a3b8" : "#94a3b8",
-            },
-          },
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: theme.spacing(0, 2),
-            minHeight: { xs: 64, sm: 70 },
-            borderBottom: `1px solid ${darkMode ? "#475569" : "#e2e8f0"}`,
-            background: darkMode 
-              ? "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)" 
-              : "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-          }}
-        >
-          <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 700,
-                color: darkMode ? "#f1f5f9" : "#1e293b",
-                whiteSpace: "nowrap",
-                fontSize: { xs: "1rem", sm: "1.1rem" },
-                background: darkMode 
-                  ? "linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)" 
-                  : "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                flexGrow: 1,
-              }}
-            >
-              {panelTitle}
-            </Typography>
-          </Collapse>
+      </StyledAppBar>
+
+      {/* Enhanced Drawer */}
+      <StyledDrawer variant="permanent" open={open} collapsed={collapsed}>
+        <Toolbar />
+        <Box sx={{ overflow: 'auto', height: '100%' }}>
+          {/* User Info Section */}
           <Box sx={{ 
-            display: "flex", 
-            gap: 1, 
-            ml: "auto",
-            justifyContent: "flex-end"
+            p: 2, 
+            borderBottom: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
+            backgroundColor: darkMode ? '#0f172a' : '#f8fafc'
           }}>
-            {!isMobile && (
-              <Tooltip title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"} arrow placement="bottom">
-                <IconButton 
-                  onClick={handleDrawerToggle}
-                  disabled={isTransitioning}
-                  sx={{
-                    color: darkMode ? "#f1f5f9" : "#1e293b",
-                    borderRadius: "10px",
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.04)",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                >
-                  {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                </IconButton>
-              </Tooltip>
-            )}
-            {isMobile && (
-              <IconButton 
-                onClick={handleDrawerClose}
-                sx={{
-                  color: darkMode ? "#f1f5f9" : "#1e293b",
-                  borderRadius: "10px",
-                  "&:hover": {
-                    backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.04)",
-                    transform: "scale(1.1)",
-                  },
-                  transition: "all 0.2s ease-in-out",
-                }}
-              >
-                <ChevronLeftIcon />
-              </IconButton>
-            )}
-          </Box>
-        </Box>
-        <Box sx={{ 
-          overflow: "auto", 
-          height: "calc(100vh - 70px)",
-          "&::-webkit-scrollbar": {
-            width: "6px",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "transparent",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: darkMode ? "#64748b" : "#cbd5e1",
-            borderRadius: "3px",
-          },
-          "&::-webkit-scrollbar-thumb:hover": {
-            background: darkMode ? "#94a3b8" : "#94a3b8",
-          },
-        }}>
-          <List sx={{ pt: 2, pb: 1 }}>
-            <ListItemButton 
-              onClick={() => navigate(dashboardRoute)}
-              sx={{
-                mx: 1.5,
-                mb: 1,
-                borderRadius: "14px",
-                background: darkMode 
-                  ? "linear-gradient(135deg, rgba(96,165,250,0.1) 0%, rgba(167,139,250,0.1) 100%)" 
-                  : "linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(139,92,246,0.05) 100%)",
-                border: `1px solid ${darkMode ? "rgba(96,165,250,0.2)" : "rgba(59,130,246,0.1)"}`,
-                "&:hover": {
-                  background: darkMode 
-                    ? "linear-gradient(135deg, rgba(96,165,250,0.15) 0%, rgba(167,139,250,0.15) 100%)" 
-                    : "linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%)",
-                  transform: "translateX(4px)",
-                  boxShadow: darkMode 
-                    ? "0 4px 12px rgba(96,165,250,0.2)" 
-                    : "0 4px 12px rgba(59,130,246,0.15)",
-                },
-                "&.Mui-selected": {
-                  background: darkMode 
-                    ? "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)" 
-                    : "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  color: "#ffffff",
-                  "&:hover": {
-                    background: darkMode 
-                      ? "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)" 
-                      : "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
-                  },
-                },
-                transition: "all 0.3s ease-in-out",
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 44 }}>
-                <DashboardIcon />
-              </ListItemIcon>
-              <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
-                <ListItemText 
-                  primary="Dashboard" 
-                  primaryTypographyProps={{ 
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Avatar sx={{ 
+                width: 40, 
+                height: 40,
+                backgroundColor: darkMode ? '#475569' : '#e2e8f0',
+                color: darkMode ? '#e2e8f0' : '#1e293b',
+                mr: 2
+              }}>
+                {actualUser?.name?.charAt(0) || actualUserType?.charAt(0) || 'U'}
+              </Avatar>
+              {!collapsed && (
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle2" sx={{ 
                     fontWeight: 600,
-                    fontSize: "0.95rem",
-                  }}
-                />
-              </Collapse>
-            </ListItemButton>
-            <Divider sx={{ my: 3, mx: 2, borderColor: darkMode ? "#475569" : "#e2e8f0" }} />
-            {/* Render sidebarData.sections */}
-            {sidebarData.sections.map((section) => (
-              <Box key={section.name}>
-                <ListItemButton 
-                  onClick={() => handleToggle(section.name)}
-                  sx={{
-                    mx: 1.5,
-                    mb: 0.5,
-                    borderRadius: "12px",
-                    "&:hover": {
-                      backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
-                      transform: "translateX(2px)",
-                    },
-                    transition: "all 0.2s ease-in-out",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 44 }}>
-                    {section.icon}
-                  </ListItemIcon>
-                  <Box sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexGrow: 1,
-                    justifyContent: "space-between",
-                    minWidth: 0,
+                    color: darkMode ? '#e2e8f0' : '#1e293b'
                   }}>
-                    <Collapse in={!collapsed} orientation="horizontal" timeout={300} sx={{ flexGrow: 1, minWidth: 0 }}>
-                      <ListItemText 
-                        primary={section.name} 
-                        primaryTypographyProps={{ 
-                          fontSize: "0.9rem",
-                          fontWeight: 500,
-                          color: darkMode ? "#e2e8f0" : "#374151",
-                          noWrap: true,
-                        }}
-                      />
-                    </Collapse>
-                    {/* Only show one icon, depending on collapsed state */}
-                    {!collapsed ? (
-                      <Collapse in={!collapsed} orientation="horizontal" timeout={300} sx={{ ml: 1 }}>
-                        {selectedService[section.name] ? (
-                          <ArrowDropDownIcon />
-                        ) : (
-                          <ArrowRightIcon />
-                        )}
-                      </Collapse>
-                    ) : (
-                      <Box sx={{ ml: 1 }}>
-                        {selectedService[section.name] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                      </Box>
-                    )}
-                  </Box>
-                </ListItemButton>
-                <Collapse
-                  in={selectedService[section.name] && !collapsed}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <List component="div" disablePadding>
-                    {section.items.map((item, index) => (
-                      <ListItemButton 
-                        key={index} 
-                        sx={{ 
-                          pl: 7,
-                          py: 0.75,
-                          mx: 1.5,
-                          borderRadius: "10px",
-                          "&:hover": {
-                            backgroundColor: darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.01)",
-                            transform: "translateX(2px)",
-                          },
-                          transition: "all 0.2s ease-in-out",
-                        }}
-                        onClick={() => item.url && navigate(item.url)}
-                      >
-                        <ListItemText 
-                          primary={typeof item === 'string' ? item : item.name}
-                          primaryTypographyProps={{ 
-                            fontSize: "0.85rem",
-                            color: darkMode ? "#cbd5e1" : "#6b7280",
-                            fontWeight: 400,
-                          }}
-                        />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </Collapse>
-              </Box>
-            ))}
-            {/* Render modules only for admin */}
-            {userRole === "admin" && <>
-              <Divider sx={{ my: 3, mx: 2, borderColor: darkMode ? "#475569" : "#e2e8f0" }} />
-              <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
-                <Box sx={{ px: 2.5, mb: 1.5 }}>
-                  <Typography 
-                    variant="overline" 
-                    sx={{ 
-                      fontWeight: 700,
-                      color: darkMode ? "#94a3b8" : "#64748b",
-                      letterSpacing: "1.2px",
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    MODULES
+                    {actualUser?.name || actualUserType || 'User'}
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: darkMode ? '#94a3b8' : '#64748b'
+                  }}>
+                    {actualUserType || 'Guest'}
                   </Typography>
                 </Box>
-              </Collapse>
-              {moduleData.sections.map((section) => (
+              )}
+            </Box>
+            
+            {/* Permission Summary */}
+            {!collapsed && (
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="caption" sx={{ 
+                  color: darkMode ? '#94a3b8' : '#64748b', 
+                  display: 'block' 
+                }}>
+                  Permissions: {userPermissionSummary.canView ? 'View' : ''} {userPermissionSummary.canCreate ? 'Create' : ''} {userPermissionSummary.canUpdate ? 'Update' : ''} {userPermissionSummary.canDelete ? 'Delete' : ''}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
+          {/* Navigation Sections */}
+          <List sx={{ p: 0 }}>
+            {/* Business Sections - Show for all authenticated users */}
+            {actualUserType && actualUserType !== 'guest' ? (
+              sidebarData.sections.map((section) => (
                 <Box key={section.name}>
-                  <ListItemButton 
-                    onClick={() => handleModules(section.name)}
+                  <ListItemButton
+                    onClick={() => handleToggle(section.name)}
                     sx={{
-                      mx: 1.5,
-                      mb: 0.5,
-                      borderRadius: "12px",
-                      "&:hover": {
-                        backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
-                        transform: "translateX(2px)",
-                      },
-                      transition: "all 0.2s ease-in-out",
+                      backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                      color: darkMode ? '#e2e8f0' : '#1e293b',
+                      '&:hover': {
+                        backgroundColor: darkMode ? '#334155' : '#f1f5f9'
+                      }
                     }}
                   >
-                    <ListItemIcon sx={{ minWidth: 44 }}>
+                    <ListItemIcon sx={{ color: darkMode ? '#e2e8f0' : '#1e293b' }}>
                       {section.icon}
                     </ListItemIcon>
-                    <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
+                    {!collapsed && (
                       <ListItemText 
                         primary={section.name}
-                        primaryTypographyProps={{ 
-                          fontSize: "0.9rem",
-                          fontWeight: 500,
-                          color: darkMode ? "#e2e8f0" : "#374151",
+                        sx={{ 
+                          '& .MuiListItemText-primary': {
+                            fontWeight: 500
+                          }
                         }}
                       />
-                    </Collapse>
-                    <Collapse in={!collapsed} orientation="horizontal" timeout={300}>
-                      {selectedModules[section.name] ? (
-                        <ArrowDropDownIcon />
-                      ) : (
-                        <ArrowRightIcon />
-                      )}
-                    </Collapse>
+                    )}
+                    {!collapsed && (
+                      selectedService[section.name] ? <ChevronLeftIcon /> : <ChevronRightIcon />
+                    )}
                   </ListItemButton>
-                  <Collapse
-                    in={selectedModules[section.name] && !collapsed}
-                    timeout="auto"
-                    unmountOnExit
-                  >
+                  
+                  <Collapse in={selectedService[section.name]} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      {section.items.map((item, index) => (
+                      {section.items.map((item) => (
                         <ListItemButton
-                          key={index}
-                          sx={{ 
-                            pl: 7,
-                            py: 0.75,
-                            mx: 1.5,
-                            borderRadius: "10px",
-                            "&:hover": {
-                              backgroundColor: darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.01)",
-                              transform: "translateX(2px)",
+                          key={item.name}
+                          onClick={() => handleNavigation(item)}
+                          sx={{
+                            pl: collapsed ? 2 : 4,
+                            backgroundColor: darkMode ? '#0f172a' : '#f8fafc',
+                            color: darkMode ? '#cbd5e1' : '#475569',
+                            '&:hover': {
+                              backgroundColor: darkMode ? '#1e293b' : '#e2e8f0'
                             },
-                            transition: "all 0.2s ease-in-out",
+                            '&.Mui-selected': {
+                              backgroundColor: darkMode ? '#334155' : '#e2e8f0',
+                              color: darkMode ? '#e2e8f0' : '#1e293b'
+                            }
                           }}
-                          onClick={() => navigate(item.url)}
                         >
-                          <ListItemText 
-                            primary={item.name}
-                            primaryTypographyProps={{ 
-                              fontSize: "0.85rem",
-                              color: darkMode ? "#cbd5e1" : "#6b7280",
-                              fontWeight: 400,
-                            }}
-                          />
+                          <ListItemIcon sx={{ color: 'inherit' }}>
+                            {item.icon}
+                          </ListItemIcon>
+                          {!collapsed && (
+                            <ListItemText 
+                              primary={item.name}
+                              sx={{ 
+                                '& .MuiListItemText-primary': {
+                                  fontSize: '0.875rem'
+                                }
+                              }}
+                            />
+                          )}
                         </ListItemButton>
                       ))}
                     </List>
                   </Collapse>
                 </Box>
-              ))}
-            </>}
+              ))
+            ) : null}
+
+            {/* Admin Modules - Only show for Admin users */}
+            {actualUserType === "Admin" && (
+              <>
+                <Divider sx={{ my: 3, mx: 2, borderColor: darkMode ? "#475569" : "#e2e8f0" }} />
+                <Typography variant="overline" sx={{ 
+                  px: 2, 
+                  color: darkMode ? '#94a3b8' : '#64748b',
+                  fontWeight: 600
+                }}>
+                  Admin Modules
+                </Typography>
+                {additionalMenuItems.map((item) => (
+                  <ListItemButton
+                    key={item.name}
+                    onClick={() => handleNavigation(item)}
+                    sx={{
+                      backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                      color: darkMode ? '#e2e8f0' : '#1e293b',
+                      '&:hover': {
+                        backgroundColor: darkMode ? '#334155' : '#f1f5f9'
+                      }
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: darkMode ? '#e2e8f0' : '#1e293b' }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    {!collapsed && (
+                      <ListItemText 
+                        primary={item.name}
+                        sx={{ 
+                          '& .MuiListItemText-primary': {
+                            fontWeight: 500
+                          }
+                        }}
+                      />
+                    )}
+                  </ListItemButton>
+                ))}
+              </>
+            )}
           </List>
-          {/* ...rest of sidebar rendering... */}
         </Box>
-        <Divider sx={{ my: 2, mx: 2, borderColor: darkMode ? '#334155' : '#e2e8f0' }} />
-        <List sx={{ pb: 1, pt: 0 }}>
-          {additionalMenuItems.map((item) => {
-            let icon = null;
-            let iconColor = '';
-            if (item.name.toLowerCase().includes('share')) {
-              icon = <ShareIcon fontSize="inherit" />;
-              iconColor = '#3b82f6'; // blue
-            } else if (item.name.toLowerCase().includes('news')) {
-              icon = <NewspaperIcon fontSize="inherit" />;
-              iconColor = '#f59e42'; // orange
-            } else {
-              icon = <NewspaperIcon fontSize="inherit" />;
-              iconColor = darkMode ? '#60a5fa' : '#3b82f6';
-            }
-            return (
-              <ListItem key={item.name} disablePadding>
-                <ListItemButton
-                  sx={{
-                    borderRadius: '10px',
-                    minHeight: 44,
-                    mb: 0.5,
-                    px: 2,
-                    '&:hover': {
-                      backgroundColor: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      transform: 'translateY(-1px)',
-                    },
-                    transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
-                  }}
+      </StyledDrawer>
+
+      {/* Main Content Area */}
+      <Box component="main" sx={{ 
+        flexGrow: 1, 
+        p: 3,
+        width: { sm: `calc(100% - ${currentDrawerWidth}px)` },
+        marginTop: '64px'
+      }}>
+        {/* Content will be rendered here */}
+      </Box>
+
+      {/* Enhanced Profile Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileClose}
+        PaperProps={{
+          sx: {
+            backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+            border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
+            borderRadius: 2,
+            minWidth: 200,
+            mt: 1
+          }
+        }}
+      >
+        <MenuItem onClick={handleDashboardNavigation} sx={{ 
+          color: darkMode ? '#e2e8f0' : '#1e293b',
+          '&:hover': {
+            backgroundColor: darkMode ? '#334155' : '#f1f5f9'
+          }
+        }}>
+          <DashboardIcon sx={{ mr: 2 }} />
+          Dashboard
+        </MenuItem>
+        <MenuItem onClick={handleProfileClose} sx={{ 
+          color: darkMode ? '#e2e8f0' : '#1e293b',
+          '&:hover': {
+            backgroundColor: darkMode ? '#334155' : '#f1f5f9'
+          }
+        }}>
+          <Settings sx={{ mr: 2 }} />
+          Settings
+        </MenuItem>
+        <Divider sx={{ borderColor: darkMode ? '#334155' : '#e2e8f0' }} />
+        <MenuItem onClick={handleLogout} sx={{ 
+          color: '#ef4444',
+          '&:hover': {
+            backgroundColor: darkMode ? '#7f1d1d' : '#fef2f2'
+          }
+        }}>
+          <Logout sx={{ mr: 2 }} />
+          Logout
+        </MenuItem>
+      </Menu>
+
+      {/* Enhanced Messages Popover */}
+      <Popover
+        open={openMsg}
+        anchorEl={msgAnchorEl}
+        onClose={handleMsgClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            width: 320,
+            maxHeight: 400,
+            background: darkMode ? "#1e293b" : "#ffffff",
+            border: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
+            borderRadius: "12px",
+            boxShadow: darkMode 
+              ? "0 10px 25px rgba(0,0,0,0.3)" 
+              : "0 10px 25px rgba(0,0,0,0.1)",
+          }
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}` }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: darkMode ? "#e2e8f0" : "#1e293b" }}>
+            Messages
+          </Typography>
+        </Box>
+        <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+          {messages.map((message) => (
+            <Box
+              key={message.id}
+              sx={{
+                p: 2,
+                borderBottom: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
+                "&:hover": {
+                  backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: darkMode ? "#e2e8f0" : "#1e293b" }}>
+                  {message.sender}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => handleRemoveMessage(message.id)}
+                  sx={{ color: darkMode ? "#94a3b8" : "#64748b" }}
                 >
-                  <ListItemIcon sx={{ minWidth: 36, color: iconColor, fontSize: 20 }}>
-                    {icon}
-                  </ListItemIcon>
-                  <Collapse in={!collapsed} orientation="horizontal" timeout={300} sx={{ flexGrow: 1 }}>
-                    <ListItemText 
-                      primary={item.name}
-                      primaryTypographyProps={{ 
-                        fontSize: '0.95rem',
-                        fontWeight: 500,
-                        color: darkMode ? '#e2e8f0' : '#374151',
-                      }}
-                    />
-                  </Collapse>
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
-        <SnackBar
-          open={snackOpen}
-          setOpen={setSnackOpen}
-          options={snackOptions}
-        />
-      </MuiDrawer>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              <Typography variant="body2" sx={{ color: darkMode ? "#cbd5e1" : "#6b7280", mb: 1 }}>
+                {message.text}
+              </Typography>
+              <Typography variant="caption" sx={{ color: darkMode ? "#94a3b8" : "#64748b" }}>
+                {message.time}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Popover>
+
+      {/* Enhanced Notifications Popover */}
+      <Popover
+        open={openNotif}
+        anchorEl={notifAnchorEl}
+        onClose={handleNotifClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            width: 320,
+            maxHeight: 400,
+            background: darkMode ? "#1e293b" : "#ffffff",
+            border: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
+            borderRadius: "12px",
+            boxShadow: darkMode 
+              ? "0 10px 25px rgba(0,0,0,0.3)" 
+              : "0 10px 25px rgba(0,0,0,0.1)",
+          }
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}` }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: darkMode ? "#e2e8f0" : "#1e293b" }}>
+            Notifications
+          </Typography>
+        </Box>
+        <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+          {notifications.map((notification) => (
+            <Box
+              key={notification.id}
+              sx={{
+                p: 2,
+                borderBottom: `1px solid ${darkMode ? "#334155" : "#e2e8f0"}`,
+                "&:hover": {
+                  backgroundColor: darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                <Chip
+                  label={notification.type}
+                  size="small"
+                  color={notification.type === 'success' ? 'success' : notification.type === 'warning' ? 'warning' : 'info'}
+                  sx={{ fontSize: '0.7rem' }}
+                />
+                <IconButton
+                  size="small"
+                  onClick={() => handleRemoveNotification(notification.id)}
+                  sx={{ color: darkMode ? "#94a3b8" : "#64748b" }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              <Typography variant="body2" sx={{ color: darkMode ? "#cbd5e1" : "#6b7280", mb: 1 }}>
+                {notification.text}
+              </Typography>
+              <Typography variant="caption" sx={{ color: darkMode ? "#94a3b8" : "#64748b" }}>
+                {notification.time}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Popover>
+
+      {/* Enhanced Snackbar */}
+      <SnackBar
+        open={snackOpen}
+        setOpen={setSnackOpen}
+        options={snackOptions}
+      />
     </Box>
   );
 } 

@@ -12,6 +12,11 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function SnackBar(props) {
+  // Add default values and null checks
+  const options = props.options || {};
+  const color = options.color || "info";
+  const message = options.message || "";
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       props.setOpen(false);
@@ -19,22 +24,23 @@ export default function SnackBar(props) {
     }
     props.setOpen(false);
   };
+
   return (
     <React.Fragment>
       <Stack spacing={2} sx={{ width: "100%" }}>
         <Snackbar
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          open={props.open}
+          open={props.open || false}
           autoHideDuration={5000}
           onClose={handleClose}
           TransitionComponent={TransitionUp}
         >
           <Alert
             onClose={handleClose}
-            severity={props.options.color}
+            severity={color}
             sx={{ width: "100%" }}
           >
-            {props.options.message}
+            {message}
           </Alert>
         </Snackbar>
       </Stack>

@@ -66,7 +66,7 @@ import {
 } from '@mui/icons-material';
 import { sidebarData } from '../../../../../CommonComponents/SidebarData.js';
 import { ThemeContext } from '../../../../../ContextOrRedux/ThemeProvider.js';
-import { useSidebar } from '../Context/SidebarContext.js';
+import { useSidebar } from 'Template/Dashboards/Views/StaffDashboard/Context/SidebarContext';
 
 const StaffHeader = ({ navItems, section, setSection }) => {
   const theme = useTheme();

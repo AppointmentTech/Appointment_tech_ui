@@ -14,26 +14,62 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import { ThemeContext } from 'ContextOrRedux/ThemeProvider.js';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'ContextOrRedux/AuthContext.js';
+import { sidebarData } from '../../../../../CommonComponents/SidebarData.js';
+import { getServiceTypesFromSidebar } from '../ServicesManagement/ServiceConfig.js';
 
-const navIcons = {
-  assigned: <AssignmentIcon />,
-  guests: <PersonIcon />,
-  rooms: <MeetingRoomIcon />,
-  maintenance: <BuildIcon />,
-  profile: <PersonIcon />,
+// Dynamic navigation icons based on available services
+const getDynamicNavIcons = (serviceTypes) => {
+  const icons = {
+    dashboard: <DashboardIcon />,
+    assigned: <AssignmentIcon />,
+    services: <AssignmentIcon />,
+    scheduler: <ScheduleIcon />,
+    analytics: <AnalyticsIcon />,
+    guests: <PersonIcon />,
+    rooms: <MeetingRoomIcon />,
+    maintenance: <BuildIcon />,
+    profile: <PersonIcon />,
+  };
+
+  // Add service-specific icons
+  Object.entries(serviceTypes).forEach(([key, config]) => {
+    icons[key] = config.icon;
+  });
+
+  return icons;
 };
 
-const navItemsDefault = [
-  { key: 'assigned', label: 'Assigned Services' },
-  { key: 'guests', label: 'Guest Management' },
-  { key: 'rooms', label: 'Room Management' },
-  { key: 'maintenance', label: 'Maintenance Requests' },
-  { key: 'profile', label: 'Profile' },
-];
+// Generate dynamic navigation items from SidebarData
+const getDynamicNavItems = (serviceTypes) => {
+  const baseItems = [
+    { key: 'dashboard', label: 'Dashboard' },
+    { key: 'assigned', label: 'Assigned Services' },
+    { key: 'services', label: 'Service Management' },
+    { key: 'scheduler', label: 'Service Scheduler' },
+    { key: 'analytics', label: 'Service Analytics' },
+    { key: 'guests', label: 'Guest Management' },
+    { key: 'rooms', label: 'Room Management' },
+    { key: 'maintenance', label: 'Maintenance Requests' },
+    { key: 'profile', label: 'Profile' },
+  ];
+
+  // Add service-specific items
+  Object.entries(serviceTypes).forEach(([key, config]) => {
+    baseItems.push({ key, label: config.label });
+  });
+
+  return baseItems;
+};
+
+const navIcons = getDynamicNavIcons(getServiceTypesFromSidebar(sidebarData));
+const navItemsDefault = getDynamicNavItems(getServiceTypesFromSidebar(sidebarData));
 
 const mockMessages = [
   { id: 1, sender: 'Manager', text: 'Please check urgent service requests.', time: '2 min ago' },

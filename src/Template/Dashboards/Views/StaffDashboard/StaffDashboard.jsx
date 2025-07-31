@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import StaffHeader from './Components/StaffHeader.jsx';
 import AssignedServices from './ServicesManagement/AssignedServices.jsx';
+import ServiceManagement from './ServicesManagement/ServiceManagement.jsx';
+import ServiceAnalytics from './ServicesManagement/ServiceAnalytics.jsx';
+import ServiceScheduler from './ServicesManagement/ServiceScheduler.jsx';
+import ServiceDashboard from './ServicesManagement/ServiceDashboard.jsx';
 import RoomManagement from './ServicesManagement/RoomManagement.jsx';
 import MaintenanceRequests from './ServicesManagement/MaintenanceRequests.jsx';
 import GuestManagement from './ServicesManagement/GuestManagement.jsx';
@@ -10,7 +14,11 @@ import { Box, useTheme, Fab, Dialog, DialogTitle, DialogContent, DialogActions, 
 import AddIcon from '@mui/icons-material/Add';
 
 const NAV_ITEMS = [
+  { key: 'dashboard', label: 'Dashboard' },
   { key: 'assigned', label: 'Assigned Services' },
+  { key: 'services', label: 'Service Management' },
+  { key: 'scheduler', label: 'Service Scheduler' },
+  { key: 'analytics', label: 'Service Analytics' },
   { key: 'guests', label: 'Guest Management' },
   { key: 'rooms', label: 'Room Management' },
   { key: 'maintenance', label: 'Maintenance Requests' },
@@ -36,7 +44,7 @@ const initialMaintenance = [
 
 const StaffDashboard = () => {
   const theme = useTheme();
-  const [section, setSection] = useState('assigned');
+  const [section, setSection] = useState('dashboard');
   const [guests, setGuests] = useState(initialGuests);
   const [rooms, setRooms] = useState(initialRooms);
   const [maintenance, setMaintenance] = useState(initialMaintenance);
@@ -97,7 +105,11 @@ const StaffDashboard = () => {
       >
         {section === 'assigned' && <DailyTasks onTaskNavigate={handleTaskNavigate} />}
         <Box sx={{ background: theme.palette.background.paper, borderRadius: 2, boxShadow: 2, p: { xs: 1, sm: 4 }, minHeight: 400 }}>
+          {section === 'dashboard' && <ServiceDashboard />}
           {section === 'assigned' && <AssignedServices />}
+          {section === 'services' && <ServiceManagement />}
+          {section === 'scheduler' && <ServiceScheduler />}
+          {section === 'analytics' && <ServiceAnalytics />}
           {section === 'guests' && <GuestManagement guests={guests} setGuests={setGuests} onCheckOut={handleGuestCheckOut} />}
           {section === 'rooms' && <RoomManagement rooms={rooms} setRooms={setRooms} onAssign={handleAssignRoom} onCheckOut={handleCheckOutRoom} />}
           {section === 'maintenance' && <MaintenanceRequests maintenance={maintenance} setMaintenance={setMaintenance} />}

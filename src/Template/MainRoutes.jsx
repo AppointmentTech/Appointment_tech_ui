@@ -4,6 +4,7 @@ import { createBrowserHistory } from "history";
 import { CircularProgress, Box } from "@mui/material";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import { AuthContext } from "../ContextOrRedux/AuthContext.js";
+import { SidebarProvider } from "./Dashboards/Views/StaffDashboard/Context/SidebarContext.js";
 
 // Error Pages - Lazy loaded
 const Error404 = lazy(() => import("./ErrorPages/Error404.jsx"));
@@ -216,7 +217,11 @@ export default function MainRoutes() {
             <Route
               exact
               path="/StaffDashboard"
-              element={<StaffDashboard />}
+              element={
+                <SidebarProvider>
+                  <StaffDashboard />
+                </SidebarProvider>
+              }
             />
             <Route
               exact

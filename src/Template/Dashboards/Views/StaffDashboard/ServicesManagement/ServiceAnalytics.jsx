@@ -46,7 +46,8 @@ import {
   Timeline as TimelineIcon,
   Star as StarIcon,
   ThumbUp as ThumbUpIcon,
-  ThumbDown as ThumbDownIcon
+  ThumbDown as ThumbDownIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { sidebarData } from '../../../../../CommonComponents/SidebarData.js';
@@ -96,11 +97,17 @@ const SERVICE_TYPES = dynamicServiceTypes;
 
 const ServiceAnalytics = () => {
   const theme = useTheme();
-  const [selectedService, setSelectedService] = useState('cleaning');
+    const [selectedService, setSelectedService] = useState(Object.keys(mockAnalytics)[0] || 'cleaning');
   const [timeRange, setTimeRange] = useState('week');
-
-  const currentAnalytics = mockAnalytics[selectedService];
-  const serviceConfig = SERVICE_TYPES[selectedService];
+  
+  // Ensure selectedService exists in both mockAnalytics and SERVICE_TYPES
+  const validService = Object.keys(mockAnalytics).includes(selectedService) ? selectedService : Object.keys(mockAnalytics)[0];
+  const currentAnalytics = mockAnalytics[validService];
+  const serviceConfig = SERVICE_TYPES[validService] || {
+    label: 'Unknown Service',
+    icon: <AssignmentIcon />,
+    color: 'primary'
+  };
 
   const getEfficiencyColor = (efficiency) => {
     if (efficiency >= 90) return 'success';
@@ -122,7 +129,7 @@ const ServiceAnalytics = () => {
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            color: theme.palette[serviceConfig.color]?.main,
+            color: serviceConfig.color ? theme.palette[serviceConfig.color]?.main : theme.palette.primary.main,
             fontSize: '2rem'
           }}>
             {serviceConfig.icon}

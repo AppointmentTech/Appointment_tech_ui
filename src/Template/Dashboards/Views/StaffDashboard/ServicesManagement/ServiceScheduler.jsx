@@ -98,6 +98,8 @@ const ServiceScheduler = () => {
   const [scheduledServices, setScheduledServices] = useState(mockScheduledServices);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedService, setSelectedService] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [filterType, setFilterType] = useState('All');
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -106,7 +108,14 @@ const ServiceScheduler = () => {
 
   // Get services for selected date
   const getServicesForDate = (date) => {
-    return scheduledServices.filter(service => service.date === date);
+    let filteredServices = scheduledServices.filter(service => service.date === date);
+    
+    // Apply type filter
+    if (filterType !== 'All') {
+      filteredServices = filteredServices.filter(service => service.type === filterType);
+    }
+    
+    return filteredServices;
   };
 
   // Get available time slots for a service type
@@ -196,7 +205,7 @@ const ServiceScheduler = () => {
 
       {/* Date Selection and Filters */}
       <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={4}>
           <Card sx={{ p: 3, boxShadow: 2 }}>
             <Typography variant="h6" fontWeight={600} mb={2}>
               Date Selection
@@ -212,7 +221,25 @@ const ServiceScheduler = () => {
             />
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ p: 3, boxShadow: 2 }}>
+            <Typography variant="h6" fontWeight={600} mb={2}>
+              Service Type Filter
+            </Typography>
+            <FormControl fullWidth>
+              <Select
+                value={filterType}
+                onChange={e => setFilterType(e.target.value)}
+              >
+                <MenuItem value="All">All Types</MenuItem>
+                {Object.entries(SERVICE_TYPES).map(([key, config]) => (
+                  <MenuItem key={key} value={key}>{config.label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
           <Card sx={{ p: 3, boxShadow: 2 }}>
             <Typography variant="h6" fontWeight={600} mb={2}>
               Status Filter

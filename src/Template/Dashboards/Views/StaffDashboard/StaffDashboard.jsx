@@ -10,9 +10,11 @@ import MaintenanceRequests from './ServicesManagement/MaintenanceRequests.jsx';
 import GuestManagement from './ServicesManagement/GuestManagement.jsx';
 import StaffProfile from './Profile/StaffProfile.jsx';
 import DailyTasks from './ServicesManagement/DailyTasks.jsx';
-import { Box, useTheme, Fab, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
+import { Box, useTheme, Fab, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, useMediaQuery } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useSidebar } from './Context/SidebarContext.js';
 
+// Navigation items for AppBar title display
 const NAV_ITEMS = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'assigned', label: 'Assigned Services' },
@@ -44,6 +46,8 @@ const initialMaintenance = [
 
 const StaffDashboard = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { sidebarCollapsed } = useSidebar();
   const [section, setSection] = useState('dashboard');
   const [guests, setGuests] = useState(initialGuests);
   const [rooms, setRooms] = useState(initialRooms);
@@ -94,17 +98,17 @@ const StaffDashboard = () => {
         section={section}
         setSection={setSection}
       />
-      <Box
-        sx={{
-          maxWidth: 1200,
-          mx: 'auto',
-          p: { xs: 1, sm: 4 },
-          mt: 4,
-          minHeight: '60vh',
-        }}
-      >
+             <Box
+         sx={{
+           ml: { xs: 0, md: sidebarCollapsed ? '80px' : '280px' },
+           p: { xs: 1, sm: 4 },
+           mt: 8, // Account for fixed AppBar
+           minHeight: '60vh',
+           transition: 'margin-left 0.3s ease',
+         }}
+       >
         {section === 'assigned' && <DailyTasks onTaskNavigate={handleTaskNavigate} />}
-        <Box sx={{ background: theme.palette.background.paper, borderRadius: 2, boxShadow: 2, p: { xs: 1, sm: 4 }, minHeight: 400 }}>
+        <Box sx={{ minHeight: 400 }}>
           {section === 'dashboard' && <ServiceDashboard />}
           {section === 'assigned' && <AssignedServices />}
           {section === 'services' && <ServiceManagement />}
@@ -117,7 +121,19 @@ const StaffDashboard = () => {
         </Box>
       </Box>
       {/* Floating Action Button for logging maintenance issue */}
-      <Fab color="error" aria-label="log-maintenance" sx={{ position: 'fixed', bottom: 32, right: 32, zIndex: 1200 }} onClick={() => setLogMaintenanceOpen(true)}>
+             <Fab 
+         color="error" 
+         aria-label="log-maintenance" 
+         sx={{ 
+           position: 'fixed', 
+           bottom: 32, 
+           right: 32, 
+           zIndex: 1200,
+           ml: { xs: 0, md: sidebarCollapsed ? '80px' : '280px' },
+           transition: 'margin-left 0.3s ease'
+         }} 
+         onClick={() => setLogMaintenanceOpen(true)}
+       >
         <AddIcon />
       </Fab>
       {/* Modal for logging maintenance issue */}

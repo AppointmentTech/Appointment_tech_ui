@@ -127,6 +127,8 @@ const ServiceManagement = () => {
   const [editForm, setEditForm] = useState({});
   const [viewModal, setViewModal] = useState(false);
   const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Calculate statistics
   useEffect(() => {
@@ -151,7 +153,11 @@ const ServiceManagement = () => {
   const filteredServices = services.filter(service => {
     const statusMatch = filter === 'All' || service.status === filter;
     const typeMatch = typeFilter === 'All' || service.type === typeFilter;
-    return statusMatch && typeMatch;
+    const searchMatch = searchTerm === '' || 
+      service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.guest.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.room.toLowerCase().includes(searchTerm.toLowerCase());
+    return statusMatch && typeMatch && searchMatch;
   });
 
   // Handle service status update
@@ -253,6 +259,13 @@ const ServiceManagement = () => {
           Service Management
         </Typography>
         <Box display="flex" gap={2} flexWrap="wrap">
+          <TextField
+            size="small"
+            placeholder="Search services..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            sx={{ minWidth: 200 }}
+          />
           <FormControl size="small" sx={{ minWidth: 160 }}>
             <InputLabel>Status</InputLabel>
             <Select
@@ -287,6 +300,7 @@ const ServiceManagement = () => {
             onClick={() => {
               setFilter('All');
               setTypeFilter('All');
+              setSearchTerm('');
             }}
           >
             Reset

@@ -148,6 +148,7 @@ const SERVICE_TYPES = dynamicServiceTypes;
 const ServiceDashboard = () => {
   const theme = useTheme();
   const [dashboardData] = useState(mockDashboardData);
+  const [loading, setLoading] = useState(false);
 
   const getActionColor = (action) => {
     switch (action) {
@@ -178,6 +179,33 @@ const ServiceDashboard = () => {
     }
   };
 
+  const handleRefresh = () => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+
+  const handleNewService = () => {
+    // Navigate to service management or open new service modal
+    console.log('Navigate to new service creation');
+  };
+
+  // Safe service type config getter
+  const getServiceTypeConfig = (type) => {
+    const config = dynamicServiceTypes[type];
+    if (!config) {
+      console.warn(`Service type '${type}' not found in configuration`);
+      return {
+        label: type.charAt(0).toUpperCase() + type.slice(1),
+        icon: <AssignmentIcon />,
+        color: 'primary'
+      };
+    }
+    return config;
+  };
+
   return (
     <Box>
       {/* Header */}
@@ -189,12 +217,15 @@ const ServiceDashboard = () => {
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+            disabled={loading}
           >
-            Refresh
+            {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
+            onClick={handleNewService}
           >
             New Service
           </Button>
@@ -287,11 +318,7 @@ const ServiceDashboard = () => {
               </TableHead>
               <TableBody>
                 {Object.entries(dashboardData.serviceTypes).map(([type, data]) => {
-                  const config = SERVICE_TYPES[type];
-                  if (!config || !config.color) {
-                    console.warn('Missing config or color for service type:', type, config);
-                    return null; // Guard: skip if config or color is undefined
-                  }
+                  const config = getServiceTypeConfig(type);
                   return (
                     <TableRow key={type}>
                       <TableCell>
@@ -356,18 +383,12 @@ const ServiceDashboard = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={performer.name}
-                    secondary={
-                      <Box>
-                        <Typography variant="body2" color="text.secondary">
-                          {performer.type} • {performer.services} services
-                        </Typography>
-                        <Box display="flex" alignItems="center" gap={0.5}>
-                          <StarIcon color="warning" fontSize="small" />
-                          <Typography variant="body2">{performer.rating}</Typography>
-                        </Box>
-                      </Box>
-                    }
+                    secondary={`${performer.type} • ${performer.services} services`}
                   />
+                  <Box display="flex" alignItems="center" gap={0.5}>
+                    <StarIcon color="warning" fontSize="small" />
+                    <Typography variant="body2">{performer.rating}</Typography>
+                  </Box>
                 </ListItem>
               ))}
             </List>
@@ -384,7 +405,7 @@ const ServiceDashboard = () => {
             </Typography>
             <List>
               {dashboardData.recentActivities.map((activity) => {
-                const config = SERVICE_TYPES[activity.type];
+                const config = getServiceTypeConfig(activity.type);
                 return (
                   <ListItem key={activity.id} sx={{ px: 0 }}>
                     <ListItemIcon>
@@ -402,20 +423,14 @@ const ServiceDashboard = () => {
                     </ListItemIcon>
                     <ListItemText
                       primary={activity.title}
-                      secondary={
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            {activity.staff} • {activity.time}
-                          </Typography>
-                          {activity.rating && (
-                            <Box display="flex" alignItems="center" gap={0.5}>
-                              <StarIcon color="warning" fontSize="small" />
-                              <Typography variant="body2">{activity.rating}</Typography>
-                            </Box>
-                          )}
-                        </Box>
-                      }
+                      secondary={`${activity.staff} • ${activity.time}`}
                     />
+                    {activity.rating && (
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <StarIcon color="warning" fontSize="small" />
+                        <Typography variant="body2">{activity.rating}</Typography>
+                      </Box>
+                    )}
                   </ListItem>
                 );
               })}
@@ -430,7 +445,7 @@ const ServiceDashboard = () => {
             </Typography>
             <List>
               {dashboardData.upcomingServices.map((service) => {
-                const config = SERVICE_TYPES[service.type];
+                const config = getServiceTypeConfig(service.type);
                 return (
                   <ListItem key={service.id} sx={{ px: 0 }}>
                     <ListItemIcon>
@@ -440,19 +455,13 @@ const ServiceDashboard = () => {
                     </ListItemIcon>
                     <ListItemText
                       primary={service.title}
-                      secondary={
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            {service.staff} • {service.time}
-                          </Typography>
-                          <Chip 
-                            label={service.priority} 
-                            color={getPriorityColor(service.priority)} 
-                            size="small" 
-                            sx={{ mt: 0.5 }}
-                          />
-                        </Box>
-                      }
+                      secondary={`${service.staff} • ${service.time}`}
+                    />
+                    <Chip 
+                      label={service.priority} 
+                      color={getPriorityColor(service.priority)} 
+                      size="small" 
+                      sx={{ mt: 0.5 }}
                     />
                     <Box display="flex" gap={1}>
                       <Tooltip title="View Details">
